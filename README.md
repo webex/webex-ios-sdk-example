@@ -4,10 +4,10 @@ Kitchen Sink is a developer friendly sample implementation of Webex client SDK a
 
 ## Screenshots 
 <ul>
-<img src="https://sqbu-github.cisco.com/SDK4Spark/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0613.jpg" width="22%" height="23%">
-<img src="https://sqbu-github.cisco.com/SDK4Spark/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0618.jpg" width="22%" height="23%">
-<img src="https://sqbu-github.cisco.com/SDK4Spark/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0614.jpg" width="22%" height="23%">
-<img src="https://sqbu-github.cisco.com/SDK4Spark/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0616.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0613.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0618.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0614.jpg" width="22%" height="23%">
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/ScreenShots/IMG_0616.jpg" width="22%" height="23%">
 </ul>
 
 1. ScreenShot-1: Main page of Application, listing main functions of this demo.
@@ -226,4 +226,4 @@ Below is code snippets of the SDK calling in the demo.
         4.2.3 select the KitchenSinkBroadcastExtension, tap Start Broadcast button
 # Buddies-App
 Here is another demo app-"Buddies", which is more implemented as production application, combined call functionalities with CallKit, included message/call UI-implementation which could be used as widgets.
-[GitHub-Buddies](https://sqbu-github.cisco.com/SDK4Spark/webex-ios-sdk-example-buddies)
+[GitHub-Buddies](https://github.com/webex/webex-ios-sdk-example-buddies)

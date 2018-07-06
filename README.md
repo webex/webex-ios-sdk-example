@@ -11,7 +11,7 @@ Kitchen Sink is a developer friendly sample implementation of Webex client SDK a
 </ul>
 
 1. ScreenShot-1: Main page of Application, listing main functions of this demo.
-1. ScreenShot-2: Calling peopel/room page.
+1. ScreenShot-2: Calling people/room page.
 1. ScreenShot-3: Iniciate call page, contains call recent/search/email/group.
 1. ScreenShot-4: Show messaing APIs with present payloads.
 

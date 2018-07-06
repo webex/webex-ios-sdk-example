@@ -155,7 +155,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Spark" translatesAutoresizingMaskIntoConstraints="NO" id="aP4-Hv-VoA">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Webex" translatesAutoresizingMaskIntoConstraints="NO" id="aP4-Hv-VoA">
                                 <rect key="frame" x="167" y="114" width="80" height="80"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="U43-3O-Bvu"/>
@@ -289,7 +289,7 @@
                                 <color key="textColor" red="0.41568627450000001" green="0.41960784309999999" blue="0.42352941179999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Spark" translatesAutoresizingMaskIntoConstraints="NO" id="tBu-Co-gJW">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Webex" translatesAutoresizingMaskIntoConstraints="NO" id="tBu-Co-gJW">
                                 <rect key="frame" x="167" y="114" width="80" height="80"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="80" id="ZTh-RU-5iv"/>
@@ -408,7 +408,7 @@
                                 <color key="textColor" red="0.41568627450000001" green="0.41960784309999999" blue="0.42352941179999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Spark" translatesAutoresizingMaskIntoConstraints="NO" id="1v8-6W-uLP">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Webex" translatesAutoresizingMaskIntoConstraints="NO" id="1v8-6W-uLP">
                                 <rect key="frame" x="167" y="114" width="80" height="80"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="80" id="eYc-qc-VO4"/>
@@ -528,7 +528,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Spark" translatesAutoresizingMaskIntoConstraints="NO" id="xOu-K1-FsD">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Webex" translatesAutoresizingMaskIntoConstraints="NO" id="xOu-K1-FsD">
                                                     <rect key="frame" x="167" y="-15" width="80" height="80"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="80" id="Nbr-pe-lc1"/>
@@ -2582,8 +2582,8 @@
         <image name="DefaultAvatar" width="80" height="80"/>
         <image name="MobileBG" width="360" height="640"/>
         <image name="MountainBackground" width="375" height="667"/>
-        <image name="Spark" width="51" height="51"/>
         <image name="Wallpaper" width="833" height="468"/>
+        <image name="Webex" width="66" height="66"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="bcn-z4-zYB"/>

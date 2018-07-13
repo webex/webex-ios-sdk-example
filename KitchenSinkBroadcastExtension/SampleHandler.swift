@@ -14,7 +14,7 @@ class SampleHandler: RPBroadcastSampleHandler {
     override func broadcastStarted(withSetupInfo setupInfo: [String : NSObject]?) {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional.
         
-        WebexBroadcastExtension.sharedInstance.start(applicationGroupIdentifier: "group.com.cisco.sparkSDK.demo") {
+        WebexBroadcastExtension.sharedInstance.start(applicationGroupIdentifier: "group.com.cisco.webexSDK.demo") {
             error in
             if let webexError = error {
                 switch webexError {

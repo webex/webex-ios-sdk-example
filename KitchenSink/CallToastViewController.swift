@@ -29,9 +29,7 @@ class CallToastViewController: BaseViewController {
     @IBOutlet weak var avatarViewHeight: NSLayoutConstraint!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
-    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
-    @IBOutlet weak var previewRenderView: MediaRenderView!
-    
+    @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!    
     /// answerBtn clicked block 
     var answerBtnClickedBlock : (()->())?
     

@@ -25,7 +25,7 @@ import Toast_Swift
 enum VideoCallRole {
     case CallPoster(String)
     case CallReceiver(String)
-    case RoomCallPoster(String, String)
+    case SpaceCallPoster(String, String)
 }
 
 class VideoCallViewController: BaseViewController {
@@ -159,9 +159,9 @@ class VideoCallViewController: BaseViewController {
                 self.didDialWithRemoteAddress(remoteAddress)
                 self.setupAvatarView(remoteAddress)
                 self.webexPersonWithEmailString(emailStr: remoteAddress)
-            case .RoomCallPoster(let roomId, let roomName):
-                self.didDialWithRemoteAddress(roomId)
-                self.setupAvatarView(roomName)
+            case .SpaceCallPoster(let spaceId, let spaceName):
+                self.didDialWithRemoteAddress(spaceId)
+                self.setupAvatarView(spaceName)
             }
             first = false
         }

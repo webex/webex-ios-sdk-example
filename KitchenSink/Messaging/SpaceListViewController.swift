@@ -1,5 +1,5 @@
 //
-//  RoomListViewController.swift
+//  SpaceListViewController.swift
 //  KitchenSink
 //
 //  Created by qucui on 2018/1/18.
@@ -15,23 +15,23 @@ enum SegmentType : Int{
     case space = 3
 }
 let cellHeight : CGFloat = 100.0
-class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource {
+class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource {
     
     fileprivate var backView: UIView?
     fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     fileprivate var segmentedControl: UISegmentedControl?
-    fileprivate var roomType: RoomType = RoomType.group
+    fileprivate var spaceType: SpaceType = SpaceType.group
     fileprivate var searchResult: [Person] = [Person]()
     fileprivate var historyResult: [Person] = [Person]()
-    fileprivate var spaceResult: [Room] = [Room]()
+    fileprivate var spaceResult: [Space] = [Space]()
     fileprivate var messageEmailTextField: UITextField?
     fileprivate var messageEmailBackView: UIView?
     fileprivate var historyTableView: UITableView?
-    fileprivate var roomTableView: UITableView?
+    fileprivate var spaceTableView: UITableView?
     fileprivate var searchTableView: UITableView!
     fileprivate let searchBar : UISearchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 40))
     fileprivate var currentSegType: SegmentType = SegmentType.history
-    fileprivate var createRoomButton: UIButton?
+    fileprivate var createSpaceButton: UIButton?
     
     
     /// saparkSDK reperesent for the WebexSDK API instance
@@ -83,15 +83,15 @@ class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableVi
     }
     
     // MARK: - WebexSDK: list Spaces
-    private func requestWebexRoomList(){
+    private func requestWebexSpaceList(){
         self.indicatorView.startAnimating()
-        self.webexSDK?.rooms.list(max: 5, type: self.roomType ,sortBy: RoomSortType.byLastActivity ,completionHandler: { (response: ServiceResponse<[Room]>) in
+        self.webexSDK?.spaces.list(max: 5, type: self.spaceType ,sortBy: SpaceSortType.byLastActivity ,completionHandler: { (response: ServiceResponse<[Space]>) in
             self.indicatorView.stopAnimating()
             switch response.result {
             case .success(let value):
                 self.spaceResult.removeAll()
                 self.spaceResult = value
-                self.roomTableView?.reloadData()
+                self.spaceTableView?.reloadData()
             case .failure:
                 break
             }
@@ -165,16 +165,16 @@ class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableVi
 
     public func messageWithPerson( _ person: Person){
         UserDefaultsUtil.addMessagePersonHistory(person)
-        let activityDetailVC = RoomDetailViewController()
+        let activityDetailVC = SpaceDetailViewController()
         activityDetailVC.emailAddress =  person.emails?.first?.toString()
         activityDetailVC.webexSDK = self.webexSDK
         self.navigationController?.pushViewController(activityDetailVC, animated: true)
     }
     
-    public func messageWithRoom( _ roomModel: Room?){
-        if let room = roomModel{
-            let activityDetailVC = RoomDetailViewController()
-            activityDetailVC.roomModel = room
+    public func messageWithSpace( _ spaceModel: Space?){
+        if let space = spaceModel{
+            let activityDetailVC = SpaceDetailViewController()
+            activityDetailVC.spaceModel = space
             activityDetailVC.webexSDK = self.webexSDK
             self.navigationController?.pushViewController(activityDetailVC, animated: true)
         }
@@ -255,29 +255,29 @@ class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableVi
     }
     
     private func setUpSpaceTableView(){
-        if self.roomTableView == nil{
-            self.roomTableView = UITableView(frame:  CGRect(x: 0.0, y: 0.0, width: kScreenWidth, height: kScreenHeight-kNavHeight), style: .plain)
-            self.roomTableView?.showsVerticalScrollIndicator = false
-            self.roomTableView?.separatorStyle = .none
-            self.roomTableView?.dataSource = self
-            self.roomTableView?.delegate = self
-            self.backView?.addSubview(self.roomTableView!)
+        if self.spaceTableView == nil{
+            self.spaceTableView = UITableView(frame:  CGRect(x: 0.0, y: 0.0, width: kScreenWidth, height: kScreenHeight-kNavHeight), style: .plain)
+            self.spaceTableView?.showsVerticalScrollIndicator = false
+            self.spaceTableView?.separatorStyle = .none
+            self.spaceTableView?.dataSource = self
+            self.spaceTableView?.delegate = self
+            self.backView?.addSubview(self.spaceTableView!)
             
-            self.createRoomButton = UIButton(frame: CGRect(x: kScreenWidth/2-40, y: kScreenHeight-kNavHeight*2-80, width: 80, height: 80))
-            self.createRoomButton?.setImage(UIImage.fontAwesomeIcon(name: .plus, textColor: UIColor.white, size: CGSize.init(width: 50*Utils.WIDTH_SCALE , height: 50*Utils.WIDTH_SCALE)), for: .normal)
-            self.createRoomButton?.setImage(UIImage.fontAwesomeIcon(name: .plus, textColor: UIColor.gray, size: CGSize.init(width: 50*Utils.WIDTH_SCALE , height: 50*Utils.WIDTH_SCALE)), for: .highlighted)
-            self.createRoomButton?.backgroundColor = UIColor.buttonGreenNormal()
-            self.createRoomButton?.addTarget(self, action: #selector(createRoomBtnClicked), for: .touchUpInside)
-            self.createRoomButton?.layer.cornerRadius = 40.0
-            self.createRoomButton?.layer.masksToBounds = true
-            self.backView?.addSubview(self.createRoomButton!)
+            self.createSpaceButton = UIButton(frame: CGRect(x: kScreenWidth/2-40, y: kScreenHeight-kNavHeight*2-80, width: 80, height: 80))
+            self.createSpaceButton?.setImage(UIImage.fontAwesomeIcon(name: .plus, textColor: UIColor.white, size: CGSize.init(width: 50*Utils.WIDTH_SCALE , height: 50*Utils.WIDTH_SCALE)), for: .normal)
+            self.createSpaceButton?.setImage(UIImage.fontAwesomeIcon(name: .plus, textColor: UIColor.gray, size: CGSize.init(width: 50*Utils.WIDTH_SCALE , height: 50*Utils.WIDTH_SCALE)), for: .highlighted)
+            self.createSpaceButton?.backgroundColor = UIColor.buttonGreenNormal()
+            self.createSpaceButton?.addTarget(self, action: #selector(createSpaceBtnClicked), for: .touchUpInside)
+            self.createSpaceButton?.layer.cornerRadius = 40.0
+            self.createSpaceButton?.layer.masksToBounds = true
+            self.backView?.addSubview(self.createSpaceButton!)
         }
-        self.roomTableView?.addSubview(self.indicatorView)
-        self.indicatorView.center = (self.roomTableView?.center)!
-        self.requestWebexRoomList()
-        self.backView?.bringSubview(toFront: self.roomTableView!)
-        self.backView?.bringSubview(toFront: self.createRoomButton!)
-        self.roomTableView?.reloadData()
+        self.spaceTableView?.addSubview(self.indicatorView)
+        self.indicatorView.center = (self.spaceTableView?.center)!
+        self.requestWebexSpaceList()
+        self.backView?.bringSubview(toFront: self.spaceTableView!)
+        self.backView?.bringSubview(toFront: self.createSpaceButton!)
+        self.spaceTableView?.reloadData()
     }
 
     // MARK: table view delegate
@@ -310,18 +310,18 @@ class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableVi
             }
             let person = dataSource?[indexPath.row]
             cell?.updateWithPersonModel(person)
-            cell?.roomListVC = self
+            cell?.spaceListVC = self
             return cell!
         }else{
-            var cell = tableView.dequeueReusableCell(withIdentifier: "MessageRoomCell") as? MessageRoomCell
+            var cell = tableView.dequeueReusableCell(withIdentifier: "MessageSpaceCell") as? MessageSpaceCell
             if cell == nil{
-                cell = MessageRoomCell(style: .default, reuseIdentifier: "MessageRoomCell")
+                cell = MessageSpaceCell(style: .default, reuseIdentifier: "MessageSpaceCell")
             }
-            let dataSource: [Room]?
+            let dataSource: [Space]?
             dataSource = spaceResult
-            let room = dataSource?[indexPath.row]
-            cell?.updateWithRoom(room)
-            cell?.roomListVC = self
+            let space = dataSource?[indexPath.row]
+            cell?.updateWithSpace(space)
+            cell?.spaceListVC = self
             return cell!
         }
 
@@ -362,14 +362,14 @@ class RoomListViewController: BaseViewController, UISearchBarDelegate, UITableVi
     }
     
     // MARK: create sapce button clicked
-    @objc private func createRoomBtnClicked(){
-        let createRoomVC = CreateGroupViewControlller()
-        createRoomVC.webexSDK = self.webexSDK
-        createRoomVC.spaceCreatedBlock = { room in
-            self.spaceResult.insert(room, at: 0)
-            self.roomTableView?.reloadData()
+    @objc private func createSpaceBtnClicked(){
+        let createSpaceVC = CreateGroupViewControlller()
+        createSpaceVC.webexSDK = self.webexSDK
+        createSpaceVC.spaceCreatedBlock = { space in
+            self.spaceResult.insert(space, at: 0)
+            self.spaceTableView?.reloadData()
         }
-        self.navigationController?.pushViewController(createRoomVC, animated: true)
+        self.navigationController?.pushViewController(createSpaceVC, animated: true)
     }
     
     override func dissmissKeyboard() {

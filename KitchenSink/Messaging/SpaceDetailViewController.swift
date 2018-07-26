@@ -9,10 +9,10 @@
 import UIKit
 import WebexSDK
 
-class RoomDetailViewController: BaseViewController, UIImagePickerControllerDelegate , UINavigationControllerDelegate {
+class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDelegate , UINavigationControllerDelegate {
     
-    var roomModel: Room?
-    var roomId: String?
+    var spaceModel: Space?
+    var spaceId: String?
     var emailAddress: String?
     private var contentTextView: UITextView?
     private var fileContentsView: UIScrollView?
@@ -85,13 +85,13 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
         }
         
         self.setUpFileContentsView(files: [])
-        if let room = self.roomModel{
-            self.webexSDK?.messages.post(roomId: room.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
+        if let space = self.spaceModel{
+            self.webexSDK?.messages.post(spaceId: space.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
                 switch response.result{
                 case .success(let message):
                     /// Send Message Call Back Code Here
                     self.title = "Sent Sucess!"
-                    self.roomId = message.roomId
+                    self.spaceId = message.spaceId
                     self.updateMessageAcitivty(message)
                     break
                 case .failure(let error):
@@ -112,7 +112,7 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
                                             case .success(let message):
                                                 /// Send Message Call Back Code Here
                                                 self.title = "Sent Sucess!"
-                                                self.roomId = message.roomId
+                                                self.spaceId = message.spaceId
                                                 self.updateMessageAcitivty(message)
                                                 break
                                             case .failure(let error):
@@ -188,9 +188,9 @@ class RoomDetailViewController: BaseViewController, UIImagePickerControllerDeleg
     // MARK: - UI Implementation
     public func setupView(){
         self.view.backgroundColor = UIColor.white
-        if let room = self.roomModel{
-            self.title = room.title
-            self.roomId = room.id
+        if let space = self.spaceModel{
+            self.title = space.title
+            self.spaceId = space.id
         }else if let email = self.emailAddress{
             self.title = email
         }else{

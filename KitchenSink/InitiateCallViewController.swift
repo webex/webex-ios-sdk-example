@@ -35,7 +35,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate let searchController = UISearchController(searchResultsController: nil)
     fileprivate var searchResult: [Person]?
     fileprivate var historyResult: [Person]?
-    fileprivate var spaceResult: [Room]?
+    fileprivate var spaceResult: [Space]?
     fileprivate var dialEmail: String?
     fileprivate var segmentedControl: UISegmentedControl?
     
@@ -66,8 +66,8 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         self.presentVideoCallView(emailAddress)
     }
     
-    func dialRoomWithRoomId(_ roomId: String, _ roomName: String){
-        self.presentRoomVideoCallView(roomId,roomName)
+    func dialSpaceWithSpaceId(_ spaceId: String, _ spaceName: String){
+        self.presentSpaceVideoCallView(spaceId,spaceName)
     }
     
     fileprivate func presentVideoCallView(_ remoteAddr: String) {
@@ -78,9 +78,9 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         }
     }
     
-    fileprivate func presentRoomVideoCallView(_ roomId: String, _ roomName: String) {
+    fileprivate func presentSpaceVideoCallView(_ spaceId: String, _ spaceName: String) {
         if let videoCallViewController = (storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController) {
-            videoCallViewController.videoCallRole = VideoCallRole.RoomCallPoster(roomId, roomName)
+            videoCallViewController.videoCallRole = VideoCallRole.SpaceCallPoster(spaceId, spaceName)
             videoCallViewController.webexSDK = self.webexSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }
@@ -124,9 +124,9 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     }
     
     // MARK: - WebexSDK: list Space
-    private func webexListRoom(){
+    private func webexListSpace(){
         self.indicatorView.startAnimating()
-        self.webexSDK?.rooms.list(type: RoomType.group ,completionHandler: { (response: ServiceResponse<[Room]>) in
+        self.webexSDK?.spaces.list(type: SpaceType.group ,completionHandler: { (response: ServiceResponse<[Space]>) in
             self.indicatorView.stopAnimating()
             switch response.result {
             case .success(let value):
@@ -237,7 +237,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         spaceTableView.isHidden = hidden
         
         if !hidden {
-            self.webexListRoom()
+            self.webexListSpace()
         }
     }
     
@@ -320,17 +320,17 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         }else{
              let cell = tableView.dequeueReusableCell(withIdentifier: "SpaceCell", for: indexPath) as! SpaceTableViewCell
             
-            let dataSource: [Room]?
+            let dataSource: [Space]?
             
             dataSource = spaceResult
             
-            let room = dataSource?[indexPath.row]
-            let roomName = room?.title
-            let roomId = room?.id
-            cell.roomId = roomId
-            cell.roomName = roomName
+            let space = dataSource?[indexPath.row]
+            let spaceName = space?.title
+            let spaceId = space?.id
+            cell.spaceId = spaceId
+            cell.spaceName = spaceName
             cell.initiateCallViewController = self
-            cell.spaceNameLabel.text = roomName
+            cell.spaceNameLabel.text = spaceName
             
             return cell
         }

@@ -204,7 +204,7 @@ class HomeTableViewController: BaseTableViewController {
     }
     
     @IBAction func messageBtnClicked(){
-        let messageVC = RoomListViewController()
+        let messageVC = SpaceListViewController()
         messageVC.webexSDK = self.webexSDK
         self.navigationController?.pushViewController(messageVC, animated: true)
     }

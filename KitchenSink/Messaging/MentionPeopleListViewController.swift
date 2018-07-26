@@ -13,7 +13,7 @@ class MentionPeopleListViewController: UIViewController, UITableViewDataSource, 
     fileprivate var tableView: UITableView!
     fileprivate var membershipResult: [Membership] = [Membership]()
     
-    public var roomId: String?
+    public var spaceId: String?
     public var completionBlock: ((Membership?)->Void)?
     /// saparkSDK reperesent for the WebexSDK API instance
     var webexSDK: Webex?
@@ -34,7 +34,7 @@ class MentionPeopleListViewController: UIViewController, UITableViewDataSource, 
     // MARK: - WebexSDK: list Memberships
     private func requestMemberShipList(){
         self.indicatorView.startAnimating()
-        self.webexSDK?.memberships.list(roomId: self.roomId!, completionHandler: { (response: ServiceResponse<[Membership]>) in
+        self.webexSDK?.memberships.list(spaceId: self.spaceId!, completionHandler: { (response: ServiceResponse<[Membership]>) in
             self.indicatorView.stopAnimating()
             switch response.result {
             case .success(let value):

@@ -16,7 +16,7 @@ class MessagePersonCell: UITableViewCell {
     private var nameLabel: UILabel!
     var messageButton: UIButton!
     private var line: CALayer?
-    var roomListVC: RoomListViewController!
+    var spaceListVC: SpaceListViewController!
     
     public func updateWithPersonModel(_ personModel: Person?){
         self.personModel = personModel
@@ -58,7 +58,7 @@ class MessagePersonCell: UITableViewCell {
     @objc func message(_ sender: UIButton) {
         if let model = self.personModel{
             UserDefaultsUtil.addMessagePersonHistory(self.personModel!)
-            roomListVC.messageWithPerson(model)
+            spaceListVC.messageWithPerson(model)
         }
     }
     

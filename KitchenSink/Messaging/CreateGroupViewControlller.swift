@@ -18,7 +18,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
     fileprivate var searchTableView: UITableView!
     fileprivate var selectedPersonList: [Person] = [Person]()
     fileprivate var selectedPersonTableView: UITableView!
-    public var spaceCreatedBlock: ((Room)->Void)?
+    public var spaceCreatedBlock: ((Space)->Void)?
     
     /// saparkSDK reperesent for the WebexSDK API instance
     var webexSDK: Webex?
@@ -75,13 +75,13 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
         }
         self.view?.addSubview(self.indicatorView)
         self.indicatorView.center = (self.view?.center)!
-        self.webexSDK?.rooms.create(title: spaceTitle) { (response: ServiceResponse<Room>) in
+        self.webexSDK?.spaces.create(title: spaceTitle) { (response: ServiceResponse<Space>) in
             switch response.result {
             case .success(let value):
                 let threahGroup = DispatchGroup()
                 for person in self.selectedPersonList{
                     DispatchQueue.global().async(group: threahGroup, execute: {
-                        self.webexSDK?.memberships.create(roomId: value.id!, personEmail:(person.emails?.first)!, completionHandler: { (response: ServiceResponse<Membership>) in
+                        self.webexSDK?.memberships.create(spaceId: value.id!, personEmail:(person.emails?.first)!, completionHandler: { (response: ServiceResponse<Membership>) in
                             switch response.result{
                             case .success(_):
                                 break
@@ -111,7 +111,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
         let nextButton = UIButton.init(frame: CGRect.init(x: 0, y: 0, width: 44, height: 44))
         nextButton.setTitle("Done", for: .normal)
         nextButton.setTitleColor(UIColor.blue, for: .normal)
-        nextButton.addTarget(self, action: #selector(createRoom), for: .touchUpInside)
+        nextButton.addTarget(self, action: #selector(createSpace), for: .touchUpInside)
         
         let rightView = UIView.init(frame:CGRect.init(x: 0, y: 0, width: 44, height: 44))
         rightView.addSubview(nextButton)
@@ -122,7 +122,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
         navigationItem.rightBarButtonItems = [fixBarSpacer,rightButtonItem]
     }
     
-    @objc private func createRoom(){
+    @objc private func createSpace(){
         if self.selectedPersonList.count == 0{
             let alert = UIAlertController(title: "Alert", message: "Need At Least One Member", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

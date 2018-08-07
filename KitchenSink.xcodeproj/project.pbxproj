@@ -22,15 +22,15 @@
 		04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */; };
 		04D9882A1CEDAEBF00C18422 /* CallRateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D988291CEDAEBF00C18422 /* CallRateViewController.swift */; };
 		101B64D0202174810037A35C /* CreateGroupViewControlller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101B64CF202174810037A35C /* CreateGroupViewControlller.swift */; };
-		10324BB320103F4900F2D405 /* RoomListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10324BB220103F4900F2D405 /* RoomListViewController.swift */; };
+		10324BB320103F4900F2D405 /* SpaceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10324BB220103F4900F2D405 /* SpaceListViewController.swift */; };
 		103B734920172E8A001B7469 /* KitchensinkInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103B734820172E8A001B7469 /* KitchensinkInputView.swift */; };
-		1054FC162010807A0020BE19 /* RoomDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1054FC152010807A0020BE19 /* RoomDetailViewController.swift */; };
+		1054FC162010807A0020BE19 /* SpaceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1054FC152010807A0020BE19 /* SpaceDetailViewController.swift */; };
 		1054FC1A2010C9BD0020BE19 /* TestImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 1054FC192010C9BD0020BE19 /* TestImage.png */; };
 		1054FC1C2010CADA0020BE19 /* thumbNail.png in Resources */ = {isa = PBXBuildFile; fileRef = 1054FC1B2010CADA0020BE19 /* thumbNail.png */; };
 		106A03191F3451CC00167542 /* WebexEnvirmonment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03171F3451CC00167542 /* WebexEnvirmonment.swift */; };
 		106A031A1F3451CC00167542 /* VideoAudioSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106A03181F3451CC00167542 /* VideoAudioSetting.swift */; };
 		106DA2FB201F19EE0069C9CE /* MessagePersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */; };
-		107D247B201053900083C9CE /* MessageRoomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107D247A201053900083C9CE /* MessageRoomCell.swift */; };
+		107D247B201053900083C9CE /* MessageSpaceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107D247A201053900083C9CE /* MessageSpaceCell.swift */; };
 		10B3029620183CC700E8F96B /* MentionPeopleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */; };
 		10B3029B2018476E00E8F96B /* MembershipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B3029A2018476E00E8F96B /* MembershipCell.swift */; };
 		10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */; };
@@ -106,15 +106,15 @@
 		04D988291CEDAEBF00C18422 /* CallRateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallRateViewController.swift; sourceTree = "<group>"; };
 		100439F7B25246FAC6F6EC9C /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
 		101B64CF202174810037A35C /* CreateGroupViewControlller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupViewControlller.swift; sourceTree = "<group>"; };
-		10324BB220103F4900F2D405 /* RoomListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomListViewController.swift; sourceTree = "<group>"; };
+		10324BB220103F4900F2D405 /* SpaceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceListViewController.swift; sourceTree = "<group>"; };
 		103B734820172E8A001B7469 /* KitchensinkInputView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KitchensinkInputView.swift; sourceTree = "<group>"; };
-		1054FC152010807A0020BE19 /* RoomDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomDetailViewController.swift; sourceTree = "<group>"; };
+		1054FC152010807A0020BE19 /* SpaceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpaceDetailViewController.swift; sourceTree = "<group>"; };
 		1054FC192010C9BD0020BE19 /* TestImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TestImage.png; sourceTree = "<group>"; };
 		1054FC1B2010CADA0020BE19 /* thumbNail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumbNail.png; sourceTree = "<group>"; };
 		106A03171F3451CC00167542 /* WebexEnvirmonment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexEnvirmonment.swift; sourceTree = "<group>"; };
 		106A03181F3451CC00167542 /* VideoAudioSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoAudioSetting.swift; sourceTree = "<group>"; };
 		106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagePersonCell.swift; sourceTree = "<group>"; };
-		107D247A201053900083C9CE /* MessageRoomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRoomCell.swift; sourceTree = "<group>"; };
+		107D247A201053900083C9CE /* MessageSpaceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSpaceCell.swift; sourceTree = "<group>"; };
 		10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionPeopleListViewController.swift; sourceTree = "<group>"; };
 		10B3029A2018476E00E8F96B /* MembershipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembershipCell.swift; sourceTree = "<group>"; };
 		10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceTableViewCell.swift; sourceTree = "<group>"; };
@@ -272,10 +272,10 @@
 			isa = PBXGroup;
 			children = (
 				103B734820172E8A001B7469 /* KitchensinkInputView.swift */,
-				10324BB220103F4900F2D405 /* RoomListViewController.swift */,
-				1054FC152010807A0020BE19 /* RoomDetailViewController.swift */,
+				10324BB220103F4900F2D405 /* SpaceListViewController.swift */,
+				1054FC152010807A0020BE19 /* SpaceDetailViewController.swift */,
 				10B3029520183CC700E8F96B /* MentionPeopleListViewController.swift */,
-				107D247A201053900083C9CE /* MessageRoomCell.swift */,
+				107D247A201053900083C9CE /* MessageSpaceCell.swift */,
 				10B3029A2018476E00E8F96B /* MembershipCell.swift */,
 				106DA2FA201F19EE0069C9CE /* MessagePersonCell.swift */,
 				101B64CF202174810037A35C /* CreateGroupViewControlller.swift */,
@@ -375,6 +375,7 @@
 				04AE18201CDAD3D800A8F078 /* Resources */,
 				C7626039205F530900219F95 /* Embed App Extensions */,
 				7F0D3195945D6E2913F07BEB /* [CP] Embed Pods Frameworks */,
+				3EBA472D36A7F77918A78F52 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -395,6 +396,7 @@
 				C7626016205F530800219F95 /* Sources */,
 				C7626017205F530800219F95 /* Frameworks */,
 				C7626018205F530800219F95 /* Resources */,
+				9B43AA0327817E8C2764B091 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -514,6 +516,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3EBA472D36A7F77918A78F52 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		7F0D3195945D6E2913F07BEB /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -576,6 +593,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		9B43AA0327817E8C2764B091 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		F99255BD830BF38937CCFDD6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -612,14 +644,14 @@
 				C785D3101E9494A300A5A648 /* Utils.swift in Sources */,
 				04AE18281CDAD3D800A8F078 /* StartViewController.swift in Sources */,
 				5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */,
-				1054FC162010807A0020BE19 /* RoomDetailViewController.swift in Sources */,
+				1054FC162010807A0020BE19 /* SpaceDetailViewController.swift in Sources */,
 				C7D086E81E9B6FAA00FC662B /* KSLabel.swift in Sources */,
 				10B3029B2018476E00E8F96B /* MembershipCell.swift in Sources */,
 				04419ABA1CE065E0002BAFC2 /* WaitingCallViewController.swift in Sources */,
 				106A03191F3451CC00167542 /* WebexEnvirmonment.swift in Sources */,
 				0471A25A1CDC5ECD00C6647E /* VideoCallViewController.swift in Sources */,
 				0471A25C1CDC655200C6647E /* InitiateCallViewController.swift in Sources */,
-				10324BB320103F4900F2D405 /* RoomListViewController.swift in Sources */,
+				10324BB320103F4900F2D405 /* SpaceListViewController.swift in Sources */,
 				0471A2561CDB429B00C6647E /* HomeTableViewController.swift in Sources */,
 				04AE18261CDAD3D800A8F078 /* AppDelegate.swift in Sources */,
 				101B64D0202174810037A35C /* CreateGroupViewControlller.swift in Sources */,
@@ -631,7 +663,7 @@
 				C7371292210965E800FCBF82 /* ParticipantTableViewCell.swift in Sources */,
 				106DA2FB201F19EE0069C9CE /* MessagePersonCell.swift in Sources */,
 				0471A2581CDC438300C6647E /* WebexLoginViewController.swift in Sources */,
-				107D247B201053900083C9CE /* MessageRoomCell.swift in Sources */,
+				107D247B201053900083C9CE /* MessageSpaceCell.swift in Sources */,
 				C785D3221E95EE6400A5A648 /* UserDefaultUtil.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -28,7 +28,7 @@ enum VideoCallRole {
     case SpaceCallPoster(String, String)
 }
 
-class VideoCallViewController: BaseViewController {
+class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     // MARK: - UI Outlets variables
     @IBOutlet private weak var disconnectionTypeLabel: UILabel!
@@ -68,12 +68,10 @@ class VideoCallViewController: BaseViewController {
     
     @IBOutlet weak var callControlItem: UITabBarItem!
     
-    @IBOutlet weak var auxiliaryVideoItem: UITabBarItem!
+    @IBOutlet weak var auxiliaryStreamItem: UITabBarItem!
     
     @IBOutlet weak var participantsItem: UITabBarItem!
-
-
-    @IBOutlet var auxVideoMuteViews: [UIView]!
+    
     @IBOutlet var auxVideoNameLabels: [UILabel]!
     @IBOutlet var auxVideoViews: [MediaRenderView]!
     @IBOutlet weak var callControlView: UIView!
@@ -92,8 +90,8 @@ class VideoCallViewController: BaseViewController {
     private var first: Bool = true
     private var participantArray: [CallMembership] = []
     private var personInfoArray: [Person] = []
-    private var subscribedAuxViews: [MediaRenderView] = []
-    private var auxiliaryVideoUI: [AuxiliaryVideoUICollection] = []
+    private var openedAuxViews: [MediaRenderView] = []
+    private var auxiliaryVideoUI: [AuxiliaryStreamUICollection] = []
     
     override var navigationTitle: String? {
         get {
@@ -136,6 +134,7 @@ class VideoCallViewController: BaseViewController {
     /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet private weak var remoteView: MediaRenderView!
     
+    /// MediaRenderView is an OpenGL backed UIView
     @IBOutlet weak var screenShareView: MediaRenderView!
     
     
@@ -144,6 +143,15 @@ class VideoCallViewController: BaseViewController {
     
     /// currentCall represent current processing call instance
     var currentCall: Call?
+    
+    ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
+    var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
+    
+    ///onAuxStreamAvailable represent the call back when current call have a new auxiliary stream.
+    var onAuxStreamAvailable: (() -> MediaRenderView?)?
+    
+    ///onAuxStreamUnavailable represent the call back when current call have a existing auxiliary stream being unavailable.
+    var onAuxStreamUnavailable: (() -> MediaRenderView?)?
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
@@ -423,13 +431,8 @@ class VideoCallViewController: BaseViewController {
                     case .sendingScreenShare(let startedSending):
                         strongSelf.screenShareSwitch.isOn = startedSending
                         
-                    case .activeSpeakerChangedEvent(let membership):
-                        print("========activeSpeakerChangedEvent:\(membership.email ?? "")============")
+                    case .activeSpeakerChangedEvent(_,_):
                         strongSelf.updateActiveSpeakerView()
-                        break
-                    case .remoteAuxVideosCount(let count):
-                        print("========remoteAuxVideosCount:\(count)============")
-                        strongSelf.subscribeRemoteAuxiliaryVideo(count: count)
                         break
                     default:
                         break
@@ -469,27 +472,50 @@ class VideoCallViewController: BaseViewController {
                 
             }
             
-            call.onRemoteAuxVideoChanged = {
-                event in
-                switch event {
-                case .remoteAuxVideoPersonChangedEvent(let remoteAuxVideo):
-                    print("========remoteAuxVideoPersonChangedEvent:\(remoteAuxVideo.person?.email ?? "none")============")
-                    self.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
-                case .receivingAuxVideoEvent(let remoteAuxVideo):
-                    print("========receivingAuxVideoEvent:\(remoteAuxVideo.person?.email ?? "none")============")
-                    print("========remoteAuxSendingVideoEvent isSending:\(remoteAuxVideo.isReceivingVideo)============")
-                    self.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
-                case .remoteAuxSendingVideoEvent(let remoteAuxVideo):
-                    print("========remoteAuxSendingVideoEvent:\(remoteAuxVideo.person?.email ?? "none")============")
-                    print("========remoteAuxSendingVideoEvent isSending:\(remoteAuxVideo.isSendingVideo)============")
-                    self.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
-                    break
-                case .remoteAuxVideoSizeChangedEvent(let remoteAuxVideo):
-                    print("Auxiliary video size changed:\(remoteAuxVideo.remoteAuxVideoSize)")
-                    break
+            call.multiStreamObserver = self
+            
+            self.onAuxStreamAvailable = { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.updateBadgeValue()
+                    return strongSelf.auxiliaryVideoUI.filter({!$0.inUse}).first?.mediaRenderView
                 }
+                return nil
+            }
+
+            self.onAuxStreamUnavailable = { [weak self] in
+                if let strongSelf = self {
+                    strongSelf.updateBadgeValue()
+                    return strongSelf.auxiliaryVideoUI.filter({$0.inUse}).last?.mediaRenderView
+                }
+                return nil
             }
             
+            self.onAuxStreamChanged = { [weak self] event in
+                if let strongSelf = self {
+                    switch event {
+                    case .auxStreamOpenedEvent(let view, let result):
+                        switch result {
+                        case .success(let auxStream):
+                            strongSelf.openedAuxiliaryUI(view: view, auxStream: auxStream)
+                        case .failure(let error):
+                            print("========\(error)=====")
+                        }
+                    case .auxStreamPersonChangedEvent(let auxStream,_,_):
+                        strongSelf.updateAuxiliaryUIBy(auxStream:auxStream)
+                    case .auxStreamSendingVideoEvent(let auxStream):
+                        strongSelf.updateAuxiliaryUIBy(auxStream: auxStream)
+                    case .auxStreamSizeChangedEvent(let auxStream):
+                        print("Auxiliary stream size changed:\(auxStream.auxStreamSize)")
+                        break
+                    case .auxStreamClosedEvent(let view, let error):
+                        if error == nil {
+                            strongSelf.closedAuxiliaryUI(view: view)
+                        } else {
+                            print("=====auxStreamClosedEvent error:\(String(describing: error))")
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -515,39 +541,6 @@ class VideoCallViewController: BaseViewController {
             }
         } else {
             print("could not parse email address \(emailStr) for retrieving user profile")
-        }
-    }
-    
-    // MARK: - SDK subscribe auxiliary video
-    private func subscribeRemoteAuxiliaryVideo(count:Int) {
-        self.auxiliaryVideoItem.badgeValue = count == 0 ? nil:String(count)
-        // more auxiliary videos coming subscribe it if less than four view.
-        if count > self.auxiliaryVideoUI.filter({$0.inUse}).count {
-            if let videoUI = self.auxiliaryVideoUI.filter({!$0.inUse}).first {
-                self.currentCall?.subscribeRemoteAuxVideo(view: videoUI.mediaRenderView) {
-                    result in
-                    switch result {
-                    case .success(let remoteAuxVideo):
-                        videoUI.remoteAuxVideo = remoteAuxVideo
-                        self.updateAuxiliaryUI(remoteAuxVideo: remoteAuxVideo)
-                    case .failure(let error):
-                        print("ERROR: \(String(describing: error))")
-                        break
-                    }
-                }
-            }
-        // some auxiliary videos ended, unsubscribe these and relese these view.
-        } else if count < self.auxiliaryVideoUI.filter({$0.inUse}).count {
-            if let videoUI = self.auxiliaryVideoUI.filter({$0.inUse}).last, let remoteAuxVideo = videoUI.remoteAuxVideo {
-                self.currentCall?.unsubscribeRemoteAuxVideo(remoteAuxVideo: remoteAuxVideo) {
-                    error in
-                    if error != nil {
-                        print("ERROR: \(String(describing: error))")
-                    } else {
-                        videoUI.remoteAuxVideo = nil
-                    }
-                }
-            }
         }
     }
     
@@ -645,9 +638,9 @@ class VideoCallViewController: BaseViewController {
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.callControlItem.selectedImage =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryVideoItem.image =
+        self.auxiliaryStreamItem.image =
             UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryVideoItem.selectedImage =
+        self.auxiliaryStreamItem.selectedImage =
             UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         
         callFunctionTabBar.delegate = self
@@ -656,7 +649,7 @@ class VideoCallViewController: BaseViewController {
         self.callFunctionTabBar.selectedItem = callControlItem
         
         for index in 0..<self.auxVideoViews.count {
-            self.auxiliaryVideoUI.append(AuxiliaryVideoUICollection.init(nameLabel: auxVideoNameLabels[index], muteView: auxVideoMuteViews[index], mediaRenderView: auxVideoViews[index]))
+            self.auxiliaryVideoUI.append(AuxiliaryStreamUICollection.init(nameLabel: auxVideoNameLabels[index],mediaRenderView: auxVideoViews[index]))
         }
     }
     
@@ -912,9 +905,11 @@ class VideoCallViewController: BaseViewController {
         self.callFunctionTabBar.isHidden = true
         self.hideDialpadButton(true)
     }
-
+    
     private func showAvatarContainerView(_ shown: Bool) {
-        self.avatarContainerView.isHidden = !shown
+        DispatchQueue.main.async {
+            self.avatarContainerView.isHidden = !shown
+        }
     }
     
     private func hideDialpadView(_ hidden: Bool) {
@@ -993,19 +988,36 @@ class VideoCallViewController: BaseViewController {
     }
     
     private func updateParticipantTable() {
-        self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined}) ?? []
-        self.participantsTableView.reloadData()
+        DispatchQueue.main.async {
+            self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined}) ?? []
+            self.participantsTableView.reloadData()
+        }
     }
     
     private func updateActiveSpeakerView() {
-        self.participantsTableView.reloadData()
+        DispatchQueue.main.async {
+            self.participantsTableView.reloadData()
+        }
     }
     
-    private func updateAuxiliaryUI(remoteAuxVideo:RemoteAuxVideo) {
-        if let auxiliaryUI = self.auxiliaryVideoUI.filter({ remoteAuxVideo.containRenderView(view:$0.mediaRenderView)}).first {
-            if let fetchedPerson = self.personInfoArray.filter({$0.id == remoteAuxVideo.person?.personId}).first {
+    private func openedAuxiliaryUI(view:MediaRenderView,auxStream:AuxStream) {
+        if let auxiliaryUI = self.auxiliaryVideoUI.filter({$0.mediaRenderView == view }).first {
+            auxiliaryUI.auxStream = auxStream
+            self.updateAuxiliaryUIBy(auxStream: auxStream)
+        }
+    }
+    
+    private func closedAuxiliaryUI(view:MediaRenderView) {
+        if let auxiliaryUI = self.auxiliaryVideoUI.filter({$0.mediaRenderView == view }).first {
+            auxiliaryUI.auxStream = nil
+        }
+    }
+    
+    private func updateAuxiliaryUIBy(auxStream:AuxStream) {
+        if let auxiliaryUI = self.auxiliaryVideoUI.filter({ $0.mediaRenderView == auxStream.renderView }).first {
+            if let fetchedPerson = self.personInfoArray.filter({$0.id == auxStream.person?.personId}).first {
                 auxiliaryUI.update(person: fetchedPerson)
-            } else if let personId = remoteAuxVideo.person?.personId {
+            } else if let personId = auxStream.person?.personId {
                 self.webexSDK?.people.get(personId: personId) { [weak self] response in
                     if self != nil {
                         switch response.result {
@@ -1018,8 +1030,19 @@ class VideoCallViewController: BaseViewController {
                         }
                     }
                 }
+            } else {
+                auxiliaryUI.update(person: nil)
             }
         }
+    }
+    
+    func updateBadgeValue() {
+        if let auxStreamCount = self.currentCall?.availableAuxStreamCount, auxStreamCount != 0 {
+            self.auxiliaryStreamItem.badgeValue = String(auxStreamCount)
+        } else {
+            self.auxiliaryStreamItem.badgeValue = nil
+        }
+        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.count)
     }
     
     // MARK: Slide In View SetUp
@@ -1193,14 +1216,13 @@ class VideoCallViewController: BaseViewController {
     }
     
     //MARK: - Auxiliary UI class(views container and update method)
-    private class AuxiliaryVideoUICollection {
+    private class AuxiliaryStreamUICollection {
         var avatarImageView: UIImageView
         let nameLabel: UILabel
-        let muteView: UIView
         let mediaRenderView: MediaRenderView
-        var remoteAuxVideo: RemoteAuxVideo? {
+        var auxStream: AuxStream? {
             didSet {
-                if remoteAuxVideo == nil {
+                if auxStream == nil {
                     cleanUp()
                 }
             }
@@ -1209,85 +1231,64 @@ class VideoCallViewController: BaseViewController {
         
         var inUse: Bool {
             get {
-                return remoteAuxVideo != nil
+                return auxStream != nil
             }
         }
         
         private var currentPerson: Person?
         private var currentAvatar: UIImage?
         
-        init(nameLabel: UILabel, muteView: UIView, mediaRenderView: MediaRenderView) {
+        init(nameLabel: UILabel, mediaRenderView: MediaRenderView) {
             self.nameLabel = nameLabel
-            self.muteView = muteView
             self.mediaRenderView = mediaRenderView
             self.noVideoView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
+            self.mediaRenderView.addSubview(self.noVideoView)
+            self.noVideoView.translatesAutoresizingMaskIntoConstraints = false
+            self.mediaRenderView.addConstraints([NSLayoutConstraint.init(item: self.noVideoView, attribute: .width, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .width, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .height, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .height, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .centerX, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .centerX, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .centerY, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .centerY, multiplier: 1, constant: 0)])
+            
+            
             self.noVideoView.backgroundColor = self.mediaRenderView.backgroundColor
-            self.remoteAuxVideo = nil
+            self.auxStream = nil
             self.avatarImageView = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
-            self.muteView.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:))))
-            self.muteView.isHidden = true
+            self.noVideoView.addSubview(self.avatarImageView)
+            self.avatarImageView.translatesAutoresizingMaskIntoConstraints = false
+            self.noVideoView.addConstraints([NSLayoutConstraint.init(item: self.avatarImageView, attribute: .width, relatedBy: .equal, toItem: self.noVideoView, attribute: .width, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .height, relatedBy: .equal, toItem: self.noVideoView, attribute: .height, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .centerX, relatedBy: .equal, toItem: self.noVideoView, attribute: .centerX, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: self.noVideoView, attribute: .centerY, multiplier: 1, constant: 0)])
             self.currentPerson = nil
         }
         
         private func cleanUp() {
             self.nameLabel.text = "Waiting.."
-            self.muteView.isHidden = true
             self.avatarImageView.image = nil
-            self.avatarImageView.removeFromSuperview()
-            self.noVideoView.removeFromSuperview()
-            self.mediaRenderView.addSubview(self.noVideoView)
+            self.avatarImageView.isHidden = true
+            self.noVideoView.isHidden = false
+            self.mediaRenderView.bringSubview(toFront: self.noVideoView)
             self.currentPerson = nil
         }
         
-        func update(person:Person) {
-            if let remoteAux = self.remoteAuxVideo {
-                self.muteView.isHidden = false
-                self.nameLabel.text = person.displayName
-                if remoteAux.isReceivingVideo && remoteAux.isSendingVideo {
-                    self.noVideoView.removeFromSuperview()
-                    self.avatarImageView.removeFromSuperview()
-                } else if !remoteAux.isReceivingVideo && remoteAux.isSendingVideo {
-                    self.avatarImageView.removeFromSuperview()
-                    self.nameLabel.text = "Waiting.."
-                    self.mediaRenderView.addSubview(self.noVideoView)
-                }else {
-                    self.noVideoView.addSubview(self.avatarImageView)
-                    if self.currentPerson?.id != person.id {
-                        self.avatarImageView.image = nil
-                        Utils.downloadAvatarImage(person.avatar, completionHandler: {
-                            self.avatarImageView.image = $0
-                            self.currentAvatar = $0
-                            self.currentPerson = person
-                        })
-                    } else {
-                        self.avatarImageView.image = self.currentAvatar
+        func update(person:Person?) {
+            DispatchQueue.main.async {
+                if let stream = self.auxStream, let updatePerson = person {
+                    self.nameLabel.text = updatePerson.displayName
+                    if stream.isSendingVideo {
+                        self.noVideoView.isHidden = true
+                        self.avatarImageView.isHidden = true
+                    }  else {
+                        
+                        self.avatarImageView.isHidden = false
+                        if self.currentPerson?.id != updatePerson.id {
+                            self.avatarImageView.image = nil
+                            Utils.downloadAvatarImage(updatePerson.avatar, completionHandler: {
+                                self.avatarImageView.image = $0
+                                self.currentAvatar = $0
+                                self.currentPerson = updatePerson
+                            })
+                        } else {
+                            self.avatarImageView.image = self.currentAvatar
+                        }
+                        self.noVideoView.isHidden = false
                     }
-                    self.mediaRenderView.addSubview(self.noVideoView)
-                }
-                self.updateCheckbox()
-            }
-        }
-        
-        @objc func handleCapGestureEvent(sender:UITapGestureRecognizer) {
-            if let view = sender.view , view == muteView, let auxVideo = self.remoteAuxVideo {
-                auxVideo.isReceivingVideo = !auxVideo.isReceivingVideo
-                if let person = self.currentPerson {
-                    self.update(person: person)
                 } else {
-                    self.avatarImageView.removeFromSuperview()
-                    self.nameLabel.text = "Waiting.."
-                    self.mediaRenderView.addSubview(self.noVideoView)
-                    self.updateCheckbox()
-                }
-            }
-        }
-        
-        private func updateCheckbox() {
-            if let imageView = muteView.viewWithTag(1) as? UIImageView, let auxVideo = self.remoteAuxVideo {
-                if auxVideo.isReceivingVideo {
-                    imageView.image = checkImage
-                } else {
-                    imageView.image = uncheckImage
+                    self.cleanUp()
                 }
             }
         }
@@ -1363,7 +1364,7 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.participantsTableView {
-            self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.count)
+            self.updateBadgeValue()
             return self.participantArray.count
         }
         return 0

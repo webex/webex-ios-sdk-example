@@ -208,6 +208,53 @@ Below is code snippets of the SDK calling in the demo.
             }
         }
     }
+    
+    /* 
+        Using multi stream in this call.
+        Implementation MultiStreamObserver protocol.
+    */
+    
+    //set the observer of this call to get the multi stream event */
+    self.currentCall?.multiStreamObserver = self
+            
+    //Implementation callback when a new multi stream media being available. Return a MediaRenderView let the SDK open it automatically. Return nil if you want to open it by call the API:openAuxStream(view: MediaRenderView) later.
+    self.onAuxStreamAvailable = { 
+        ...
+        return mediaRenderView
+    }
+            
+    //Implementation callback when an existing multi stream media being unavailable. The SDK will close the last auxiliary stream if you don't return the specified view.
+    self.onAuxStreamUnavailable = {
+        ...
+        return nil
+    }
+            
+    //Implementation callback when an existing multi stream media changed. */
+    self.onAuxStreamChanged = {event in
+        switch event {
+            /* Callback for open an auxiliary stream results. */
+            case .auxStreamOpenedEvent(let view, let result):
+                switch result {
+                    case .success(let auxStream):
+                        ...
+                    case .failure(let error):
+                        ...
+                }
+            /* This might be triggered when the auxiliary stream's speaker has changed. */
+            case .auxStreamPersonChangedEvent(let auxStream,_,_):
+                 ...
+            /* This might be triggered when the speaker muted or unmuted the video. */
+            case .auxStreamSendingVideoEvent(let auxStream):
+                ...
+            /* This might be triggered when the speaker's video rendering view size has changed. */
+            case .auxStreamSizeChangedEvent(let auxStream):
+                ...
+            /* Callback for close an auxiliary stream results. */
+            case .auxStreamClosedEvent(let view, let error):
+                ...
+            }
+        }
+    }
     ```
 1. Enable and using screen share on your iPhone
 

@@ -1,5 +1,5 @@
 //
-//  MessageRoomCell.swift
+//  MessageSpaceCell.swift
 //  KitchenSink
 //
 //  Created by qucui on 2018/1/18.
@@ -8,25 +8,25 @@
 
 import UIKit
 import WebexSDK
-class MessageRoomCell: UITableViewCell {
+class MessageSpaceCell: UITableViewCell {
 
-    public var roomModel: Room?
-    private var roomTitleLabel : UILabel?
+    public var spaceModel: Space?
+    private var spaceTitleLabel : UILabel?
     private var line: CALayer?
     private var messageButton : UIButton!
-    var roomListVC: RoomListViewController!
+    var spaceListVC: SpaceListViewController!
     
-    public func updateWithRoom(_ roomModel: Room?){
-        self.roomModel = roomModel
-        if(self.roomTitleLabel == nil){
-            self.roomTitleLabel = UILabel(frame: CGRect(x: 15.0, y: 0.0, width: kScreenWidth-80, height: cellHeight))
-            self.roomTitleLabel?.font = UIFont.labelLightFont(ofSize: 17*Utils.HEIGHT_SCALE)
-            self.roomTitleLabel?.textColor = UIColor.darkGray
-            self.roomTitleLabel?.textAlignment = .center
-            self.roomTitleLabel?.numberOfLines = 0
-            self.addSubview(self.roomTitleLabel!)
+    public func updateWithSpace(_ spaceModel: Space?){
+        self.spaceModel = spaceModel
+        if(self.spaceTitleLabel == nil){
+            self.spaceTitleLabel = UILabel(frame: CGRect(x: 15.0, y: 0.0, width: kScreenWidth-80, height: cellHeight))
+            self.spaceTitleLabel?.font = UIFont.labelLightFont(ofSize: 17*Utils.HEIGHT_SCALE)
+            self.spaceTitleLabel?.textColor = UIColor.darkGray
+            self.spaceTitleLabel?.textAlignment = .center
+            self.spaceTitleLabel?.numberOfLines = 0
+            self.addSubview(self.spaceTitleLabel!)
         }
-        self.roomTitleLabel?.text = (self.roomModel?.title)!
+        self.spaceTitleLabel?.text = (self.spaceModel?.title)!
         
         if(self.messageButton == nil){
             self.messageButton = UIButton(frame: CGRect(x: kScreenWidth-70, y: 26*Utils.HEIGHT_SCALE, width: 48*Utils.HEIGHT_SCALE, height: 48*Utils.HEIGHT_SCALE))
@@ -47,7 +47,7 @@ class MessageRoomCell: UITableViewCell {
     }
     
     @objc func message(_ sender: UIButton) {
-        roomListVC.messageWithRoom(self.roomModel)
+        spaceListVC.messageWithSpace(self.spaceModel)
     }
     
     override func awakeFromNib() {

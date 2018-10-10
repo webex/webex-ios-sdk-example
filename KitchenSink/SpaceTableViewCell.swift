@@ -21,8 +21,8 @@ class SpaceTableViewCell: UITableViewCell {
     
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     
-    var roomId: String?
-    var roomName: String?
+    var spaceId: String?
+    var spaceName: String?
     var initiateCallViewController: InitiateCallViewController!
     
     override func awakeFromNib() {
@@ -43,7 +43,7 @@ class SpaceTableViewCell: UITableViewCell {
     }
     
     @objc func dial(_ sender: UIButton) {
-        initiateCallViewController.dialRoomWithRoomId(roomId!, roomName!)
+        initiateCallViewController.dialSpaceWithSpaceId(spaceId!, spaceName!)
     }
 
 }

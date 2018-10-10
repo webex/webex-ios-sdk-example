@@ -13,10 +13,10 @@ end
 
 target 'KitchenSink' do
     platform :ios, '10.0'
-    pod 'WebexSDK', :git => 'https://github.com/webex/webex-ios-sdk.git', :branch => 'master'
+    pod 'WebexSDK', :git => 'https://github.com/webex/webex-ios-sdk.git', :branch => 'develop'
     pod 'Cosmos', '~> 15.0'
     pod 'Toast-Swift', '~> 3.0'
-    pod 'FontAwesome.swift','~> 1.3'
+    pod 'FontAwesome.swift','~> 1.3.2'
 end
 
 

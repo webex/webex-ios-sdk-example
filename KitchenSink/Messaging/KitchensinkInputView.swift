@@ -34,7 +34,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
     public var sendBtnClickBlock : ((_ text : String?, _ membership: Membership?, _ imageInfo: [String: Any]?)->())?
     
     private static var myContext = 0
-    private var backVC: RoomDetailViewController
+    private var backVC: SpaceDetailViewController
     public var textView: UITextView?
     private var sendBtn: UIButton?
     private var backViewTap: UIGestureRecognizer?
@@ -51,7 +51,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
     private var selectedMembership : Membership?
     private var control: UIControl?
     
-    init(frame: CGRect , backVC: RoomDetailViewController){
+    init(frame: CGRect , backVC: SpaceDetailViewController){
         self.backVC = backVC
         super.init(frame: frame)
         self.control = UIControl(frame: backVC.view.bounds)
@@ -71,7 +71,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
             self.imageBtn?.addTarget(self, action: #selector(addImageButtnClicked), for: .touchUpInside)
             self.attachmentBackView?.addSubview(self.imageBtn!)
             
-            if let _ = self.backVC.roomModel?.id{
+            if let _ = self.backVC.spaceModel?.id{
                 self.mentionBtn = UIButton(frame: CGRect(x: Int(inputViewHeight/2)+5, y: 5, width: Int(inputViewHeight/2)-10, height: Int(inputViewHeight/2)-10))
                 self.mentionBtn?.setTitle("Mentions", for: .normal)
                 self.mentionBtn?.backgroundColor = UIColor.buttonBlueNormal()
@@ -202,7 +202,7 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
     @objc private func addMentionButtonClicked(){
         let mentionListVC = MentionPeopleListViewController()
         mentionListVC.webexSDK = self.backVC.webexSDK
-        mentionListVC.roomId = self.backVC.roomModel?.id
+        mentionListVC.spaceId = self.backVC.spaceModel?.id
         let navVC = UINavigationController(rootViewController: mentionListVC)
         mentionListVC.completionBlock = { (membership) in
             navVC.dismiss(animated: true, completion: {})

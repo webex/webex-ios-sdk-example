@@ -670,6 +670,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         callFunctionTabBar.delegate = self
         self.participantsTableView.dataSource = self
         self.participantsTableView.delegate = self
+        self.participantsTableView.allowsSelection = false
         self.callFunctionTabBar.selectedItem = callControlItem
         
         for index in 0..<self.auxVideoViews.count {

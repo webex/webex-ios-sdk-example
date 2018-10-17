@@ -22,5 +22,5 @@ end
 
 target 'KitchenSinkBroadcastExtension' do
     platform :ios, '11.2'
-    pod 'WebexBroadcastExtensionKit', :git => 'https://github.com/webex/webex-ios-sdk.git', :branch => ‘master’
+    pod 'WebexBroadcastExtensionKit', :git => 'https://github.com/webex/webex-ios-sdk.git', :branch => ‘develop’
 end

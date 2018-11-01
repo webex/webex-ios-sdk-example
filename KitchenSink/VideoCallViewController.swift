@@ -491,7 +491,10 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.onAuxStreamAvailable = { [weak self] in
                 if let strongSelf = self {
                     strongSelf.updateBadgeValue()
-                    return strongSelf.auxiliaryVideoUI.filter({!$0.inUse}).first?.mediaRenderView
+                    if let auxUI = strongSelf.auxiliaryVideoUI.filter({!$0.inUse}).first {
+                        auxUI.inUse = true
+                        return auxUI.mediaRenderView
+                    }
                 }
                 return nil
             }
@@ -500,7 +503,10 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.onAuxStreamUnavailable = { [weak self] in
                 if let strongSelf = self {
                     strongSelf.updateBadgeValue()
-                    return strongSelf.auxiliaryVideoUI.filter({$0.inUse}).last?.mediaRenderView
+                    if let auxUI = strongSelf.auxiliaryVideoUI.filter({$0.inUse}).last {
+                        auxUI.inUse = false
+                        return auxUI.mediaRenderView
+                    }
                 }
                 return nil
             }
@@ -1247,11 +1253,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             }
         }
     
-        var inUse: Bool {
-            get {
-                return auxStream != nil
-            }
-        }
+        var inUse: Bool = false
         
         private var currentPerson: Person?
         private var currentAvatar: UIImage?

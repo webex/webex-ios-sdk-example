@@ -3,7 +3,7 @@
 //  KitchenSink
 //
 //  Created by qucui on 2018/1/29.
-//  Copyright © 2018年 Cisco Systems, Inc. All rights reserved.
+//  Copyright 2016-2019 Cisco Systems Inc. All rights reserved.
 //
 
 import UIKit

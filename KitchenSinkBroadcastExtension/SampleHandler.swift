@@ -3,7 +3,7 @@
 //  KitchenSinkBroadcastExtension
 //
 //  Created by panzh on 19/03/2018.
-//  Copyright © 2018 Cisco Systems, Inc. All rights reserved.
+//  Copyright 2016-2019 Cisco Systems Inc. All rights reserved.
 //
 
 import ReplayKit

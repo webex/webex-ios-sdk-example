@@ -27,7 +27,12 @@ let kScreenSize = UIScreen.main.bounds
 let kScreenWidth = kScreenSize.width
 let kScreenHeight = kScreenSize.height
 let iPhoneX = (kScreenWidth == 375 && kScreenHeight == 812)
-let kNavHeight : CGFloat = iPhoneX ? 88.0 : 64.0
+var kNavHeight : CGFloat {
+    get{
+        let statusH = UIApplication.shared.statusBarFrame.height
+        return statusH + 44.0
+    }
+}
 
 class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigationControllerDelegate{
     

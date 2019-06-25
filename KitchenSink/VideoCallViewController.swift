@@ -794,7 +794,9 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             return
         }
         
-        if !(self.currentCall!.receivingVideo) || !(self.currentCall!.remoteSendingVideo) {
+        if !(self.currentCall!.receivingVideo)
+            || (!self.currentCall!.remoteSendingVideo && !self.currentCall!.remoteSendingScreenShare)
+        {
             self.showAvatarContainerView(true)
         } else {
             self.showAvatarContainerView(false)

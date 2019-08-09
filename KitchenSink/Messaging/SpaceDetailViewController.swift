@@ -55,7 +55,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         if let imageDict = image{
             do{
                 let selectedImage = imageDict["UIImagePickerControllerOriginalImage"] as! UIImage
-                let imageData = UIImageJPEGRepresentation(selectedImage, 1.0)
+                let imageData = selectedImage.jpegData(compressionQuality: 1.0)
                 let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 let imageURL = docDir.appendingPathComponent("tempImage.jpeg")
                 if let url = URL.init(string:imageURL.path) {
@@ -244,7 +244,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         self.fileContentsView?.backgroundColor = UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         
         self.view.addSubview(self.fileContentsView!)
-        self.view.bringSubview(toFront: self.textInputView!)
+        self.view.bringSubviewToFront(self.textInputView!)
         
         self.receivedFiles?.removeAll()
         self.receivedFiles = files

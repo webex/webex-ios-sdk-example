@@ -33,7 +33,7 @@ class HomeTableViewController: BaseTableViewController {
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
     @IBOutlet var buttonFontScaleCollection: [UIButton]!
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    let indicatorView = UIActivityIndicatorView(style: .gray)
     
     /// isWebexPhoneRegisterd reperesent if the phone device complete register to Cisco Cloud
     var isWebexPhoneRegisterd: Bool = false

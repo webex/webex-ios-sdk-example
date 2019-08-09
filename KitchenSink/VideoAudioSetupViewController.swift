@@ -130,7 +130,7 @@ class VideoAudioSetupViewController: BaseViewController {
         videoViewHiddenHelpLabel.alpha = globalVideoSetting.isVideoEnabled() ? 0:1
         videoViewhiddenHelpLabelHeight.constant = CGFloat(globalVideoSetting.isVideoEnabled() ? 0:videoViewSetupHelpLabelHeightContant)
         view.removeConstraint(videoSetupBackroundViewBottom)
-        videoSetupBackroundViewBottom =  NSLayoutConstraint.init(item: videoSetupBackoundView, attribute: .bottom, relatedBy: .equal, toItem: globalVideoSetting.isVideoEnabled() ? videoSetupView:loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: globalVideoSetting.isVideoEnabled() ? 0:-(videoSetupBackoundViewTop.constant))
+        videoSetupBackroundViewBottom =  NSLayoutConstraint.init(item: videoSetupBackoundView!, attribute: .bottom, relatedBy: .equal, toItem: globalVideoSetting.isVideoEnabled() ? videoSetupView:loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: globalVideoSetting.isVideoEnabled() ? 0:-(videoSetupBackoundViewTop.constant))
         view.addConstraint(videoSetupBackroundViewBottom)
         
         view.layoutIfNeeded()
@@ -328,7 +328,7 @@ class VideoAudioSetupViewController: BaseViewController {
             secondView = videoViewHiddenHelpLabel
             secondConstraint = videoViewhiddenHelpLabelHeight
             secondConstant = videoViewSetupHelpLabelHeightContant
-            backoundViewBottom = NSLayoutConstraint.init(item: videoSetupBackoundView, attribute: .bottom, relatedBy: .equal, toItem: loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: -(videoSetupBackoundViewTop.constant))
+            backoundViewBottom = NSLayoutConstraint.init(item: videoSetupBackoundView!, attribute: .bottom, relatedBy: .equal, toItem: loudSpeakerLabel, attribute: .bottom, multiplier: 1, constant: -(videoSetupBackoundViewTop.constant))
         }
         else {
             firstView = videoViewHiddenHelpLabel
@@ -337,7 +337,7 @@ class VideoAudioSetupViewController: BaseViewController {
             secondView = videoSetupView
             secondConstraint = videoViewHeight
             secondConstant = videoViewSetupHeightContant
-            backoundViewBottom = NSLayoutConstraint.init(item: videoSetupBackoundView, attribute: .bottom, relatedBy: .equal, toItem: videoSetupView, attribute: .bottom, multiplier: 1, constant: 0)
+            backoundViewBottom = NSLayoutConstraint.init(item: videoSetupBackoundView!, attribute: .bottom, relatedBy: .equal, toItem: videoSetupView, attribute: .bottom, multiplier: 1, constant: 0)
         }
         
         expandedView(withAnim: { [weak self] in

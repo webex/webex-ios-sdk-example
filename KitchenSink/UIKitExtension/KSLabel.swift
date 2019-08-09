@@ -26,7 +26,7 @@ class KSLabel: UILabel {
     override func drawText(in rect: CGRect) {
         
         let insets = UIEdgeInsets.init(top: 0, left: insetValue, bottom: 0, right: insetValue)
-        super.drawText(in: UIEdgeInsetsInsetRect(rect, insets))
+        super.drawText(in: rect.inset(by: insets))
     }
     
     override var intrinsicContentSize: CGSize {

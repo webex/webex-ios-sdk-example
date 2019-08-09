@@ -40,7 +40,7 @@ class PersonTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         let selector = #selector(PersonTableViewCell.dial)
-        dialButton.addTarget(self, action: selector, for: UIControlEvents.touchUpInside)
+        dialButton.addTarget(self, action: selector, for: UIControl.Event.touchUpInside)
         
         
         for label in labelFontScaleCollection {

@@ -857,7 +857,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
         
         self.disconnectionTypeLabel.text = disconnectionTypeLabel.text! + disconnectionTypeString
-        self.view.bringSubview(toFront: self.disconnectionTypeLabel)
+        self.view.bringSubviewToFront(self.disconnectionTypeLabel)
         self.disconnectionTypeLabel.isHidden = false
     }
     
@@ -909,17 +909,17 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.callFunctionTabBar.isHidden = true
         } else {
             if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.callControl.rawValue {
-                self.view.bringSubview(toFront: self.callControlView)
+                self.view.bringSubviewToFront(self.callControlView)
                 self.callControlView.isHidden = false
                 self.participantsView.isHidden = true
                 self.auxVideosContainerView.isHidden = true
             } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.auxiliaryVide.rawValue {
-                self.view.bringSubview(toFront: self.auxVideosContainerView)
+                self.view.bringSubviewToFront(self.auxVideosContainerView)
                 self.callControlView.isHidden = true
                 self.participantsView.isHidden = true
                 self.auxVideosContainerView.isHidden = false
             } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.participants.rawValue {
-                self.view.bringSubview(toFront: self.participantsView)
+                self.view.bringSubviewToFront(self.participantsView)
                 self.callControlView.isHidden = true
                 self.participantsView.isHidden = false
                 self.auxVideosContainerView.isHidden = true
@@ -1309,7 +1309,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.avatarImageView.image = nil
             self.avatarImageView.isHidden = true
             self.noVideoView.isHidden = false
-            self.mediaRenderView.bringSubview(toFront: self.noVideoView)
+            self.mediaRenderView.bringSubviewToFront(self.noVideoView)
             self.currentPerson = nil
         }
     }
@@ -1358,17 +1358,17 @@ extension VideoCallViewController :UITabBarDelegate {
     
     func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         if item.tag == TabBarItemType.callControl.rawValue {
-            self.view.bringSubview(toFront: self.callControlView)
+            self.view.bringSubviewToFront(self.callControlView)
             self.callControlView.isHidden = false
             self.auxVideosContainerView.isHidden = true
             self.participantsView.isHidden = true
         } else if item.tag == TabBarItemType.auxiliaryVide.rawValue {
-            self.view.bringSubview(toFront: self.auxVideosContainerView)
+            self.view.bringSubviewToFront(self.auxVideosContainerView)
             self.callControlView.isHidden = true
             self.auxVideosContainerView.isHidden = false
             self.participantsView.isHidden = true
         } else if item.tag == TabBarItemType.participants.rawValue {
-            self.view.bringSubview(toFront: self.participantsView)
+            self.view.bringSubviewToFront(self.participantsView)
             self.callControlView.isHidden = true
             self.auxVideosContainerView.isHidden = true
             self.participantsView.isHidden = false

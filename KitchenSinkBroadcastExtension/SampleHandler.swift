@@ -71,6 +71,8 @@ class SampleHandler: RPBroadcastSampleHandler {
             case RPSampleBufferType.audioMic:
                 // Handle audio sample buffer for mic audio
                 break
+        @unknown default:
+            break
         }
     }
     

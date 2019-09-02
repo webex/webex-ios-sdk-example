@@ -209,7 +209,11 @@ class BaseNavigaionBar : UINavigationBar {
     override func layoutSubviews() {
         super.layoutSubviews()
         for view in subviews {
-            view.layoutMargins = .zero
+            if #available(iOS 13.0 , *) {
+                ///
+            } else {
+                view.layoutMargins = .zero
+            }
         }
     }
 }

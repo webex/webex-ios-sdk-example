@@ -111,3 +111,14 @@ extension UIImage {
     }
 }
 
+extension UISegmentedControl {
+    func setTintColor(_ color:UIColor) {
+        if #available(iOS 13.0, *) {
+            self.selectedSegmentTintColor = color
+            self.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
+        } else {
+            self.tintColor = color
+        }
+    }
+}
+

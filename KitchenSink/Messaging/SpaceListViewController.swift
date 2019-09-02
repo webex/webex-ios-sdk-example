@@ -106,7 +106,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
         //init history tableView data
         segmentedControl = UISegmentedControl.init(items: itemArray)
         segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
-        segmentedControl?.tintColor = UIColor.titleGreyColor()
+        segmentedControl?.setTintColor(UIColor.titleGreyColor())
         segmentedControl?.selectedSegmentIndex = 0
         segmentedControl?.addTarget(self, action: #selector(segmentClicked(_:)),for:.valueChanged)
         navigationItem.titleView = segmentedControl

@@ -172,7 +172,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
         segmentedControl = UISegmentedControl.init(items: itemArray)
         segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
-        segmentedControl?.tintColor = UIColor.titleGreyColor()
+        segmentedControl?.setTintColor(UIColor.titleGreyColor())
         segmentedControl?.selectedSegmentIndex = 0
         segmentedControl?.addTarget(self, action: #selector(switchDialWay(_:)),for:.valueChanged)
         navigationItem.titleView = segmentedControl

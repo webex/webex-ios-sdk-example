@@ -147,14 +147,19 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
     }
     
     @objc private func messageToEmailButtonClicked(){
-        if let emailAddress = self.messageEmailTextField?.text{
-            if emailAddress.count == 0{
+        if let address = self.messageEmailTextField?.text{
+            if address.count == 0{
                 return
             }
-            self.webexSDK?.people.list(email: EmailAddress.fromString(emailAddress), completionHandler: { (response) in
+            let email = EmailAddress.fromString(address)
+            let personId = email == nil ? address : nil
+            // email is used for OAuth, personId is used for JWT
+            self.webexSDK?.people.list(email: email, id: personId, completionHandler: { (response) in
                 switch response.result{
-                case .success(let person):
-                    self.messageWithPerson(person[0])
+                case .success(let persons):
+                    if let person = persons.first {
+                        self.messageWithPerson(person)
+                    }
                     break
                 case .failure(_):
                     self.showNoPersonAlertView()
@@ -235,7 +240,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
             self.messageEmailTextField?.layer.borderWidth = 0.5
             self.messageEmailTextField?.layer.borderColor = UIColor.lightGray.cgColor
             self.messageEmailTextField?.layer.masksToBounds = true
-            self.messageEmailTextField?.placeholder = "Email For Message"
+            self.messageEmailTextField?.placeholder = "Email or PersonId For Message"
             self.messageEmailTextField?.textAlignment = .center
             self.messageEmailTextField?.font = UIFont.textViewLightFont(ofSize: 20 * Utils.HEIGHT_SCALE)
             self.messageEmailBackView?.addSubview(self.messageEmailTextField!)

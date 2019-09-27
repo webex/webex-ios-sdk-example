@@ -215,7 +215,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
         if globalVideoSetting.isVideoEnabled() {
             if #available(iOS 11.2, *) {
-                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.webexSDK.demo")
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.webexsdk.KitchenSink")
             }
             else {
                 mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
@@ -249,7 +249,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         var mediaOption = MediaOption.audioOnly()
         if globalVideoSetting.isVideoEnabled() {
             if #available(iOS 11.2, *) {
-                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.webexSDK.demo")
+                mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!), screenShare: nil, applicationGroupIdentifier: "group.com.cisco.webexsdk.KitchenSink")
             }
             else {
                 mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))

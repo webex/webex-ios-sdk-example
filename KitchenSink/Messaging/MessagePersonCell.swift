@@ -32,7 +32,7 @@ class MessagePersonCell: UITableViewCell {
         })
         
         if(self.nameLabel == nil){
-            self.nameLabel = UILabel(frame: CGRect(x: 110, y: 0, width: kScreenWidth-190, height: cellHeight*Utils.HEIGHT_SCALE))
+            self.nameLabel = UILabel(frame: CGRect(x: 30+80*Utils.HEIGHT_SCALE, y: 0, width: kScreenWidth-110-80*Utils.HEIGHT_SCALE, height: cellHeight*Utils.HEIGHT_SCALE))
             self.addSubview(self.nameLabel!)
         }
         self.nameLabel.text = self.personModel?.displayName
@@ -49,7 +49,7 @@ class MessagePersonCell: UITableViewCell {
         
         if(self.line == nil){
             self.line = CALayer()
-            self.line?.frame = CGRect(x: 25, y: cellHeight - 0.5, width: kScreenWidth-25, height: 0.5)
+            self.line?.frame = CGRect(x: 25, y: cellHeight*Utils.HEIGHT_SCALE - 0.5, width: kScreenWidth-25, height: 0.5)
             self.line?.backgroundColor = UIColor.lightGray.cgColor
             self.layer.addSublayer(self.line!)
         }

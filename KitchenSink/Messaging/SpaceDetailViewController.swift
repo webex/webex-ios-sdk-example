@@ -85,8 +85,12 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         }
         
         self.setUpFileContentsView(files: [])
+        var text:Message.Text?
+        if let str = finalStr {
+            text = Message.Text.html(html: str)
+        }
         if let space = self.spaceModel{
-            self.webexSDK?.messages.post(spaceId: space.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
+            self.webexSDK?.messages.post(text, toSpace: space.id!, mentions: mentions, withFiles: files, completionHandler: { (response) in
                 switch response.result{
                 case .success(let message):
                     /// Send Message Call Back Code Here
@@ -100,29 +104,27 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                         self.title = "Sent Fail!"
                     }
                     break
-                }}
-            )
-        }else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
-            self.webexSDK?.messages.post(personEmail: emailAddress,
-                                         text: finalStr,
-                                         files: files,
-                                         queue: nil,
-                                         completionHandler: { (response) in
-                                            switch response.result{
-                                            case .success(let message):
-                                                /// Send Message Call Back Code Here
-                                                self.title = "Sent Sucess!"
-                                                self.spaceId = message.spaceId
-                                                self.updateMessageAcitivty(message)
-                                                break
-                                            case .failure(let error):
-                                                DispatchQueue.main.async {
-                                                    print(error)
-                                                    self.title = "Sent Fail!"
-                                                }
-                                                break
-                                            }
+                }
             })
+        }
+        else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
+            self.webexSDK?.messages.post(text, toPersonEmail: emailAddress, withFiles: files, completionHandler: { (response) in
+                switch response.result{
+                case .success(let message):
+                    /// Send Message Call Back Code Here
+                    self.title = "Sent Sucess!"
+                    self.spaceId = message.spaceId
+                    self.updateMessageAcitivty(message)
+                    break
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        print(error)
+                        self.title = "Sent Fail!"
+                    }
+                    break
+                }
+            })
+            
         }
     }
     

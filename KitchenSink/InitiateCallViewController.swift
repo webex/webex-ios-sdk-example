@@ -166,7 +166,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         searchController.searchBar.placeholder = "Email or user name"
         definesPresentationContext = true
         tableView.tableHeaderView = searchController.searchBar
-        view.bringSubview(toFront: indicatorView)
+        view.bringSubviewToFront(indicatorView)
         dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
         
         let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]

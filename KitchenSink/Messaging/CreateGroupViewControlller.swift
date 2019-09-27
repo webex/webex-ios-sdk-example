@@ -10,7 +10,7 @@ import UIKit
 import WebexSDK
 
 class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISearchBarDelegate,UITableViewDelegate,UITableViewDataSource{
-    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
 
     fileprivate var spaceNameTextFeild: UITextField?
     fileprivate var searchBar : UISearchBar?
@@ -183,7 +183,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
             self.selectedPersonTableView?.delegate = self
             self.view.addSubview(self.selectedPersonTableView!)
         }
-        self.view.bringSubview(toFront: self.selectedPersonTableView)
+        self.view.bringSubviewToFront(self.selectedPersonTableView)
         self.selectedPersonTableView?.reloadData()
     }
     
@@ -199,7 +199,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
             self.view.addSubview(self.searchTableView)
         }
         searchTableView.isHidden = false
-        self.view.bringSubview(toFront: self.searchTableView)
+        self.view.bringSubviewToFront(self.searchTableView)
         self.searchTableView?.reloadData()
     }
     

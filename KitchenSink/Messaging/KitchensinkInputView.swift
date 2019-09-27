@@ -27,7 +27,12 @@ let kScreenSize = UIScreen.main.bounds
 let kScreenWidth = kScreenSize.width
 let kScreenHeight = kScreenSize.height
 let iPhoneX = (kScreenWidth == 375 && kScreenHeight == 812)
-let kNavHeight : CGFloat = iPhoneX ? 88.0 : 64.0
+var kNavHeight : CGFloat {
+    get{
+        let statusH = UIApplication.shared.statusBarFrame.height
+        return statusH + 44.0
+    }
+}
 
 class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigationControllerDelegate{
     
@@ -57,8 +62,8 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
         self.control = UIControl(frame: backVC.view.bounds)
         self.control?.addTarget(self, action: #selector(backViewTapped), for: .touchUpInside)
         self.setUpSubViews()
-        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillAppear(notification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillDisappear(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyBoardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     @objc private func plusBtnClicked(){
@@ -138,11 +143,11 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
     // MARK: UI Logic Implementation
     @objc func keyBoardWillAppear(notification: Notification){
         let userInfo = notification.userInfo!
-        let keyboardFrame:NSValue = userInfo[UIKeyboardFrameEndUserInfoKey] as! NSValue
+        let keyboardFrame:NSValue = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
         let keyboardRectangle = keyboardFrame.cgRectValue
         let keyboardHeight = keyboardRectangle.height
         self.backVC.view.addSubview(self.control!)
-        self.backVC.view.bringSubview(toFront: self)
+        self.backVC.view.bringSubviewToFront(self)
         UIView.animate(withDuration: 0.25) {
             self.transform = CGAffineTransform(translationX: 0, y: -keyboardHeight)
         }
@@ -246,6 +251,8 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
                 break
             case .denied:
                 break
+            @unknown default:
+                break
         }
 
     }
@@ -254,7 +261,10 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
         picker.dismiss(animated: true) {}
         self.textView?.becomeFirstResponder()
     }
-    @objc func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    @objc func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+// Local variable inserted by Swift 4.2 migrator.
+let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
+
         picker.dismiss(animated: true) {}
         self.textView?.becomeFirstResponder()
         self.selectedImageDict = info
@@ -290,4 +300,9 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
         fatalError("init(coder:) has not been implemented")
     }
     
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
 }

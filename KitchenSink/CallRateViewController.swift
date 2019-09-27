@@ -67,8 +67,8 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer.init(target: self, action: #selector(dissmissKeyboard))
         view.addGestureRecognizer(tap)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(CallRateViewController.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         topToSuperView = titleTopToSuperViewConstraint.constant
         
         
@@ -129,7 +129,7 @@ class CallRateViewController: BaseViewController, UITextViewDelegate {
             return
         }
         
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             guard keyboardSize.size.height > 0 else {
                 return
             }

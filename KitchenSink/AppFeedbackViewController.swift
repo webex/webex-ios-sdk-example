@@ -120,7 +120,7 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         mailComposerVC.setMessageBody(userCommentsText.text, isHTML: false)
         
         if (snapshotImage != nil) {
-            let myData: Data = UIImagePNGRepresentation(snapshotImage)!
+            let myData: Data = snapshotImage.pngData()!
             mailComposerVC.addAttachmentData(myData, mimeType: "image/png", fileName: snapshotFileName)
         }
         
@@ -185,10 +185,10 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
     }
     
     func attachSnapshot() {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.photoLibrary) {
             
             imagePicker.delegate = self
-            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
+            imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary;
             imagePicker.allowsEditing = false
             
             present(imagePicker, animated: true, completion: nil)

@@ -105,8 +105,8 @@ class JWTLoginViewController: BaseViewController {
     // MARK: - UI Implementation
     override func initView()
     {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         topToSuperView = imageTopToSuperView.constant
         
         for label in labelFontScaleCollection {
@@ -158,14 +158,14 @@ class JWTLoginViewController: BaseViewController {
     
     func showWaitingView() {
         waitingView.startAnimating()
-        jwtLoginButton.setTitleColor(UIColor.clear, for: UIControlState.disabled)
+        jwtLoginButton.setTitleColor(UIColor.clear, for: UIControl.State.disabled)
         jwtLoginButton.isEnabled = false
         jwtLoginButton.alpha = 0.5
     }
     
     func hideWaitingView() {
         waitingView.stopAnimating()
-        jwtLoginButton.setTitleColor(UIColor.white, for: UIControlState.disabled)
+        jwtLoginButton.setTitleColor(UIColor.white, for: UIControl.State.disabled)
         jwtLoginButton.alpha = 1
         jwtTextFieldChanged(jwtTextField)
     }
@@ -175,7 +175,7 @@ class JWTLoginViewController: BaseViewController {
             return
         }
         
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             guard keyboardSize.size.height > 0 else {
                 return
             }

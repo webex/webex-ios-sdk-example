@@ -14,7 +14,7 @@ class SampleHandler: RPBroadcastSampleHandler {
     override func broadcastStarted(withSetupInfo setupInfo: [String : NSObject]?) {
         // User has requested to start the broadcast. Setup info from the UI extension can be supplied but optional.
         
-        WebexBroadcastExtension.sharedInstance.start(applicationGroupIdentifier: "group.com.cisco.webexSDK.demo") {
+        WebexBroadcastExtension.sharedInstance.start(applicationGroupIdentifier: "group.com.cisco.webexsdk.KitchenSink") {
             error in
             if let webexError = error {
                 switch webexError {
@@ -71,6 +71,8 @@ class SampleHandler: RPBroadcastSampleHandler {
             case RPSampleBufferType.audioMic:
                 // Handle audio sample buffer for mic audio
                 break
+        @unknown default:
+            break
         }
     }
     

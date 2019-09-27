@@ -55,7 +55,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         if let imageDict = image{
             do{
                 let selectedImage = imageDict["UIImagePickerControllerOriginalImage"] as! UIImage
-                let imageData = UIImageJPEGRepresentation(selectedImage, 1.0)
+                let imageData = selectedImage.jpegData(compressionQuality: 1.0)
                 let docDir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 let imageURL = docDir.appendingPathComponent("tempImage.jpeg")
                 if let url = URL.init(string:imageURL.path) {
@@ -85,8 +85,12 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         }
         
         self.setUpFileContentsView(files: [])
+        var text:Message.Text?
+        if let str = finalStr {
+            text = Message.Text.html(html: str)
+        }
         if let space = self.spaceModel{
-            self.webexSDK?.messages.post(spaceId: space.id!,text: finalStr,mentions: mentions, files: files,completionHandler: { (response) in
+            self.webexSDK?.messages.post(text, toSpace: space.id!, mentions: mentions, withFiles: files, completionHandler: { (response) in
                 switch response.result{
                 case .success(let message):
                     /// Send Message Call Back Code Here
@@ -100,29 +104,27 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                         self.title = "Sent Fail!"
                     }
                     break
-                }}
-            )
-        }else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
-            self.webexSDK?.messages.post(personEmail: emailAddress,
-                                         text: finalStr,
-                                         files: files,
-                                         queue: nil,
-                                         completionHandler: { (response) in
-                                            switch response.result{
-                                            case .success(let message):
-                                                /// Send Message Call Back Code Here
-                                                self.title = "Sent Sucess!"
-                                                self.spaceId = message.spaceId
-                                                self.updateMessageAcitivty(message)
-                                                break
-                                            case .failure(let error):
-                                                DispatchQueue.main.async {
-                                                    print(error)
-                                                    self.title = "Sent Fail!"
-                                                }
-                                                break
-                                            }
+                }
             })
+        }
+        else if let email = self.emailAddress,let emailAddress = EmailAddress.fromString(email){
+            self.webexSDK?.messages.post(text, toPersonEmail: emailAddress, withFiles: files, completionHandler: { (response) in
+                switch response.result{
+                case .success(let message):
+                    /// Send Message Call Back Code Here
+                    self.title = "Sent Sucess!"
+                    self.spaceId = message.spaceId
+                    self.updateMessageAcitivty(message)
+                    break
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        print(error)
+                        self.title = "Sent Fail!"
+                    }
+                    break
+                }
+            })
+            
         }
     }
     
@@ -244,7 +246,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         self.fileContentsView?.backgroundColor = UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         
         self.view.addSubview(self.fileContentsView!)
-        self.view.bringSubview(toFront: self.textInputView!)
+        self.view.bringSubviewToFront(self.textInputView!)
         
         self.receivedFiles?.removeAll()
         self.receivedFiles = files

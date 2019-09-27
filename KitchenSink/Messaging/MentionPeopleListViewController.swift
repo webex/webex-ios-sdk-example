@@ -9,7 +9,7 @@
 import UIKit
 import WebexSDK
 class MentionPeopleListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
-    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
     fileprivate var tableView: UITableView!
     fileprivate var membershipResult: [Membership] = [Membership]()
     

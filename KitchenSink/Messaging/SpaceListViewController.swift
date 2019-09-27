@@ -18,7 +18,7 @@ let cellHeight : CGFloat = 100.0
 class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource {
     
     fileprivate var backView: UIView?
-    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    fileprivate var indicatorView: UIActivityIndicatorView = UIActivityIndicatorView(style: .gray)
     fileprivate var segmentedControl: UISegmentedControl?
     fileprivate var spaceType: SpaceType = SpaceType.group
     fileprivate var searchResult: [Person] = [Person]()
@@ -202,7 +202,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
             self.historyTableView?.delegate = self
             self.backView?.addSubview(self.historyTableView!)
         }
-        self.backView?.bringSubview(toFront: self.historyTableView!)
+        self.backView?.bringSubviewToFront(self.historyTableView!)
         self.historyTableView?.reloadData()
     }
     
@@ -226,7 +226,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
         }
         self.searchTableView?.addSubview(self.indicatorView)
         self.indicatorView.center = (self.searchTableView?.center)!
-        self.backView?.bringSubview(toFront: self.searchTableView!)
+        self.backView?.bringSubviewToFront(self.searchTableView!)
         self.searchBar.becomeFirstResponder()
         self.searchTableView?.reloadData()
     }
@@ -255,7 +255,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
             messageButton.addTarget(self, action:#selector(messageToEmailButtonClicked), for: .touchUpInside)
             self.messageEmailBackView?.addSubview(messageButton)
         }
-        self.backView?.bringSubview(toFront: self.messageEmailBackView!)
+        self.backView?.bringSubviewToFront(self.messageEmailBackView!)
         self.messageEmailTextField?.becomeFirstResponder()
     }
     
@@ -280,8 +280,8 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
         self.spaceTableView?.addSubview(self.indicatorView)
         self.indicatorView.center = (self.spaceTableView?.center)!
         self.requestWebexSpaceList()
-        self.backView?.bringSubview(toFront: self.spaceTableView!)
-        self.backView?.bringSubview(toFront: self.createSpaceButton!)
+        self.backView?.bringSubviewToFront(self.spaceTableView!)
+        self.backView?.bringSubviewToFront(self.createSpaceButton!)
         self.spaceTableView?.reloadData()
     }
 

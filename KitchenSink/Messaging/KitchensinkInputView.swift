@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 import UIKit
-import FontAwesome_swift
 import PhotosUI
 import WebexSDK
 

@@ -55,9 +55,9 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet var heightScaleConstraintCollection: [NSLayoutConstraint]!
     @IBOutlet weak var preview: MediaRenderView!
     @IBOutlet weak var bandwidthBackView: UIView!
-    private let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private let uncheckImage = UIImage.fontAwesomeIcon(name: .square, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let arrowImage = UIImage.fontAwesomeIcon(name: .angleRight, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private let checkImage = UIImage.fontAwesomeIcon(name: .checkSquare, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let selfViewSetupHeightContant = 320 * Utils.HEIGHT_SCALE
     private let selfViewSetupHelpLabelHeightContant = 54 * Utils.HEIGHT_SCALE
     private let videoViewSetupHeightContant = 420 * Utils.HEIGHT_SCALE

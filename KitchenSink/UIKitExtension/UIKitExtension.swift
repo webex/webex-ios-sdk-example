@@ -20,6 +20,8 @@
 
 import Foundation
 import UIKit
+import FontAwesome_swift
+
 extension UIFont {
     static let fontFamilyDesc: [UIFontDescriptor.AttributeName:Any] = [UIFontDescriptor.AttributeName.family: "Arial"]
     
@@ -45,6 +47,10 @@ extension UIFont {
         attributes[.traits] = traits
         let descriptor = UIFontDescriptor(fontAttributes: attributes)
         return UIFont(descriptor: descriptor, size: size)
+    }
+    
+    static func fontAwesome(ofSize: CGFloat, type: FontAwesomeStyle = .solid) -> UIFont {
+        return self.fontAwesome(ofSize: ofSize, style: type)
     }
 }
 
@@ -108,6 +114,11 @@ extension UIImage {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image?.resizableImage(withCapInsets: .zero)
+    }
+    
+    static func fontAwesomeIcon(name: FontAwesome, type: FontAwesomeStyle = .solid, textColor: UIColor, size: CGSize, backgroundColor: UIColor = UIColor.clear, borderWidth: CGFloat = 0, borderColor: UIColor = UIColor.clear) -> UIImage {
+        let icon = self.fontAwesomeIcon(name: name, style: type, textColor: textColor, size: size, backgroundColor: backgroundColor, borderWidth: borderWidth, borderColor: borderColor)
+        return icon
     }
 }
 

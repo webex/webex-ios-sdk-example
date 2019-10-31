@@ -343,6 +343,12 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                 }
             }
             
+            call.onWaitingInLobby = {[weak self] in
+                if let strongSelf = self {
+                    strongSelf.navigationTitle = "Waiting In Lobby"
+                }
+            }
+            
             /* Callback when remote participant(s) join/left/decline connected. */
             call.onCallMembershipChanged = { [weak self] memberShipChangeType  in
                 if let strongSelf = self {
@@ -380,6 +386,9 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                         else {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
                         }
+                        break
+                    case .waitingInLobby(let memberShip):
+                        print("waitingInLobby========\(memberShip.isInLobby)")
                         break
                     }
                     self?.updateParticipantTable()
@@ -676,7 +685,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         callFunctionTabBar.delegate = self
         self.participantsTableView.dataSource = self
         self.participantsTableView.delegate = self
-        self.participantsTableView.allowsSelection = false
+        self.participantsTableView.allowsSelection = true
         self.callFunctionTabBar.selectedItem = callControlItem
         
         for index in 0..<self.auxVideoViews.count {
@@ -830,6 +839,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             navigationTitle = "Initiated"
         case .ringing:
             navigationTitle = "Ringing"
+        case .inLobby:
+            navigationTitle = "InLobby"
         }
     }
     
@@ -1021,7 +1032,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     private func updateParticipantTable() {
         DispatchQueue.main.async {
-            self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined}) ?? []
+            self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined || $0.isInLobby == true}) ?? []
             self.participantsTableView.reloadData()
         }
     }
@@ -1426,5 +1437,25 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let dataSource = self.participantArray
+        let membership = dataSource[indexPath.row]
+        if membership.isInLobby == true {
+            let letinAction = UIAlertAction(title: "Let in", style: .default) { (action) in
+                print("===========Let in")
+                self.currentCall?.letIn([membership], completionHandler: { (error) in
+                    
+                })
+            }
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            let alertVC = UIAlertController(title: "Whether to Let in", message: nil, preferredStyle: .alert)
+            alertVC.addAction(letinAction)
+            alertVC.addAction(cancelAction)
+            
+            self.present(alertVC, animated: true, completion: nil)
+        }
     }
 }

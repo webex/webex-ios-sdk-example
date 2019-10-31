@@ -18,9 +18,8 @@ Kitchen Sink is a developer friendly sample implementation of Webex client SDK a
 ## Download App
 You can download our Demo App from TestFlight.
 1. Download TestFlight from App Stroe.
-1. Use this portal to register as our external tester:[register portal](https://ios-beta-user-signup-site.herokuapp.com/?token=MTcHLfVhezEow4VqgWwPTRfcKZPoXCeT)
-1. Check your Email to get your test Redeem code,put this code into TestFlight.
-1. Install Ktichen Sink App from TestFlight.
+1. Open the public url(https://testflight.apple.com/join/HWhcEPFe) from your iPhone browser.
+1. Start Testing and install Ktichen Sink App from TestFlight.
 ## Setup
 Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
 

@@ -89,6 +89,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
     private var participantArray: [CallMembership] = []
+    private var participantData: [[CallMembership]] = []
     private var personInfoArray: [Person] = []
     private var openedAuxViews: [MediaRenderView] = []
     private var auxiliaryVideoUI: [AuxiliaryStreamUICollection] = []
@@ -343,13 +344,18 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                 }
             }
             
-            call.onWaitingInLobby = {[weak self] in
+            /* Callback when yourself is in lobby. */
+            call.inLobby = {[weak self] reason in
                 if let strongSelf = self {
-                    strongSelf.navigationTitle = "Waiting In Lobby"
+                    if reason == .meetingNotStart {
+                        strongSelf.navigationTitle = "meeting not start"
+                    }else {
+                        strongSelf.navigationTitle = "waiting for admitting"
+                    }
                 }
             }
             
-            /* Callback when remote participant(s) join/left/decline connected. */
+            /* Callback when remote participant(s) join/left/decline/inLobby connected. */
             call.onCallMembershipChanged = { [weak self] memberShipChangeType  in
                 if let strongSelf = self {
                     switch memberShipChangeType {
@@ -388,7 +394,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                         }
                         break
                     case .waitingInLobby(let memberShip):
-                        print("waitingInLobby========\(memberShip.isInLobby)")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
                         break
                     }
                     self?.updateParticipantTable()
@@ -1032,7 +1038,25 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     private func updateParticipantTable() {
         DispatchQueue.main.async {
-            self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined || $0.isInLobby == true}) ?? []
+            self.participantArray = self.currentCall?.memberships ?? []
+            
+            var inMeeting = [CallMembership]()
+            var inLobby = [CallMembership]()
+            var notInMeeting = [CallMembership]()
+            self.participantArray.forEach { (callMembership) in
+                if callMembership.state == .joined {
+                    inMeeting.append(callMembership)
+                }
+                else if callMembership.state == .inLobby {
+                    inLobby.append(callMembership)
+                }
+                else {
+                    notInMeeting.append(callMembership)
+                }
+            }
+            let array:[Array<CallMembership>] = [inMeeting, inLobby, notInMeeting]
+            self.participantData = array.filter({$0.count > 0})
+            
             self.participantsTableView.reloadData()
         }
     }
@@ -1085,7 +1109,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         } else {
             self.auxiliaryStreamItem.badgeValue = nil
         }
-        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.count)
+        
+        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .inLobby}.count)
     }
     
     // MARK: Slide In View SetUp
@@ -1396,16 +1421,36 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.participantsTableView {
             self.updateBadgeValue()
-            return self.participantArray.count
+            return self.participantData[section].count
         }
         return 0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30 * Utils.HEIGHT_SCALE
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return self.participantData.count
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let state = self.participantData[section].first?.state
+        switch state {
+        case .joined:
+            return "In Meeting"
+        case .inLobby:
+            return "In Lobby"
+        default:
+            return "Not In Meeting"
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantCell", for: indexPath) as! ParticipantTableViewCell
         
-        let dataSource: [CallMembership]?
-        dataSource = self.participantArray
+        let dataSource: [[CallMembership]]?
+        dataSource = self.participantData
         
         func updateCellInfo(cell: ParticipantTableViewCell, person: Person?, callmembership: CallMembership) {
             if let cellPerson = person {
@@ -1419,7 +1464,7 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         
-        if let participant = dataSource?[indexPath.row] {
+        if let participant = dataSource?[indexPath.section][indexPath.row] {
             if let oldPerson = self.personInfoArray.filter({$0.id == participant.personId}).first {
                 updateCellInfo(cell: cell, person: oldPerson, callmembership: participant)
             } else if let personId = participant.personId {
@@ -1440,21 +1485,20 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let dataSource = self.participantArray
-        let membership = dataSource[indexPath.row]
-        if membership.isInLobby == true {
+        let dataSource = self.participantData
+        let membership = dataSource[indexPath.section][indexPath.row]
+        if membership.state == .inLobby {
+            let alertVC = UIAlertController(title: "Whether to Let in", message: nil, preferredStyle: .alert)
             let letinAction = UIAlertAction(title: "Let in", style: .default) { (action) in
-                print("===========Let in")
                 self.currentCall?.letIn([membership], completionHandler: { (error) in
-                    
+                    if error != nil {
+                        print("Let in failed " + error.debugDescription)
+                    }
                 })
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
-            let alertVC = UIAlertController(title: "Whether to Let in", message: nil, preferredStyle: .alert)
             alertVC.addAction(letinAction)
             alertVC.addAction(cancelAction)
-            
             self.present(alertVC, animated: true, completion: nil)
         }
     }

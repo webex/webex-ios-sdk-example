@@ -345,7 +345,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             }
             
             /* Callback when yourself is in lobby. */
-            call.inLobby = {[weak self] reason in
+            call.onWaiting = {[weak self] reason in
                 if let strongSelf = self {
                     if reason == .meetingNotStart {
                         strongSelf.navigationTitle = "meeting not start"
@@ -393,7 +393,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
                         }
                         break
-                    case .waitingInLobby(let memberShip):
+                    case .waiting(let memberShip, _):
                         strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
                         break
                     }
@@ -845,8 +845,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             navigationTitle = "Initiated"
         case .ringing:
             navigationTitle = "Ringing"
-        case .inLobby:
-            navigationTitle = "InLobby"
+        case .waiting:
+            navigationTitle = "In Lobby"
         }
     }
     
@@ -1047,7 +1047,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                 if callMembership.state == .joined {
                     inMeeting.append(callMembership)
                 }
-                else if callMembership.state == .inLobby {
+                else if callMembership.state == .waiting {
                     inLobby.append(callMembership)
                 }
                 else {
@@ -1110,7 +1110,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.auxiliaryStreamItem.badgeValue = nil
         }
         
-        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .inLobby}.count)
+        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .waiting}.count)
     }
     
     // MARK: Slide In View SetUp
@@ -1439,7 +1439,7 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
         switch state {
         case .joined:
             return "In Meeting"
-        case .inLobby:
+        case .waiting:
             return "In Lobby"
         default:
             return "Not In Meeting"
@@ -1487,7 +1487,7 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dataSource = self.participantData
         let membership = dataSource[indexPath.section][indexPath.row]
-        if membership.state == .inLobby {
+        if membership.state == .waiting {
             let alertVC = UIAlertController(title: "Whether to Let in", message: nil, preferredStyle: .alert)
             let letinAction = UIAlertAction(title: "Let in", style: .default) { (action) in
                 self.currentCall?.letIn([membership], completionHandler: { (error) in

@@ -205,7 +205,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         
         self.contentTextView = UITextView(frame: CGRect(x: 10, y: 30, width: kScreenWidth-20, height: 320))
         self.contentTextView?.backgroundColor =  UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-        self.contentTextView?.font = UIFont.fontAwesome(ofSize: 15)
+        self.contentTextView?.font = UIFont.systemFont(ofSize: 15)
         self.contentTextView?.isUserInteractionEnabled = true
         self.contentTextView?.isScrollEnabled = true
         self.view.addSubview(self.contentTextView!)

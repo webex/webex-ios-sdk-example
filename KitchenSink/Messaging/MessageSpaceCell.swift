@@ -16,6 +16,7 @@ class MessageSpaceCell: UITableViewCell {
     private var messageButton : UIButton!
     var spaceListVC: SpaceListViewController!
     
+    // update UI after refreshing
     public func updateWithSpace(_ spaceModel: Space?){
         self.spaceModel = spaceModel
         if(self.spaceTitleLabel == nil){

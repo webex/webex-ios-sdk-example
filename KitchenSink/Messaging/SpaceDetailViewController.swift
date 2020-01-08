@@ -32,9 +32,11 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         self.webexSDK?.messages.onEvent = { event in
             switch event {
             case .messageReceived(let message):
+                // callback all messages, if you just want to receive current space's messages, filter to use message.spaceId
                 self.updateMessageAcitivty(message)
                 break
             case .messageDeleted(_):
+                // callback the id of message deleted
                 break
             }
             

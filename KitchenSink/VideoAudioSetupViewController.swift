@@ -283,14 +283,14 @@ class VideoAudioSetupViewController: BaseViewController {
             cameraSetupView.alpha = globalVideoSetting.isSelfViewShow ? 1:0
             selfViewSetupHeight.constant = CGFloat(globalVideoSetting.isSelfViewShow ? selfViewSetupHeightContant:0)
         }
-        if !globalVideoSetting.isSelfViewShow {
+        if !globalVideoSetting.isSelfViewShow { // not sending Video stream
             frontImage.image = uncheckImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = checkImage
             //note:stopPreview stream will not sent to remote side
             webexSDK?.phone.stopPreview()
         }
-        else if globalVideoSetting.facingMode == .user {
+        else if globalVideoSetting.facingMode == .user { // front camera
             frontImage.image = checkImage
             backImage.image = uncheckImage
             selfViewCloseImage.image = uncheckImage
@@ -298,7 +298,7 @@ class VideoAudioSetupViewController: BaseViewController {
             webexSDK?.phone.stopPreview()
             webexSDK?.phone.startPreview(view: self.preview)
         }
-        else {
+        else { // back camera
             frontImage.image = uncheckImage
             backImage.image = checkImage
             selfViewCloseImage.image = uncheckImage
@@ -410,6 +410,7 @@ class VideoAudioSetupViewController: BaseViewController {
         
     }
     
+    // UIView update animation 
     private func expandedView(withAnim animations:@escaping () -> Swift.Void,completion: (() -> Swift.Void)? = nil) {
         UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10.0, options: .curveEaseIn, animations: { [weak self]  in
             if let strongSelf = self {

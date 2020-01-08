@@ -88,7 +88,9 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     private var longPressRec1 : UILongPressGestureRecognizer?
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
+    // all the membership in the space
     private var participantArray: [CallMembership] = []
+    // data source of table view, is 2-D array
     private var participantData: [[CallMembership]] = []
     private var personInfoArray: [Person] = []
     private var openedAuxViews: [MediaRenderView] = []
@@ -369,6 +371,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
                         strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " declined")
+                        /* This might be triggered when membership mute/unmute the audio */
                     case .sendingAudio(let memberShip):
                         if memberShip.sendingAudio {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute audio")
@@ -377,6 +380,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute audio")
                         }
                         break
+                        /* This might be triggered when membership mute/unmute the video */
                     case .sendingVideo(let memberShip):
                         if memberShip.sendingVideo {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute video")
@@ -385,6 +389,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute video")
                         }
                         break
+                        /* This might be triggered when membership start/end the screen share */
                     case .sendingScreenShare(let memberShip):
                         if memberShip.sendingScreenShare {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " share screen")
@@ -393,6 +398,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
                         }
                         break
+                        /* This might be triggered when membership is waiting in lobby */
                     case .waiting(let memberShip, _):
                         strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
                         break
@@ -1487,16 +1493,17 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dataSource = self.participantData
         let membership = dataSource[indexPath.section][indexPath.row]
-        if membership.state == .waiting {
-            let alertVC = UIAlertController(title: "Whether to Let in", message: nil, preferredStyle: .alert)
-            let letinAction = UIAlertAction(title: "Let in", style: .default) { (action) in
+        if membership.state == .waiting && membership.isSelf == false {
+            let alertVC = UIAlertController(title: "Let in?", message: nil, preferredStyle: .alert)
+            let letinAction = UIAlertAction(title: "Yes", style: .default) { (action) in
+                // let sb in the meeting
                 self.currentCall?.letIn([membership], completionHandler: { (error) in
                     if error != nil {
                         print("Let in failed " + error.debugDescription)
                     }
                 })
             }
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: "No", style: .cancel, handler: nil)
             alertVC.addAction(letinAction)
             alertVC.addAction(cancelAction)
             self.present(alertVC, animated: true, completion: nil)

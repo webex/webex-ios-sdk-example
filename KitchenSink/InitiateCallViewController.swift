@@ -189,22 +189,22 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         dissmissKeyboard()
         switch sender.selectedSegmentIndex
         {
-        case 0:
+        case 0: // history
             hideHistoryView(false)
             hideDialAddressView(true)
             hideSearchView(true)
             hideSpaceView(true)
-        case 1:
+        case 1: // search
             hideDialAddressView(true)
             hideSearchView(false)
             hideHistoryView(true)
             hideSpaceView(true)
-        case 2:
+        case 2: // address
             hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(false)
             hideSpaceView(true)
-        case 3:
+        case 3: // space
             hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(true)

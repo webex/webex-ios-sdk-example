@@ -18,6 +18,7 @@ class MessagePersonCell: UITableViewCell {
     private var line: CALayer?
     var spaceListVC: SpaceListViewController!
     
+    // update UI after refreshing
     public func updateWithPersonModel(_ personModel: Person?){
         self.personModel = personModel
         if(self.avatarImageView == nil){

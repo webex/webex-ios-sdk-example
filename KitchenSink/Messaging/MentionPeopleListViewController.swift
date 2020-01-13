@@ -34,6 +34,7 @@ class MentionPeopleListViewController: UIViewController, UITableViewDataSource, 
     // MARK: - WebexSDK: list Memberships
     private func requestMemberShipList(){
         self.indicatorView.startAnimating()
+        // list all memberships of the space
         self.webexSDK?.memberships.list(spaceId: self.spaceId!, completionHandler: { (response: ServiceResponse<[Membership]>) in
             self.indicatorView.stopAnimating()
             switch response.result {

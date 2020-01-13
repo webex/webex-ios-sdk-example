@@ -12,6 +12,7 @@ class MembershipCell: UITableViewCell {
     public var membershipModel: Membership?
     private var membershipTitleLabel : UILabel?
     
+    // update UI after refreshing
     public func updateWithMembership(_ membershipModel: Membership?){
         self.membershipModel = membershipModel
         if(self.membershipTitleLabel == nil){

@@ -79,6 +79,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
             switch response.result {
             case .success(let value):
                 let threahGroup = DispatchGroup()
+                // after creating space, let selectedPersons add into new space
                 for person in self.selectedPersonList{
                     DispatchQueue.global().async(group: threahGroup, execute: {
                         self.webexSDK?.memberships.create(spaceId: value.id!, personEmail:(person.emails?.first)!, completionHandler: { (response: ServiceResponse<Membership>) in
@@ -91,6 +92,7 @@ class CreateGroupViewControlller: BaseViewController ,UITextFieldDelegate ,UISea
                         })
                     })
                 }
+                
                 threahGroup.notify(queue: DispatchQueue.global(), execute: {
                     DispatchQueue.main.async {
                         if(self.spaceCreatedBlock != nil){

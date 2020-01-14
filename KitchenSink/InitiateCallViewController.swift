@@ -169,7 +169,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         view.bringSubviewToFront(indicatorView)
         dialAddressTextField.layer.borderColor = UIColor.gray.cgColor
         
-        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
+        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .phone, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
         segmentedControl = UISegmentedControl.init(items: itemArray)
         segmentedControl?.frame = CGRect.init(x: 0, y: 0, width: 150, height: 29)
         segmentedControl?.tintColor = UIColor.titleGreyColor()
@@ -189,22 +189,22 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         dissmissKeyboard()
         switch sender.selectedSegmentIndex
         {
-        case 0:
+        case 0: // history
             hideHistoryView(false)
             hideDialAddressView(true)
             hideSearchView(true)
             hideSpaceView(true)
-        case 1:
+        case 1: // search
             hideDialAddressView(true)
             hideSearchView(false)
             hideHistoryView(true)
             hideSpaceView(true)
-        case 2:
+        case 2: // address
             hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(false)
             hideSpaceView(true)
-        case 3:
+        case 3: // space
             hideHistoryView(true)
             hideSearchView(true)
             hideDialAddressView(true)

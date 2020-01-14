@@ -79,8 +79,8 @@ class AppFeedbackViewController: BaseViewController, MFMailComposeViewController
         //navigation bar init
         let nextButton = UIButton.init(frame: CGRect.init(x: 0, y: 0, width: 44, height: 44))
         
-        let nextImage = UIImage.fontAwesomeIcon(name: .send, textColor: UIColor.buttonGreenNormal(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE , height: 44))
-        let nextLightImage = UIImage.fontAwesomeIcon(name: .send, textColor: UIColor.buttonGreenHightlight(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE, height: 44))
+        let nextImage = UIImage.fontAwesomeIcon(name: .paperPlane, textColor: UIColor.buttonGreenNormal(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE , height: 44))
+        let nextLightImage = UIImage.fontAwesomeIcon(name: .paperPlane, textColor: UIColor.buttonGreenHightlight(), size: CGSize.init(width: 32 * Utils.WIDTH_SCALE, height: 44))
         nextButton.setImage(nextImage, for: .normal)
         nextButton.setImage(nextLightImage, for: .highlighted)
         nextButton.addTarget(self, action: #selector(sendMail), for: .touchUpInside)

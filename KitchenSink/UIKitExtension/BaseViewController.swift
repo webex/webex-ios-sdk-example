@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 import UIKit
-import FontAwesome_swift
 
 class BaseNavigationViewController: UINavigationController,UIGestureRecognizerDelegate,UINavigationControllerDelegate {
 

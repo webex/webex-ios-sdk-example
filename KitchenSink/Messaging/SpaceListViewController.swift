@@ -101,7 +101,7 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
     
     // MARK: - UI Implementation
     public func setupView(){
-        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .commenting, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
+        let itemArray = [UIImage.fontAwesomeIcon(name: .history, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .search, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .commentDots, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29)),UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 29))]
         
         //init history tableView data
         segmentedControl = UISegmentedControl.init(items: itemArray)
@@ -248,8 +248,8 @@ class SpaceListViewController: BaseViewController, UISearchBarDelegate, UITableV
             
             // message button
             let messageButton = UIButton(frame: CGRect(x: kScreenWidth/2-40, y: kScreenHeight/2-80, width: 80*Utils.HEIGHT_SCALE, height: 80*Utils.HEIGHT_SCALE))
-            messageButton.setImage(UIImage.fontAwesomeIcon(name: .commenting, textColor: UIColor.white, size: CGSize.init(width: 48*Utils.WIDTH_SCALE , height: 32)), for: .normal)
-            messageButton.setImage(UIImage.fontAwesomeIcon(name: .commenting, textColor: UIColor.gray, size: CGSize.init(width: 48*Utils.WIDTH_SCALE , height: 32)), for: .highlighted)
+            messageButton.setImage(UIImage.fontAwesomeIcon(name: .commentDots, textColor: UIColor.white, size: CGSize.init(width: 48*Utils.WIDTH_SCALE , height: 32)), for: .normal)
+            messageButton.setImage(UIImage.fontAwesomeIcon(name: .commentDots, textColor: UIColor.gray, size: CGSize.init(width: 48*Utils.WIDTH_SCALE , height: 32)), for: .highlighted)
             messageButton.backgroundColor = UIColor.buttonGreenNormal()
             messageButton.layer.cornerRadius = (80*Utils.HEIGHT_SCALE)/2
             messageButton.addTarget(self, action:#selector(messageToEmailButtonClicked), for: .touchUpInside)

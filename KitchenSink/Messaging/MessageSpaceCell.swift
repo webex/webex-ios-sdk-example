@@ -16,6 +16,7 @@ class MessageSpaceCell: UITableViewCell {
     private var messageButton : UIButton!
     var spaceListVC: SpaceListViewController!
     
+    // update UI after refreshing
     public func updateWithSpace(_ spaceModel: Space?){
         self.spaceModel = spaceModel
         if(self.spaceTitleLabel == nil){
@@ -30,8 +31,8 @@ class MessageSpaceCell: UITableViewCell {
         
         if(self.messageButton == nil){
             self.messageButton = UIButton(frame: CGRect(x: kScreenWidth-70, y: 26*Utils.HEIGHT_SCALE, width: 48*Utils.HEIGHT_SCALE, height: 48*Utils.HEIGHT_SCALE))
-            self.messageButton?.setImage(UIImage.fontAwesomeIcon(name: .commenting, textColor: UIColor.white, size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 32)), for: .normal)
-            self.messageButton?.setImage(UIImage.fontAwesomeIcon(name: .commenting, textColor: UIColor.gray, size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 32)), for: .highlighted)
+            self.messageButton?.setImage(UIImage.fontAwesomeIcon(name: .commentDots, textColor: UIColor.white, size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 32)), for: .normal)
+            self.messageButton?.setImage(UIImage.fontAwesomeIcon(name: .commentDots, textColor: UIColor.gray, size: CGSize.init(width: 32*Utils.WIDTH_SCALE , height: 32)), for: .highlighted)
             self.messageButton.backgroundColor = UIColor.buttonGreenNormal()
             self.messageButton.layer.cornerRadius = (48*Utils.HEIGHT_SCALE)/2
             self.messageButton.addTarget(self, action: #selector(message), for: .touchUpInside)

@@ -60,8 +60,8 @@ class ParticipantTableViewCell: UITableViewCell {
         self.audioStatusImage.image = audioImage
         self.audioStatusImage.highlightedImage = muteAudioImage
         
-        let videoImage = UIImage.fontAwesomeIcon(name: .videoCamera, textColor: UIColor.buttonGreenNormal(), size: CGSize.init(width: 48 * Utils.WIDTH_SCALE , height: 48 * Utils.HEIGHT_SCALE))
-        let muteVideoImage = UIImage.fontAwesomeIcon(name: .videoCamera, textColor: UIColor.baseRedHighlight(), size: CGSize.init(width: 48 * Utils.WIDTH_SCALE, height: 48 * Utils.HEIGHT_SCALE))
+        let videoImage = UIImage.fontAwesomeIcon(name: .video, textColor: UIColor.buttonGreenNormal(), size: CGSize.init(width: 48 * Utils.WIDTH_SCALE , height: 48 * Utils.HEIGHT_SCALE))
+        let muteVideoImage = UIImage.fontAwesomeIcon(name: .video, textColor: UIColor.baseRedHighlight(), size: CGSize.init(width: 48 * Utils.WIDTH_SCALE, height: 48 * Utils.HEIGHT_SCALE))
         self.videoStatusImage.image = videoImage
         self.videoStatusImage.highlightedImage = muteVideoImage
         

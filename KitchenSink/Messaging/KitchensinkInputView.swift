@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 import UIKit
-import FontAwesome_swift
 import PhotosUI
 import WebexSDK
 
@@ -241,9 +240,11 @@ class KitchensinkInputView: UIView, UIImagePickerControllerDelegate , UINavigati
                     print("status is \(newStatus)")
                     if newStatus == PHAuthorizationStatus.authorized{
                         print("success")
-                        self.galleryPicker.sourceType = .photoLibrary
-                        self.galleryPicker.delegate = self
-                        self.backVC.present(self.galleryPicker, animated: true)
+                        DispatchQueue.main.async {
+                            self.galleryPicker.sourceType = .photoLibrary
+                            self.galleryPicker.delegate = self
+                            self.backVC.present(self.galleryPicker, animated: true)
+                        }
                     }
                 })
                 break

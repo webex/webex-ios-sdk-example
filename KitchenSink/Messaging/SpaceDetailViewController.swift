@@ -32,9 +32,11 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         self.webexSDK?.messages.onEvent = { event in
             switch event {
             case .messageReceived(let message):
+                // callback all messages, if you just want to receive current space's messages, filter to use message.spaceId
                 self.updateMessageAcitivty(message)
                 break
             case .messageDeleted(_):
+                // callback the id of message deleted
                 break
             }
             
@@ -205,7 +207,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         
         self.contentTextView = UITextView(frame: CGRect(x: 10, y: 30, width: kScreenWidth-20, height: 320))
         self.contentTextView?.backgroundColor =  UIColor.init(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-        self.contentTextView?.font = UIFont.fontAwesome(ofSize: 15)
+        self.contentTextView?.font = UIFont.systemFont(ofSize: 15)
         self.contentTextView?.isUserInteractionEnabled = true
         self.contentTextView?.isScrollEnabled = true
         self.view.addSubview(self.contentTextView!)

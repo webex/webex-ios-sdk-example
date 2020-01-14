@@ -83,12 +83,15 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     private let remoteDisplayNameLabel = UILabel()
     private let fullScreenImage = UIImage.fontAwesomeIcon(name: .expand, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
     private let normalScreenImage = UIImage.fontAwesomeIcon(name: .compress, textColor: UIColor.white, size: CGSize.init(width: 44, height: 44))
-    private static let uncheckImage = UIImage.fontAwesomeIcon(name: .squareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
-    private static let checkImage = UIImage.fontAwesomeIcon(name: .checkSquareO, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private static let uncheckImage = UIImage.fontAwesomeIcon(name: .square, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
+    private static let checkImage = UIImage.fontAwesomeIcon(name: .checkSquare, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private var longPressRec1 : UILongPressGestureRecognizer?
     private var longPressRec2 : UILongPressGestureRecognizer?
     private var first: Bool = true
+    // all the membership in the space
     private var participantArray: [CallMembership] = []
+    // data source of table view, is 2-D array
+    private var participantData: [[CallMembership]] = []
     private var personInfoArray: [Person] = []
     private var openedAuxViews: [MediaRenderView] = []
     private var auxiliaryVideoUI: [AuxiliaryStreamUICollection] = []
@@ -343,7 +346,18 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                 }
             }
             
-            /* Callback when remote participant(s) join/left/decline connected. */
+            /* Callback when yourself is in lobby. */
+            call.onWaiting = {[weak self] reason in
+                if let strongSelf = self {
+                    if reason == .meetingNotStart {
+                        strongSelf.navigationTitle = "meeting not start"
+                    }else {
+                        strongSelf.navigationTitle = "waiting for admitting"
+                    }
+                }
+            }
+            
+            /* Callback when remote participant(s) join/left/decline/inLobby connected. */
             call.onCallMembershipChanged = { [weak self] memberShipChangeType  in
                 if let strongSelf = self {
                     switch memberShipChangeType {
@@ -357,6 +371,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
                         strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " declined")
+                        /* This might be triggered when membership mute/unmute the audio */
                     case .sendingAudio(let memberShip):
                         if memberShip.sendingAudio {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute audio")
@@ -365,6 +380,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute audio")
                         }
                         break
+                        /* This might be triggered when membership mute/unmute the video */
                     case .sendingVideo(let memberShip):
                         if memberShip.sendingVideo {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute video")
@@ -373,6 +389,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute video")
                         }
                         break
+                        /* This might be triggered when membership start/end the screen share */
                     case .sendingScreenShare(let memberShip):
                         if memberShip.sendingScreenShare {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " share screen")
@@ -380,6 +397,10 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                         else {
                             strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
                         }
+                        break
+                        /* This might be triggered when membership is waiting in lobby */
+                    case .waiting(let memberShip, _):
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
                         break
                     }
                     self?.updateParticipantTable()
@@ -661,22 +682,22 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         
         //tab bar image
         self.participantsItem.image =
-            UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+            UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.participantsItem.selectedImage =
-            UIImage.fontAwesomeIcon(name: .group, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+            UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.callControlItem.image =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.callControlItem.selectedImage =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.auxiliaryStreamItem.image =
-            UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+            UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.auxiliaryStreamItem.selectedImage =
-            UIImage.fontAwesomeIcon(name: .fileMovieO, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+            UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         
         callFunctionTabBar.delegate = self
         self.participantsTableView.dataSource = self
         self.participantsTableView.delegate = self
-        self.participantsTableView.allowsSelection = false
+        self.participantsTableView.allowsSelection = true
         self.callFunctionTabBar.selectedItem = callControlItem
         
         for index in 0..<self.auxVideoViews.count {
@@ -830,6 +851,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             navigationTitle = "Initiated"
         case .ringing:
             navigationTitle = "Ringing"
+        case .waiting:
+            navigationTitle = "In Lobby"
         }
     }
     
@@ -1021,7 +1044,25 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     private func updateParticipantTable() {
         DispatchQueue.main.async {
-            self.participantArray = self.currentCall?.memberships.filter({$0.state == .joined}) ?? []
+            self.participantArray = self.currentCall?.memberships ?? []
+            
+            var inMeeting = [CallMembership]()
+            var inLobby = [CallMembership]()
+            var notInMeeting = [CallMembership]()
+            self.participantArray.forEach { (callMembership) in
+                if callMembership.state == .joined {
+                    inMeeting.append(callMembership)
+                }
+                else if callMembership.state == .waiting {
+                    inLobby.append(callMembership)
+                }
+                else {
+                    notInMeeting.append(callMembership)
+                }
+            }
+            let array:[Array<CallMembership>] = [inMeeting, inLobby, notInMeeting]
+            self.participantData = array.filter({$0.count > 0})
+            
             self.participantsTableView.reloadData()
         }
     }
@@ -1074,7 +1115,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         } else {
             self.auxiliaryStreamItem.badgeValue = nil
         }
-        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.count)
+        
+        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .waiting}.count)
     }
     
     // MARK: Slide In View SetUp
@@ -1385,16 +1427,36 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.participantsTableView {
             self.updateBadgeValue()
-            return self.participantArray.count
+            return self.participantData[section].count
         }
         return 0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30 * Utils.HEIGHT_SCALE
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return self.participantData.count
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let state = self.participantData[section].first?.state
+        switch state {
+        case .joined:
+            return "In Meeting"
+        case .waiting:
+            return "In Lobby"
+        default:
+            return "Not In Meeting"
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantCell", for: indexPath) as! ParticipantTableViewCell
         
-        let dataSource: [CallMembership]?
-        dataSource = self.participantArray
+        let dataSource: [[CallMembership]]?
+        dataSource = self.participantData
         
         func updateCellInfo(cell: ParticipantTableViewCell, person: Person?, callmembership: CallMembership) {
             if let cellPerson = person {
@@ -1408,7 +1470,7 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         
-        if let participant = dataSource?[indexPath.row] {
+        if let participant = dataSource?[indexPath.section][indexPath.row] {
             if let oldPerson = self.personInfoArray.filter({$0.id == participant.personId}).first {
                 updateCellInfo(cell: cell, person: oldPerson, callmembership: participant)
             } else if let personId = participant.personId {
@@ -1426,5 +1488,25 @@ extension VideoCallViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let dataSource = self.participantData
+        let membership = dataSource[indexPath.section][indexPath.row]
+        if membership.state == .waiting && membership.isSelf == false {
+            let alertVC = UIAlertController(title: "Let in?", message: nil, preferredStyle: .alert)
+            let letinAction = UIAlertAction(title: "Yes", style: .default) { (action) in
+                // let sb in the meeting
+                self.currentCall?.letIn([membership], completionHandler: { (error) in
+                    if error != nil {
+                        print("Let in failed " + error.debugDescription)
+                    }
+                })
+            }
+            let cancelAction = UIAlertAction(title: "No", style: .cancel, handler: nil)
+            alertVC.addAction(letinAction)
+            alertVC.addAction(cancelAction)
+            self.present(alertVC, animated: true, completion: nil)
+        }
     }
 }

@@ -8,6 +8,7 @@
 
 import UIKit
 import WebexSDK
+import WebKit
 
 class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDelegate , UINavigationControllerDelegate {
     
@@ -155,8 +156,8 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
             switch result {
             case .success(let url):
                 progressLabel.text = "100%"
-                let webView = UIWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
-                webView.loadRequest(URLRequest(url: url))
+                let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: kScreenHeight))
+                webView.load(URLRequest(url: url))
                 let webVC = UIViewController()
                 webVC.view = webView
                 self.navigationController?.pushViewController(webVC, animated: true)

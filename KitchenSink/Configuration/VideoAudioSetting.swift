@@ -64,21 +64,21 @@ class VideoAudioSetting {
         }
     }
     //TODO: @Kyle
-    var RXBandWidth: UInt32{
+    var txBandWidth: UInt32{
         get {
-            return 386000
+            return self.webexSDK?.phone.videoMaxTxBandwidth ?? Phone.DefaultBandwidth.maxBandwidth360p.rawValue
         }
         set(newValue){
-            
+            self.webexSDK?.phone.videoMaxTxBandwidth = newValue
         }
     }
     
-    var TXBandWidth: UInt32{
+    var rxBandWidth: UInt32{
         get {
-            return self.webexSDK?.phone.videoMaxBandwidth ?? 386000
+            return self.webexSDK?.phone.videoMaxRxBandwidth ?? Phone.DefaultBandwidth.maxBandwidth360p.rawValue
         }
         set(newValue){
-            self.webexSDK?.phone.videoMaxBandwidth = newValue
+            self.webexSDK?.phone.videoMaxRxBandwidth = newValue
         }
     }
     

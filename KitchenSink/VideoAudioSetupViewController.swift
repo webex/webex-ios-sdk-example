@@ -152,9 +152,8 @@ class VideoAudioSetupViewController: BaseViewController {
         
         //RX bandwidth label
         RXBandwidthArrow.image = arrowImage
-        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraRXBandwidthGestureEvent(sender:)))
+        tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraBandwidthGestureEvent(sender:)))
         RXBandwidthBackView.addGestureRecognizer(tapGesture)
-        updateRXBandwidthView()
         
         //TX bandwidth label
         bandwidthImg.image = arrowImage
@@ -201,76 +200,37 @@ class VideoAudioSetupViewController: BaseViewController {
             updateCameraStatus()
         }
     }
-    
-    @objc func handleCameraRXBandwidthGestureEvent(sender: UITapGestureRecognizer){
-        let alertController = UIAlertController(title: "Band Width", message: nil, preferredStyle: .actionSheet)
         
-        let action1 = UIAlertAction(title: "177Kbs", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth = 177000
-            self.updateRXBandwidthView()
-        })
-        let action2 = UIAlertAction(title: "384Kbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth  = 384000
-            self.updateRXBandwidthView()
-        })
-        let action3 = UIAlertAction(title: "768Kbs", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth  = 768000
-            self.updateRXBandwidthView()
-        })
-        let action4 = UIAlertAction(title: "2Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth  = 2000000
-            self.updateRXBandwidthView()
-        })
-        let action5 = UIAlertAction(title: "3Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth  = 3000000
-            self.updateRXBandwidthView()
-        })
-        let action6 = UIAlertAction(title: "4Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.RXBandWidth  = 4000000
-            self.updateRXBandwidthView()
-        })
-        
-        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
-            
-        })
-        
-        alertController.addAction(action1)
-        alertController.addAction(action2)
-        alertController.addAction(action3)
-        alertController.addAction(action4)
-        alertController.addAction(action5)
-        alertController.addAction(action6)
-        alertController.addAction(cancelButton)
-
-        self.navigationController!.present(alertController, animated: true, completion: nil)
-    }
-    
     @objc func handleCameraBandwidthGestureEvent(sender: UITapGestureRecognizer){
         let alertController = UIAlertController(title: "Band Width", message: nil, preferredStyle: .actionSheet)
         
+        func changeBandwidth(sender: UITapGestureRecognizer, bandwidth: UInt32) {
+            if (sender.view == RXBandwidthBackView) {
+                globalVideoSetting.rxBandWidth = bandwidth
+            }
+            else {
+                globalVideoSetting.txBandWidth = bandwidth
+            }
+             self.updateBandwidthView()
+        }
+        
         let action1 = UIAlertAction(title: "177Kbs", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth = 177000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 177000)
         })
         let action2 = UIAlertAction(title: "384Kbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth  = 384000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 384000)
         })
         let action3 = UIAlertAction(title: "768Kbs", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth  = 768000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 768000)
         })
         let action4 = UIAlertAction(title: "2Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth  = 2000000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 2000000)
         })
         let action5 = UIAlertAction(title: "3Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth  = 3000000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 3000000)
         })
         let action6 = UIAlertAction(title: "4Mbps", style: .default, handler: { (action) -> Void in
-            globalVideoSetting.TXBandWidth  = 4000000
-            self.updateBandwidthView()
+            changeBandwidth(sender: sender, bandwidth: 4000000)
         })
         
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) -> Void in
@@ -287,70 +247,40 @@ class VideoAudioSetupViewController: BaseViewController {
 
         self.navigationController!.present(alertController, animated: true, completion: nil)
     }
-    
-    func updateRXBandwidthView(){
-        var bandWidthStr : String = ""
-        //TODO: @Kyle
-        if let bandwidth = webexSDK?.phone.videoMaxBandwidth{
-            switch Int(bandwidth) {
-            case 177000 :
-                bandWidthStr = "177Kbps "
-                break
-            case 384000 :
-                bandWidthStr = "384Kbps "
-                break
-            case 768000 :
-                bandWidthStr = "768Kbps "
-                break
-            case 2000000 :
-                bandWidthStr = "2Mbps "
-                break
-            case 3000000 :
-                bandWidthStr = "3Mbps "
-                break
-            case 4000000:
-                bandWidthStr = "4Mbps "
-                break
-            default:
-                bandWidthStr = "720p "
-                break
-            }
-            RXBandWidthLabel.text = bandWidthStr
-        }else{
-            RXBandWidthLabel.text = ""
-        }
-    }
-    
+        
     func updateBandwidthView(){
-        var bandWidthStr : String = ""
-        if let bandwidth = webexSDK?.phone.videoMaxBandwidth{
-            switch Int(bandwidth) {
-            case 177000 :
-                bandWidthStr = "177Kbps "
-                break
-            case 384000 :
-                bandWidthStr = "384Kbps "
-                break
-            case 768000 :
-                bandWidthStr = "768Kbps "
-                break
-            case 2000000 :
-                bandWidthStr = "2Mbps "
-                break
-            case 3000000 :
-                bandWidthStr = "3Mbps "
-                break
-            case 4000000:
-                bandWidthStr = "4Mbps "
-                break
-            default:
-                bandWidthStr = "720p "
-                break
+        func updateBandwidthView(lable: UILabel) {
+            var bandWidthStr : String = ""
+            let bandwidth = (lable == RXBandWidthLabel) ? webexSDK?.phone.videoMaxRxBandwidth : webexSDK?.phone.videoMaxTxBandwidth
+            if let bandwidth = bandwidth {
+                switch Int(bandwidth) {
+                case 177000 :
+                    bandWidthStr = "177Kbps "
+                    break
+                case 384000 :
+                    bandWidthStr = "384Kbps "
+                    break
+                case 768000 :
+                    bandWidthStr = "768Kbps "
+                    break
+                case 2000000 :
+                    bandWidthStr = "2Mbps "
+                    break
+                case 3000000 :
+                    bandWidthStr = "3Mbps "
+                    break
+                case 4000000:
+                    bandWidthStr = "4Mbps "
+                    break
+                default:
+                    bandWidthStr = "720p "
+                    break
+                }
             }
-            bandWidthLabel.text = bandWidthStr
-        }else{
-            bandWidthLabel.text = ""
+            lable.text = bandWidthStr
         }
+        updateBandwidthView(lable: RXBandWidthLabel)
+        updateBandwidthView(lable: bandWidthLabel)
     }
     
     func updateCallCapStatus() {

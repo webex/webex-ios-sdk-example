@@ -250,34 +250,9 @@ class VideoAudioSetupViewController: BaseViewController {
         
     func updateBandwidthView(){
         func updateBandwidthView(lable: UILabel) {
-            var bandWidthStr : String = ""
-            let bandwidth = (lable == RXBandWidthLabel) ? webexSDK?.phone.videoMaxRxBandwidth : webexSDK?.phone.videoMaxTxBandwidth
-            if let bandwidth = bandwidth {
-                switch Int(bandwidth) {
-                case 177000 :
-                    bandWidthStr = "177Kbps "
-                    break
-                case 384000 :
-                    bandWidthStr = "384Kbps "
-                    break
-                case 768000 :
-                    bandWidthStr = "768Kbps "
-                    break
-                case 2000000 :
-                    bandWidthStr = "2Mbps "
-                    break
-                case 3000000 :
-                    bandWidthStr = "3Mbps "
-                    break
-                case 4000000:
-                    bandWidthStr = "4Mbps "
-                    break
-                default:
-                    bandWidthStr = "720p "
-                    break
-                }
+            if let bandwidth = (lable == RXBandWidthLabel) ? webexSDK?.phone.videoMaxRxBandwidth : webexSDK?.phone.videoMaxTxBandwidth {
+                lable.text = "\(bandwidth/1000) Kbps"
             }
-            lable.text = bandWidthStr
         }
         updateBandwidthView(lable: RXBandWidthLabel)
         updateBandwidthView(lable: bandWidthLabel)

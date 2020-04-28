@@ -63,8 +63,17 @@ class VideoAudioSetting {
             self.webexSDK?.phone.defaultLoudSpeaker = newValue
         }
     }
+    //TODO: @Kyle
+    var RXBandWidth: UInt32{
+        get {
+            return 386000
+        }
+        set(newValue){
+            
+        }
+    }
     
-    var bandWidth: UInt32{
+    var TXBandWidth: UInt32{
         get {
             return self.webexSDK?.phone.videoMaxBandwidth ?? 386000
         }

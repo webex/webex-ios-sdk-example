@@ -223,7 +223,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             else {
                 mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
             }
-            self.webexSDK?.phone.videoMaxBandwidth = globalVideoSetting.bandWidth
+            self.webexSDK?.phone.videoMaxTxBandwidth = globalVideoSetting.txBandWidth
+            self.webexSDK?.phone.videoMaxRxBandwidth = globalVideoSetting.rxBandWidth
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
@@ -257,7 +258,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             else {
                 mediaOption = MediaOption.audioVideoScreenShare(video: (self.self.selfView!, self.remoteView!))
             }
-            self.webexSDK?.phone.videoMaxBandwidth = globalVideoSetting.bandWidth
+            self.webexSDK?.phone.videoMaxTxBandwidth = globalVideoSetting.txBandWidth
+            self.webexSDK?.phone.videoMaxRxBandwidth = globalVideoSetting.rxBandWidth
         }
         
         if !globalVideoSetting.isSelfViewShow {

@@ -43,10 +43,9 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                 break
             case .messageUpdated(let messageId, let type):
                 switch type {
-                case .thumbnail(let files):
+                case .fileThumbnail(let files):
                     if self.currentMessage?.id == messageId {
-                        self.currentMessage?.files = files
-                        self.updateMessageAcitivty(self.currentMessage)
+                        self.updateMessageAcitivty(self.currentMessage, files: files)
                     }
                 }
                 break
@@ -242,14 +241,14 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         self.view.addSubview(self.textInputView!)
     }
     
-    public func updateMessageAcitivty(_ message: Message?){
+    public func updateMessageAcitivty(_ message: Message?, files: [RemoteFile]? = nil){
         guard message != nil else {
             return
         }
         if let msg = message {
             self.contentTextView?.text = "\(msg))"
         }
-        if let files = message?.files {
+        if let files = files ?? message?.files {
             self.setUpFileContentsView(files: files)
         }
         

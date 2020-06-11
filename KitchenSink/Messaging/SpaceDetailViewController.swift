@@ -19,6 +19,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
     private var fileContentsView: UIScrollView?
     private var textInputView: KitchensinkInputView?
     private var receivedFiles: [RemoteFile]? = [RemoteFile]()
+    private var currentMessage: Message?
     
     /// saparkSDK reperesent for the WebexSDK API instance
     var webexSDK: Webex?
@@ -34,10 +35,20 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
             switch event {
             case .messageReceived(let message):
                 // callback all messages, if you just want to receive current space's messages, filter to use message.spaceId
+                self.currentMessage = message
                 self.updateMessageAcitivty(message)
                 break
             case .messageDeleted(_):
                 // callback the id of message deleted
+                break
+            case .messageUpdated(let messageId, let type):
+                switch type {
+                case .thumbnail(let files):
+                    if self.currentMessage?.id == messageId {
+                        self.currentMessage?.files = files
+                        self.updateMessageAcitivty(self.currentMessage)
+                    }
+                }
                 break
             }
             
@@ -99,6 +110,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                     /// Send Message Call Back Code Here
                     self.title = "Sent Sucess!"
                     self.spaceId = message.spaceId
+                    self.currentMessage = message
                     self.updateMessageAcitivty(message)
                     break
                 case .failure(let error):
@@ -117,6 +129,7 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                     /// Send Message Call Back Code Here
                     self.title = "Sent Sucess!"
                     self.spaceId = message.spaceId
+                    self.currentMessage = message
                     self.updateMessageAcitivty(message)
                     break
                 case .failure(let error):

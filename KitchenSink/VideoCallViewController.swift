@@ -179,6 +179,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         self.updateUIStatus()
         /* WebexSDK: register callback functions for "Callstate" changing */
         self.webexCallStatesProcess()
+        
+        self.registerBroadcastObserver()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -186,6 +188,8 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         if (navigationController?.isNavigationBarHidden ?? false) == true {
             navigationController?.isNavigationBarHidden = false
         }
+        
+        self.removeBroadcastObserver()
     }
     
     override func viewDidLayoutSubviews() {
@@ -201,6 +205,26 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             
         }
         self.currentCall = nil
+    }
+    
+    func removeBroadcastObserver() {
+        CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(), UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque()), CFNotificationName("broadcastFinished" as CFString), nil)
+    }
+    
+    //the notification is posted in SampleHandler.swift
+    func registerBroadcastObserver() {
+        let observer = UnsafeRawPointer(Unmanaged.passUnretained(self).toOpaque())
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
+            observer,
+            { (_, observer, _, _, _) -> Void in
+                if let observer = observer {
+                    let mySelf = Unmanaged<VideoCallViewController>.fromOpaque(observer).takeUnretainedValue()
+                    mySelf.stopScreenShare()
+                }
+            },
+            "broadcastFinished" as CFString,
+            nil,
+            .deliverImmediately)
     }
     
     // MARK: - WebexSDK: Dail/Answer/Hangup phone call
@@ -643,6 +667,17 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     }
     
     @IBAction func toggleScreenShare(_ sender: Any) {
+
+        if #available(iOS 12.0, *) {
+                let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
+                broadcastPicker.preferredExtension = "com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtension"
+                for subview in broadcastPicker.subviews {
+                if let button = subview as? UIButton {
+                    button.sendActions(for: .allTouchEvents)
+                }
+            }
+        }
+
         if #available(iOS 11.2, *) {
             if screenShareSwitch.isOn {
                 self.currentCall?.startSharing() {
@@ -650,14 +685,24 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                     print("ERROR: \(String(describing: error))")
                 }
             } else {
-                self.currentCall?.stopSharing() {
-                    error in
-                    print("ERROR: \(String(describing: error))")
+                if #available(iOS 12.0, *) {
+                    // if iOS >= 12.0, will not call stopScreenShare() until receiving 'broadcastFinished' notification.
+                    return
                 }
+                self.stopScreenShare()
             }
         } else {
             screenShareSwitch.isOn = false
             self.view.makeToast("Screen share only available in iOS 11.2 and higher", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: ToastStyle.init())
+        }
+    }
+    
+    func stopScreenShare() {
+        if #available(iOS 11.2, *) {
+            self.currentCall?.stopSharing() {
+                error in
+                print("ERROR: \(String(describing: error))")
+            }
         }
     }
     

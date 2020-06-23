@@ -55,6 +55,7 @@ class SampleHandler: RPBroadcastSampleHandler {
     override func broadcastFinished() {
         // User has requested to finish the broadcast.
         WebexBroadcastExtension.sharedInstance.finish()
+        CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName("broadcastFinished" as CFString), nil, nil, true)
     }
     
     override func processSampleBuffer(_ sampleBuffer: CMSampleBuffer, with sampleBufferType: RPSampleBufferType) {

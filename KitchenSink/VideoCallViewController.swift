@@ -643,8 +643,18 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     }
     
     @IBAction func toggleScreenShare(_ sender: Any) {
+
         if #available(iOS 11.2, *) {
             if screenShareSwitch.isOn {
+                if #available(iOS 12.0, *) {
+                    let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+                    broadcastPicker.preferredExtension =  "com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtension"
+                    for subview in broadcastPicker.subviews {
+                        if let button = subview as? UIButton {
+                            button.sendActions(for: .allTouchEvents)
+                        }
+                    }
+                }
                 self.currentCall?.startSharing() {
                     error in
                     print("ERROR: \(String(describing: error))")

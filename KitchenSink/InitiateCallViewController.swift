@@ -126,7 +126,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     // MARK: - WebexSDK: list Space
     private func webexListSpace(){
         self.indicatorView.startAnimating()
-        self.webexSDK?.spaces.list(type: SpaceType.group ,completionHandler: { (response: ServiceResponse<[Space]>) in
+        self.webexSDK?.spaces.list(type: SpaceType.group, sortBy: .byLastActivity ,completionHandler: { (response: ServiceResponse<[Space]>) in
             self.indicatorView.stopAnimating()
             switch response.result {
             case .success(let value):

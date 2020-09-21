@@ -25,7 +25,7 @@ class MessagePersonCell: UITableViewCell {
             self.avatarImageView = UIImageView(frame: CGRect(x: 20, y: 10*Utils.HEIGHT_SCALE, width: 80*Utils.HEIGHT_SCALE, height: 80*Utils.HEIGHT_SCALE))
             self.avatarImageView.layer.cornerRadius = (80*Utils.HEIGHT_SCALE)/2
             self.avatarImageView.layer.masksToBounds = true
-            self.addSubview(self.avatarImageView!)
+            self.contentView.addSubview(self.avatarImageView!)
         }
         self.avatarImageView.image = UIImage(named: "DefaultAvatar")
         Utils.downloadAvatarImage(self.personModel?.avatar, completionHandler: {
@@ -34,7 +34,7 @@ class MessagePersonCell: UITableViewCell {
         
         if(self.nameLabel == nil){
             self.nameLabel = UILabel(frame: CGRect(x: 30+80*Utils.HEIGHT_SCALE, y: 0, width: kScreenWidth-110-80*Utils.HEIGHT_SCALE, height: cellHeight*Utils.HEIGHT_SCALE))
-            self.addSubview(self.nameLabel!)
+            self.contentView.addSubview(self.nameLabel!)
         }
         self.nameLabel.text = self.personModel?.displayName
         
@@ -45,7 +45,7 @@ class MessagePersonCell: UITableViewCell {
             self.messageButton.backgroundColor = UIColor.buttonGreenNormal()
             self.messageButton.layer.cornerRadius = (48*Utils.HEIGHT_SCALE)/2
             self.messageButton.addTarget(self, action: #selector(message), for: .touchUpInside)
-            self.addSubview(self.messageButton)
+            self.contentView.addSubview(self.messageButton)
         }
         
         if(self.line == nil){

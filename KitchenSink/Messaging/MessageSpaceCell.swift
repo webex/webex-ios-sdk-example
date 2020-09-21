@@ -25,7 +25,7 @@ class MessageSpaceCell: UITableViewCell {
             self.spaceTitleLabel?.textColor = UIColor.darkGray
             self.spaceTitleLabel?.textAlignment = .center
             self.spaceTitleLabel?.numberOfLines = 0
-            self.addSubview(self.spaceTitleLabel!)
+            self.contentView.addSubview(self.spaceTitleLabel!)
         }
         self.spaceTitleLabel?.text = (self.spaceModel?.title)!
         
@@ -36,7 +36,7 @@ class MessageSpaceCell: UITableViewCell {
             self.messageButton.backgroundColor = UIColor.buttonGreenNormal()
             self.messageButton.layer.cornerRadius = (48*Utils.HEIGHT_SCALE)/2
             self.messageButton.addTarget(self, action: #selector(message), for: .touchUpInside)
-            self.addSubview(self.messageButton)
+            self.contentView.addSubview(self.messageButton)
         }
         
         if(self.line == nil){

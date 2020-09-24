@@ -295,15 +295,19 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     func didHangUpCall(){
         self.slideInView?.removeFromSuperview()
         /* Disconnect a call. */
-        self.currentCall?.hangup() { [weak self] error in
-            if let strongSelf = self {
-                if error != nil {
-                    strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: ToastStyle.init())
-                    { bRet in
-                        
+        if let call = self.currentCall {
+            call.hangup() { [weak self] error in
+                if let strongSelf = self {
+                    if error != nil {
+                        strongSelf.view.makeToast("Call statue error:\(error!)", duration: 2, position: ToastPosition.center, title: nil, image: nil, style: ToastStyle.init())
+                        { bRet in
+                            
+                        }
                     }
                 }
             }
+        }else {
+            self.webexSDK?.phone.cancel()
         }
     }
     
@@ -1006,8 +1010,12 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         let endCallHandler = {
             (action: UIAlertAction!) in
             alert.dismiss(animated: true, completion: nil)
-            self.currentCall?.hangup() { error in
-                
+            if let call = self.currentCall {
+                call.hangup() { error in
+                    //
+                }
+            }else {
+                self.webexSDK?.phone.cancel()
             }
             _ = self.navigationController?.popViewController(animated: true)
         }

@@ -204,7 +204,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     }
     
     // MARK: - WebexSDK: Dail/Answer/Hangup phone call
-    func didDialWithRemoteAddress(_ remoteAddr: String) {
+    func didDialWithRemoteAddress(_ remoteAddr: String, isModerator:Bool? = false, pinOrPassword:String? = nil) {
         if remoteAddr.isEmpty {
             return
         }
@@ -228,7 +228,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
-        self.webexSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
+        self.webexSDK?.phone.dial(remoteAddr, moderator:isModerator, PIN: pinOrPassword, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
                 case .success(let call):
@@ -236,7 +236,37 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                     strongSelf.webexCallStatesProcess()
                     strongSelf.showScreenShareView(call.remoteSendingScreenShare)
                 case .failure(let error):
-                    _ = strongSelf.navigationController?.popViewController(animated: true)
+                    if let err = error as? WebexError, case .hostPinOrMeetingPasswordRequired = err {
+                        //
+                        var hostKeyTextField: UITextField?
+                        var passwordTextField: UITextField?
+                        let alert = UIAlertController(title: "Are you the host?", message: "If you are the host, please enter host key. Otherwise, enter the meeting password.", preferredStyle: .alert)
+                        alert.addTextField { (textFiled) in
+                            textFiled.placeholder = "Host Key"
+                            hostKeyTextField = textFiled
+                        }
+                        alert.addTextField { (textFiled) in
+                            textFiled.placeholder = "Meeting Password"
+                            passwordTextField = textFiled
+                        }
+                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+                            var isModerator = false
+                            var pinOrPassword = passwordTextField?.text
+                            if let hostKey = hostKeyTextField?.text, hostKey.count > 0 {
+                                isModerator = true
+                                pinOrPassword = hostKey
+                            }
+                            strongSelf.didDialWithRemoteAddress(remoteAddr, isModerator: isModerator, pinOrPassword: pinOrPassword)
+                        }))
+                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+                            strongSelf.navigationController?.popViewController(animated: true)
+                        }))
+                        strongSelf.present(alert, animated: true, completion: nil)
+                        
+                    }
+                    else {
+                        strongSelf.navigationController?.popViewController(animated: true)
+                    }
                     print("Dial call error: \(error)")
                 }
                 

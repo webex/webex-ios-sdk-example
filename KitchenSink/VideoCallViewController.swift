@@ -228,7 +228,9 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
         self.callStatus = .initiated
         /* Makes a call to an intended recipient on behalf of the authenticated user.*/
-        self.webexSDK?.phone.dial(remoteAddr, moderator:isModerator, PIN: pinOrPassword, option: mediaOption) { [weak self] result in
+        mediaOption.moderator = isModerator ?? false
+        mediaOption.pin = pinOrPassword
+        self.webexSDK?.phone.dial(remoteAddr, option: mediaOption) { [weak self] result in
             if let strongSelf = self {
                 switch result {
                 case .success(let call):
@@ -236,8 +238,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                     strongSelf.webexCallStatesProcess()
                     strongSelf.showScreenShareView(call.remoteSendingScreenShare)
                 case .failure(let error):
-                    if let err = error as? WebexError, case .hostPinOrMeetingPasswordRequired = err {
-                        //
+                    if let err = error as? WebexError, case .requireHostPinOrMeetingPassword = err {
                         var hostKeyTextField: UITextField?
                         var passwordTextField: UITextField?
                         let alert = UIAlertController(title: "Are you the host?", message: "If you are the host, please enter host key. Otherwise, enter the meeting password.", preferredStyle: .alert)

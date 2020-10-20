@@ -21,6 +21,8 @@ class SpaceTableViewCell: UITableViewCell {
     
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     
+    @IBOutlet weak var onGoingLabel: UILabel!
+    
     var spaceId: String?
     var spaceName: String?
     var initiateCallViewController: InitiateCallViewController!
@@ -46,4 +48,8 @@ class SpaceTableViewCell: UITableViewCell {
         initiateCallViewController.dialSpaceWithSpaceId(spaceId!, spaceName!)
     }
 
+    public func setOnGoingCall(_ isOnGoing:Bool) {
+        onGoingLabel.isHidden = !isOnGoing
+    }
+    
 }

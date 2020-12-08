@@ -63,7 +63,7 @@ class VideoAudioSetting {
             self.webexSDK?.phone.defaultLoudSpeaker = newValue
         }
     }
-    //TODO: @Kyle
+    
     var txBandWidth: UInt32{
         get {
             return self.webexSDK?.phone.videoMaxTxBandwidth ?? Phone.DefaultBandwidth.maxBandwidth360p.rawValue
@@ -79,6 +79,24 @@ class VideoAudioSetting {
         }
         set(newValue){
             self.webexSDK?.phone.videoMaxRxBandwidth = newValue
+        }
+    }
+    
+    var audioBNREnabled: Bool {
+        get {
+            return self.webexSDK?.phone.audioBNREnabled ?? false
+        }
+        set(newValue){
+            self.webexSDK?.phone.audioBNREnabled = newValue
+        }
+    }
+    
+    var audioBNRMode: Phone.AudioBNRMode {
+        get {
+            return self.webexSDK?.phone.audioBNRMode ?? .HP
+        }
+        set(newValue){
+            self.webexSDK?.phone.audioBNRMode = newValue
         }
     }
     

@@ -60,7 +60,13 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet weak var RXBandwidthTitleLabel: UILabel!
     @IBOutlet weak var RXBandWidthLabel: UILabel!
     @IBOutlet weak var RXBandwidthArrow: UIImageView!
+    @IBOutlet weak var BNRModeBackView: UIView!
+    @IBOutlet weak var HPImageView: UIImageView!
+    @IBOutlet weak var LPImageView: UIImageView!
+    @IBOutlet weak var BNRSwitch: UISwitch!
+    @IBOutlet weak var videoViewHeightConstraint: NSLayoutConstraint!
     
+    private let defaultVideoViewToTop: CGFloat = 90
     
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .square, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
     private let arrowImage = UIImage.fontAwesomeIcon(name: .angleRight, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
@@ -160,13 +166,44 @@ class VideoAudioSetupViewController: BaseViewController {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCameraBandwidthGestureEvent(sender:)))
         bandwidthBackView.addGestureRecognizer(tapGesture)
         updateBandwidthView()
+        
+        // BNR
+        BNRSwitch.isOn = globalVideoSetting.audioBNREnabled
+        BNRSwitchChange(BNRSwitch)
+        
+        let tapHPGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleBNRModeGestureEvent(sender:)))
+        HPImageView.addGestureRecognizer(tapHPGesture)
+        HPImageView.isUserInteractionEnabled = true
+        let tapLPGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleBNRModeGestureEvent(sender:)))
+        LPImageView.addGestureRecognizer(tapLPGesture)
+        LPImageView.isUserInteractionEnabled = true
+        handleBNRModeGestureEvent(sender: globalVideoSetting.audioBNRMode == .HP ? tapHPGesture : tapLPGesture)
     }
+    
     // MARK: hand checkbox change
     @IBAction func loudSpeakerSwitchChange(_ sender: Any) {
         let speakerSwitch = sender as! UISwitch
         globalVideoSetting.isLoudSpeaker = speakerSwitch.isOn
     }
     
+    @IBAction func BNRSwitchChange(_ sender: UISwitch) {
+        videoViewHeightConstraint.constant = sender.isOn ? defaultVideoViewToTop : defaultVideoViewToTop - BNRModeBackView.frame.height
+        BNRModeBackView.isHidden = !sender.isOn
+        globalVideoSetting.audioBNREnabled = sender.isOn
+    }
+    
+    @objc func handleBNRModeGestureEvent(sender:UITapGestureRecognizer) {
+        if sender.view == HPImageView {
+            HPImageView.image = checkImage
+            LPImageView.image = uncheckImage
+            globalVideoSetting.audioBNRMode = .HP
+        }else {
+            HPImageView.image = uncheckImage
+            LPImageView.image = checkImage
+            globalVideoSetting.audioBNRMode = .LP
+        }
+    }
+        
     @objc func handleCapGestureEvent(sender:UITapGestureRecognizer) {
         if let view = sender.view {
             if view == audioView {

@@ -439,6 +439,13 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                     case .waiting(let memberShip, _):
                         strongSelf.slideInStateView(slideInMsg: (memberShip.email ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
                         break
+                    /* This might be triggered when membership is muted/unmuted by other membership, such as the host*/
+                    case .audioMutedControlled(let memberShip):
+                        if memberShip.isAudioMutedControlled {
+                            strongSelf.slideInStateView(slideInMsg: "\(memberShip.email ?? "") was muted by other")
+                        }else {
+                            strongSelf.slideInStateView(slideInMsg: "\(memberShip.email ?? "") was unmuted by other")
+                        }
                     }
                     self?.updateParticipantTable()
                 }

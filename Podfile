@@ -8,6 +8,13 @@ post_install do |installer|
         config.build_settings.delete('CODE_SIGNING_ALLOWED')
         config.build_settings.delete('CODE_SIGNING_REQUIRED')
     end
+    installer.pods_project.targets.each do |target|
+        target.build_configurations.each do |config|
+          if Gem::Version.new('10.0') > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
+          end
+        end
+      end
 end
 
 

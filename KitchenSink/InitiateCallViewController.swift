@@ -36,6 +36,7 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
     fileprivate var searchResult: [Person]?
     fileprivate var historyResult: [Person]?
     fileprivate var spaceResult: [Space]?
+    fileprivate var onGoingSpaceIds = [String]()
     fileprivate var dialEmail: String?
     fileprivate var segmentedControl: UISegmentedControl?
     
@@ -48,8 +49,34 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
         super.viewDidLoad()
         self.navigationController?.navigationBar.isTranslucent = true
         self.setupView()
+        self.registerSpaceCallBack()
     }
     
+    func registerSpaceCallBack() {
+        self.webexSDK?.spaces.onEvent = { event in
+            switch event {
+            case .spaceCallStarted(let spaceId):
+                self.spaceCallOnGoing(spaceId, isStarted: true)
+            case .spaceCallEnded(let spaceId):
+                self.spaceCallOnGoing(spaceId, isStarted: false)
+            default:
+                break
+            }
+        }
+    }
+    
+    private func spaceCallOnGoing(_ spaceId:String, isStarted:Bool) {
+        if isStarted, !self.onGoingSpaceIds.contains(spaceId) {
+            self.onGoingSpaceIds.append(spaceId)
+        }
+        else if !isStarted, self.onGoingSpaceIds.contains(spaceId) {
+            self.onGoingSpaceIds.remove(at: self.onGoingSpaceIds.firstIndex(of: spaceId)!)
+        }
+        if let index = spaceResult?.firstIndex(where: { $0.id == spaceId }) {
+            let cell = spaceTableView.cellForRow(at: IndexPath(row: index, section: 0)) as? SpaceTableViewCell
+            cell?.setOnGoingCall(isStarted)
+        }
+    }
     
     // MARK: - Dial call processing
     @IBAction func dialBtnClicked(_ sender: AnyObject) {
@@ -136,6 +163,20 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
                 self.searchResult = nil
             }
             self.spaceTableView.reloadData()
+        })
+        self.webexSDK?.spaces.listWithActiveCalls(completionHandler: { (result) in
+            switch result {
+            case .success(let spaceIds):
+                self.onGoingSpaceIds = spaceIds
+                if self.spaceResult != nil {
+                    DispatchQueue.main.async {
+                        self.spaceTableView.reloadData()
+                    }
+                }
+                break
+            case .failure(_ ):
+                break
+            }
         })
     }
     
@@ -331,6 +372,11 @@ class InitiateCallViewController: BaseViewController, UISearchResultsUpdating, U
             cell.spaceName = spaceName
             cell.initiateCallViewController = self
             cell.spaceNameLabel.text = spaceName
+            if let spaceId = spaceId, onGoingSpaceIds.contains(spaceId) {
+                cell.setOnGoingCall(true)
+            }else {
+                cell.setOnGoingCall(false)
+            }
             
             return cell
         }

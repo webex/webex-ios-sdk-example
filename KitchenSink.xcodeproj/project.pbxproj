@@ -525,7 +525,6 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/AlamofireObjectMapper/AlamofireObjectMapper.framework",
 				"${BUILT_PRODUCTS_DIR}/Cosmos/Cosmos.framework",
 				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
@@ -533,19 +532,18 @@
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Toast-Swift/Toast_Swift.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/Sbu.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/Seu.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/util_ios.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/wbxaecodec.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/wbxaudioengine.framework",
-				"${PODS_ROOT}/../../webex-ios-sdk/Frameworks/Wme.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/Sbu.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/Seu.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/util_ios.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/wbxaecodec.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/wbxaudioengine.framework",
+				"${PODS_ROOT}/WebexSDK/Frameworks/Wme.framework",
 				"${BUILT_PRODUCTS_DIR}/WebexSDK/WebexSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/WebexBroadcastExtensionKit/WebexBroadcastExtensionKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AlamofireObjectMapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cosmos.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
@@ -815,7 +813,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -825,7 +823,7 @@
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -846,7 +844,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -856,7 +854,7 @@
 				INFOPLIST_FILE = KitchenSink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -882,13 +880,13 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -916,13 +914,13 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -948,13 +946,13 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtensionSetupUI/KitchenSinkBroadcastExtensionSetupUI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtensionSetupUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtensionUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -980,13 +978,13 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtensionSetupUI/KitchenSinkBroadcastExtensionSetupUI.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2600;
+				CURRENT_PROJECT_VERSION = 2700;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtensionSetupUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 2.6.0;
+				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cisco.webexsdk.KitchenSink.KitchenSinkBroadcastExtensionUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

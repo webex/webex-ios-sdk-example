@@ -255,21 +255,7 @@ Below is code snippets of the SDK calling in the demo.
         }
     }
     ```
-1. Enable and using screen share on your iPhone
 
-    4.1 Add screen recording to control center:
-    
-        4.1.1 Open Settings -> Control Center -> Customize Controls
-        
-        4.1.2 Tap '+' on Screen Recording
-        
-    4.2 To share your screen in KitchenShink:
-    
-        4.2.1 Swipe up to open Control Center
-        
-        4.2.2 Long press on recoridng button
-        
-        4.2.3 select the KitchenSinkBroadcastExtension, tap Start Broadcast button
 # Buddies-App
 Here is another demo app-"Buddies", which is more implemented as production application, combined call functionalities with CallKit, included message/call UI-implementation which could be used as widgets.
 [GitHub-Buddies](https://github.com/webex/webex-ios-sdk-example-buddies)

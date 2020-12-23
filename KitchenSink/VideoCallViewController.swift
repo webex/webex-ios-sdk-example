@@ -28,7 +28,7 @@ enum VideoCallRole {
     case SpaceCallPoster(String, String)
 }
 
-class VideoCallViewController: BaseViewController,MultiStreamObserver {
+class VideoCallViewController: BaseViewController {
     
     // MARK: - UI Outlets variables
     @IBOutlet private weak var disconnectionTypeLabel: UILabel!
@@ -52,8 +52,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     @IBOutlet private weak var selfViewHeight: NSLayoutConstraint!
     @IBOutlet weak var screenShareViewWidth: NSLayoutConstraint!
     @IBOutlet weak var screenShareViewHeight: NSLayoutConstraint!
-    @IBOutlet var dialpadViewWidth: NSLayoutConstraint!
-    @IBOutlet var dialpadViewHeight: NSLayoutConstraint!
     @IBOutlet var heightScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var widthScaleCollection: [NSLayoutConstraint]!
     @IBOutlet var labelFontScaleCollection: [UILabel]!
@@ -61,19 +59,13 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     private var slideInMsgLabel: UILabel?
     @IBOutlet weak var callFunctionTabBar: UITabBar!
     
-    @IBOutlet weak var auxVideosContainerView: UIView!
-    
     @IBOutlet weak var participantsTableView: UITableView!
     @IBOutlet weak var participantsView: UIView!
     
     @IBOutlet weak var callControlItem: UITabBarItem!
     
-    @IBOutlet weak var auxiliaryStreamItem: UITabBarItem!
-    
     @IBOutlet weak var participantsItem: UITabBarItem!
     
-    @IBOutlet var auxVideoNameLabels: [UILabel]!
-    @IBOutlet var auxVideoViews: [MediaRenderView]!
     @IBOutlet weak var callControlView: UIView!
     
     private var callStatus:CallStatus = .initiated
@@ -93,8 +85,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     // data source of table view, is 2-D array
     private var participantData: [[CallMembership]] = []
     private var personInfoArray: [Person] = []
-    private var openedAuxViews: [MediaRenderView] = []
-    private var auxiliaryVideoUI: [AuxiliaryStreamUICollection] = []
     
     override var navigationTitle: String? {
         get {
@@ -105,7 +95,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             if let titleLabel = navigationItem.titleView as? UILabel {
                 titleLabel.text = "Call status:\(self.title ?? "Unkonw")"
                 titleLabel.sizeToFit()
-                
             }
         }
     }
@@ -146,15 +135,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     /// currentCall represent current processing call instance
     var currentCall: Call?
-    
-    ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
-    var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
-    
-    ///onAuxStreamAvailable represent the call back when current call have a new auxiliary stream.
-    var onAuxStreamAvailable: (() -> MediaRenderView?)?
-    
-    ///onAuxStreamUnavailable represent the call back when current call have an existing auxiliary stream being unavailable.
-    var onAuxStreamUnavailable: (() -> MediaRenderView?)?
     
     // MARK: - Life cycle
     override func viewWillAppear(_ animated: Bool) {
@@ -549,66 +529,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                 
             }
             
-            /* set the observer of this call to get multi stream event */
-            call.multiStreamObserver = self
-            
-            /* Callback when a new multi stream media being available. Return a MediaRenderView let the SDK open it automatically. Return nil if you want to open it by call the API:openAuxStream(view: MediaRenderView) later.*/
-            self.onAuxStreamAvailable = { [weak self] in
-                if let strongSelf = self {
-                    strongSelf.updateBadgeValue()
-                    if let auxUI = strongSelf.auxiliaryVideoUI.filter({!$0.inUse}).first {
-                        auxUI.inUse = true
-                        return auxUI.mediaRenderView
-                    }
-                }
-                return nil
-            }
-            
-            /* Callback when an existing multi stream media being unavailable. The SDK will close the last auxiliary stream if you don't return the specified view*/
-            self.onAuxStreamUnavailable = { [weak self] in
-                if let strongSelf = self {
-                    strongSelf.updateBadgeValue()
-                    if let auxUI = strongSelf.auxiliaryVideoUI.filter({$0.inUse}).last {
-                        auxUI.inUse = false
-                        return auxUI.mediaRenderView
-                    }
-                }
-                return nil
-            }
-            
-            /* Callback when an existing multi stream media changed*/
-            self.onAuxStreamChanged = { [weak self] event in
-                if let strongSelf = self {
-                    switch event {
-                        /* Callback for open an auxiliary stream results*/
-                    case .auxStreamOpenedEvent(let view, let result):
-                        switch result {
-                        case .success(let auxStream):
-                            strongSelf.openedAuxiliaryUI(view: view, auxStream: auxStream)
-                        case .failure(let error):
-                            print("========\(error)=====")
-                        }
-                        /* This might be triggered when the auxiliary stream's speaker has changed.
-                         */
-                    case .auxStreamPersonChangedEvent(let auxStream,_,_):
-                        strongSelf.updateAuxiliaryUIBy(auxStream:auxStream)
-                        /* This might be triggered when the speaker muted or unmuted the video. */
-                    case .auxStreamSendingVideoEvent(let auxStream):
-                        strongSelf.updateAuxiliaryUIBy(auxStream: auxStream)
-                        /* This might be triggered when the speaker's video rendering view size has changed. */
-                    case .auxStreamSizeChangedEvent(let auxStream):
-                        print("Auxiliary stream size changed:\(auxStream.auxStreamSize)")
-                        break
-                        /* Callback for close an auxiliary stream results*/
-                    case .auxStreamClosedEvent(let view, let error):
-                        if error == nil {
-                            strongSelf.closedAuxiliaryUI(view: view)
-                        } else {
-                            print("=====auxStreamClosedEvent error:\(String(describing: error))")
-                        }
-                    }
-                }
-            }
         }
     }
     
@@ -743,10 +663,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         self.callControlItem.selectedImage =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryStreamItem.image =
-            UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryStreamItem.selectedImage =
-            UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
         
         callFunctionTabBar.delegate = self
         self.participantsTableView.dataSource = self
@@ -754,9 +670,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         self.participantsTableView.allowsSelection = true
         self.callFunctionTabBar.selectedItem = callControlItem
         
-        for index in 0..<self.auxVideoViews.count {
-            self.auxiliaryVideoUI.append(AuxiliaryStreamUICollection.init(nameLabel: auxVideoNameLabels[index],mediaRenderView: auxVideoViews[index]))
-        }
     }
     
     func updateCheckBoxStatus() {
@@ -800,7 +713,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         
         self.avatarContainerView.addSubview(avatarImageView)
         self.avatarContainerView.addSubview(remoteDisplayNameLabel)
-        
         
         let avatarImageViewCenterXConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerX, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerX, multiplier: 1, constant: 0)
         let avatarImageViewCenterYConstraint = NSLayoutConstraint.init(item: avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: avatarContainerView, attribute: .centerY, multiplier: 1, constant: -(remoteViewHeight.constant/3/4))
@@ -982,24 +894,16 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         if self.isCallDisconnected() {
             self.callControlView.isHidden = true
             self.participantsView.isHidden = true
-            self.auxVideosContainerView.isHidden = true
             self.callFunctionTabBar.isHidden = true
         } else {
             if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.callControl.rawValue {
                 self.view.bringSubviewToFront(self.callControlView)
                 self.callControlView.isHidden = false
                 self.participantsView.isHidden = true
-                self.auxVideosContainerView.isHidden = true
-            } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.auxiliaryVide.rawValue {
-                self.view.bringSubviewToFront(self.auxVideosContainerView)
-                self.callControlView.isHidden = true
-                self.participantsView.isHidden = true
-                self.auxVideosContainerView.isHidden = false
             } else if self.callFunctionTabBar.selectedItem?.tag == TabBarItemType.participants.rawValue {
                 self.view.bringSubviewToFront(self.participantsView)
                 self.callControlView.isHidden = true
                 self.participantsView.isHidden = false
-                self.auxVideosContainerView.isHidden = true
             }
             
             self.hideDialpadButton(false)
@@ -1010,7 +914,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     private func hideCallFunctionViews() {
         self.callControlView.isHidden = true
         self.participantsView.isHidden = true
-        self.auxVideosContainerView.isHidden = true
         self.callFunctionTabBar.isHidden = true
         self.hideDialpadButton(true)
     }
@@ -1131,49 +1034,7 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
     }
     
-    private func openedAuxiliaryUI(view:MediaRenderView,auxStream:AuxStream) {
-        if let auxiliaryUI = self.auxiliaryVideoUI.filter({$0.mediaRenderView == view }).first {
-            auxiliaryUI.auxStream = auxStream
-            self.updateAuxiliaryUIBy(auxStream: auxStream)
-        }
-    }
-    
-    private func closedAuxiliaryUI(view:MediaRenderView) {
-        if let auxiliaryUI = self.auxiliaryVideoUI.filter({$0.mediaRenderView == view }).first {
-            auxiliaryUI.auxStream = nil
-        }
-    }
-    
-    private func updateAuxiliaryUIBy(auxStream:AuxStream) {
-        if let auxiliaryUI = self.auxiliaryVideoUI.filter({ $0.mediaRenderView == auxStream.renderView }).first {
-            if let fetchedPerson = self.personInfoArray.filter({$0.id == auxStream.person?.personId}).first {
-                auxiliaryUI.update(person: fetchedPerson)
-            } else if let personId = auxStream.person?.personId {
-                self.webexSDK?.people.get(personId: personId) { [weak self] response in
-                    if self != nil {
-                        switch response.result {
-                        case .success(let person):
-                            auxiliaryUI.update(person: person)
-                            self?.personInfoArray.append(person)
-                        case .failure:
-                            print("======get person info failure=======")
-                            break
-                        }
-                    }
-                }
-            } else {
-                auxiliaryUI.update(person: nil)
-            }
-        }
-    }
-    
     func updateBadgeValue() {
-        if let auxStreamCount = self.currentCall?.availableAuxStreamCount, auxStreamCount != 0 {
-            self.auxiliaryStreamItem.badgeValue = String(auxStreamCount)
-        } else {
-            self.auxiliaryStreamItem.badgeValue = nil
-        }
-        
         self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .waiting}.count)
     }
     
@@ -1340,79 +1201,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         self.avatarImageView.layer.cornerRadius = avatarImageViewHeightConstraint.constant/2
     }
     
-    //MARK: - Auxiliary UI class(views container and update method)
-    private class AuxiliaryStreamUICollection {
-        
-        let nameLabel: UILabel
-        let mediaRenderView: MediaRenderView
-        let noVideoView: UIView
-        var avatarImageView: UIImageView
-        var auxStream: AuxStream? {
-            didSet {
-                if auxStream == nil {
-                    cleanUp()
-                }
-            }
-        }
-    
-        var inUse: Bool = false
-        
-        private var currentPerson: Person?
-        private var currentAvatar: UIImage?
-        
-        init(nameLabel: UILabel, mediaRenderView: MediaRenderView) {
-            self.nameLabel = nameLabel
-            self.mediaRenderView = mediaRenderView
-            self.noVideoView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
-            self.mediaRenderView.addSubview(self.noVideoView)
-            self.noVideoView.translatesAutoresizingMaskIntoConstraints = false
-            self.mediaRenderView.addConstraints([NSLayoutConstraint.init(item: self.noVideoView, attribute: .width, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .width, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .height, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .height, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .centerX, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .centerX, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.noVideoView, attribute: .centerY, relatedBy: .equal, toItem: self.mediaRenderView, attribute: .centerY, multiplier: 1, constant: 0)])
-            self.avatarImageView = UIImageView.init(frame: CGRect.init(x: 0, y: 0, width: self.mediaRenderView.frame.size.width, height: self.mediaRenderView.frame.size.height))
-            self.noVideoView.addSubview(self.avatarImageView)
-            self.avatarImageView.translatesAutoresizingMaskIntoConstraints = false
-            self.noVideoView.addConstraints([NSLayoutConstraint.init(item: self.avatarImageView, attribute: .width, relatedBy: .equal, toItem: self.noVideoView, attribute: .width, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .height, relatedBy: .equal, toItem: self.noVideoView, attribute: .height, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .centerX, relatedBy: .equal, toItem: self.noVideoView, attribute: .centerX, multiplier: 1, constant: 0),NSLayoutConstraint.init(item: self.avatarImageView, attribute: .centerY, relatedBy: .equal, toItem: self.noVideoView, attribute: .centerY, multiplier: 1, constant: 0)])
-            self.noVideoView.backgroundColor = self.mediaRenderView.backgroundColor
-            self.auxStream = nil
-            self.currentPerson = nil
-        }
-        
-        func update(person:Person?) {
-            DispatchQueue.main.async {
-                if let stream = self.auxStream, let updatePerson = person {
-                    self.nameLabel.text = updatePerson.displayName
-                    if stream.isSendingVideo {
-                        self.noVideoView.isHidden = true
-                        self.avatarImageView.isHidden = true
-                    }  else {
-                        
-                        self.avatarImageView.isHidden = false
-                        if self.currentPerson?.id != updatePerson.id {
-                            self.avatarImageView.image = nil
-                            Utils.downloadAvatarImage(updatePerson.avatar, completionHandler: {
-                                self.avatarImageView.image = $0
-                                self.currentAvatar = $0
-                                self.currentPerson = updatePerson
-                            })
-                        } else {
-                            self.avatarImageView.image = self.currentAvatar
-                        }
-                        self.noVideoView.isHidden = false
-                    }
-                } else {
-                    self.cleanUp()
-                }
-            }
-        }
-        
-        private func cleanUp() {
-            self.nameLabel.text = "Waiting.."
-            self.avatarImageView.image = nil
-            self.avatarImageView.isHidden = true
-            self.noVideoView.isHidden = false
-            self.mediaRenderView.bringSubviewToFront(self.noVideoView)
-            self.currentPerson = nil
-        }
-    }
 }
 
 // MARK: - DTMF dialpad view
@@ -1452,7 +1240,6 @@ extension VideoCallViewController : UICollectionViewDelegate {
 extension VideoCallViewController :UITabBarDelegate {
     enum TabBarItemType: Int {
         case callControl = 0
-        case auxiliaryVide = 1
         case participants = 2
     }
     
@@ -1460,17 +1247,10 @@ extension VideoCallViewController :UITabBarDelegate {
         if item.tag == TabBarItemType.callControl.rawValue {
             self.view.bringSubviewToFront(self.callControlView)
             self.callControlView.isHidden = false
-            self.auxVideosContainerView.isHidden = true
-            self.participantsView.isHidden = true
-        } else if item.tag == TabBarItemType.auxiliaryVide.rawValue {
-            self.view.bringSubviewToFront(self.auxVideosContainerView)
-            self.callControlView.isHidden = true
-            self.auxVideosContainerView.isHidden = false
             self.participantsView.isHidden = true
         } else if item.tag == TabBarItemType.participants.rawValue {
             self.view.bringSubviewToFront(self.participantsView)
             self.callControlView.isHidden = true
-            self.auxVideosContainerView.isHidden = true
             self.participantsView.isHidden = false
         }
     }

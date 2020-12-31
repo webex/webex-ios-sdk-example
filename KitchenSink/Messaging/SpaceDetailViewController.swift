@@ -47,10 +47,14 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                     if self.currentMessage?.id == messageId {
                         self.updateMessageAcitivty(self.currentMessage, files: files)
                     }
+                case .edit(let change):
+                    if self.currentMessage?.id == messageId {
+                        self.currentMessage?.updateMessage(change)
+                        self.updateMessageAcitivty(self.currentMessage, files: nil)
+                    }
                 }
                 break
             }
-            
         }
     }
     

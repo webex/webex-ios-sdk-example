@@ -592,7 +592,6 @@ class VideoCallViewController: BaseViewController {
         }
         else {
             self.normalSizePortrait()
-            
         }
     }
     

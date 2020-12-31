@@ -672,7 +672,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         }
         else {
             self.normalSizePortrait()
-            
         }
     }
     

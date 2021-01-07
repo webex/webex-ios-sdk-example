@@ -49,9 +49,9 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                     if self.currentMessage?.id == messageId {
                         self.updateMessageAcitivty(self.currentMessage, files: files)
                     }
-                case .edit(let change):
+                case .message:
                     if self.currentMessage?.id == messageId {
-                        self.currentMessage?.updateMessage(change)
+                        self.currentMessage?.update(type)
                         self.updateMessageAcitivty(self.currentMessage, files: nil)
                     }
                 }
@@ -92,7 +92,6 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                         files?.append(file)
                     }
                 }
-                
             }catch{
                 print("image convert failed")
                 return

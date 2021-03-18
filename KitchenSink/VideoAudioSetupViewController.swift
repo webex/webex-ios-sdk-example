@@ -66,6 +66,10 @@ class VideoAudioSetupViewController: BaseViewController {
     @IBOutlet weak var BNRSwitch: UISwitch!
     @IBOutlet weak var videoViewHeightConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var compositedImageView: UIImageView!
+    @IBOutlet weak var multiStreamImageView: UIImageView!
+    
+    
     private let defaultVideoViewToTop: CGFloat = 90
     
     private let uncheckImage = UIImage.fontAwesomeIcon(name: .square, type: .regular, textColor: UIColor.titleGreyColor(), size: CGSize.init(width: 33 * Utils.HEIGHT_SCALE, height: 33 * Utils.HEIGHT_SCALE))
@@ -178,6 +182,15 @@ class VideoAudioSetupViewController: BaseViewController {
         LPImageView.addGestureRecognizer(tapLPGesture)
         LPImageView.isUserInteractionEnabled = true
         handleBNRModeGestureEvent(sender: globalVideoSetting.audioBNRMode == .HP ? tapHPGesture : tapLPGesture)
+        
+        // Video stream mode
+        let tapCompositedGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleVideoStreamGestureEvent(sender:)))
+        compositedImageView.addGestureRecognizer(tapCompositedGesture)
+        compositedImageView.isUserInteractionEnabled = true
+        let tapMultiStreamGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleVideoStreamGestureEvent(sender:)))
+        multiStreamImageView.addGestureRecognizer(tapMultiStreamGesture)
+        multiStreamImageView.isUserInteractionEnabled = true
+        handleVideoStreamGestureEvent(sender: webexSDK?.phone.videoStreamMode == .composited ? tapCompositedGesture : tapMultiStreamGesture)
     }
     
     // MARK: hand checkbox change
@@ -201,6 +214,19 @@ class VideoAudioSetupViewController: BaseViewController {
             HPImageView.image = uncheckImage
             LPImageView.image = checkImage
             globalVideoSetting.audioBNRMode = .LP
+        }
+    }
+    
+    @objc func handleVideoStreamGestureEvent(sender:UITapGestureRecognizer) {
+        if sender.view == compositedImageView {
+            compositedImageView.image = checkImage
+            multiStreamImageView.image = uncheckImage
+            webexSDK?.phone.videoStreamMode = .composited
+        }else {
+            compositedImageView.image = uncheckImage
+            multiStreamImageView.image = checkImage
+            globalVideoSetting.audioBNRMode = .LP
+            webexSDK?.phone.videoStreamMode = .auxiliary
         }
     }
         

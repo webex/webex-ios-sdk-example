@@ -1,22 +1,13 @@
-//
-//  BroadcastSetupViewController.swift
-//  KitchenSinkBroadcastExtensionSetupUI
-//
-//  Created by panzh on 19/03/2018.
-//  Copyright 2016-2019 Cisco Systems Inc. All rights reserved.
-//
-
 import ReplayKit
 
 class BroadcastSetupViewController: UIViewController {
-
     // Call this method when the user has finished interacting with the view controller and a broadcast stream can start
     func userDidFinishSetup() {
         // URL of the resource where broadcast can be viewed that will be returned to the application
-        let broadcastURL = URL(string:"http://apple.com/broadcast/streamID")
+        let broadcastURL = URL(string: "http://apple.com/broadcast/streamID")
         
         // Dictionary with setup information that will be provided to broadcast extension when broadcast is started
-        let setupInfo: [String : NSCoding & NSObjectProtocol] = ["broadcastName": "example" as NSCoding & NSObjectProtocol]
+        let setupInfo: [String : NSCoding & NSObjectProtocol] = ["broadcastName" : "example" as NSCoding & NSObjectProtocol]
         
         // Tell ReplayKit that the extension is finished setting up and can begin broadcasting
         self.extensionContext?.completeRequest(withBroadcast: broadcastURL!, setupInfo: setupInfo)

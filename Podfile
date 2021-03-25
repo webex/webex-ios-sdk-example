@@ -1,33 +1,33 @@
-source 'https://github.com/CocoaPods/Specs.git'
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
 
-
-use_frameworks!
-
-post_install do |installer|
-    installer.pods_project.build_configurations.each do |config|
-        config.build_settings.delete('CODE_SIGNING_ALLOWED')
-        config.build_settings.delete('CODE_SIGNING_REQUIRED')
-    end
-    installer.pods_project.targets.each do |target|
-        target.build_configurations.each do |config|
-          if Gem::Version.new('10.0') > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
-            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
-          end
-        end
-      end
-end
-
+source "https://github.com/webex/webex-ios-sdk/archive/WebexSDK-3.0.0-beta.zip"
 
 target 'KitchenSink' do
-    platform :ios, '11.0'
-    pod 'WebexSDK'
-    pod 'Cosmos', '~> 15.0'
-    pod 'Toast-Swift', '~> 5.0.0'
-    pod 'FontAwesome.swift','~> 1.8.2'
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for KitchenSink
+  pod 'WebexSDK'
+
+  target 'KitchenSinkUITests' do
+    # Pods for testing
+  end
+
 end
 
-
 target 'KitchenSinkBroadcastExtension' do
-    platform :ios, '11.2'
-    pod 'WebexBroadcastExtensionKit'
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for KitchenSinkBroadcastExtension
+
+end
+
+target 'KitchenSinkBroadcastExtensionSetupUI' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for KitchenSinkBroadcastExtensionSetupUI
+
 end

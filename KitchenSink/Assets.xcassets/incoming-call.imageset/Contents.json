@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "incoming-call-legacy_36.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "incoming-call-legacy_36@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "incoming-call-legacy_36@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

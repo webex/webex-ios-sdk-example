@@ -225,7 +225,6 @@ class VideoAudioSetupViewController: BaseViewController {
         }else {
             compositedImageView.image = uncheckImage
             multiStreamImageView.image = checkImage
-            globalVideoSetting.audioBNRMode = .LP
             webexSDK?.phone.videoStreamMode = .auxiliary
         }
     }

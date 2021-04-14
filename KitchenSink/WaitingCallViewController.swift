@@ -102,7 +102,7 @@ class WaitingCallViewController: BaseViewController {
                 
         if let videoCallViewController = (storyboard?.instantiateViewController(withIdentifier: "VideoCallViewController") as? VideoCallViewController) {
             videoCallViewController.currentCall = self.receivedCall
-            videoCallViewController.videoCallRole = VideoCallRole.CallReceiver(self.receivedCall?.from?.email ?? "")
+            videoCallViewController.videoCallRole = VideoCallRole.CallReceiver(self.receivedCall?.from?.displayName ?? "Unknow")
             videoCallViewController.webexSDK = self.webexSDK
             navigationController?.pushViewController(videoCallViewController, animated: true)
         }

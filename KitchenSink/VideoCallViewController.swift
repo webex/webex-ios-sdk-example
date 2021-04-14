@@ -66,11 +66,9 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     @IBOutlet weak var participantsTableView: UITableView!
     @IBOutlet weak var participantsView: UIView!
     
-    @IBOutlet weak var callControlItem: UITabBarItem!
-    
-    @IBOutlet weak var auxiliaryStreamItem: UITabBarItem!
-    
-    @IBOutlet weak var participantsItem: UITabBarItem!
+    var callControlItem: UITabBarItem?
+    var auxiliaryStreamItem: UITabBarItem?
+    var participantsItem: UITabBarItem?
     
     @IBOutlet var auxVideoNameLabels: [UILabel]!
     @IBOutlet var auxVideoViews: [MediaRenderView]!
@@ -733,25 +731,37 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
         tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(handleCapGestureEvent(sender:)))
         self.backCameraView.addGestureRecognizer(tapGesture)
         
+        
+        self.callControlItem = UITabBarItem(title: "Call control", image: nil, tag: TabBarItemType.callControl.rawValue)
+        self.auxiliaryStreamItem = UITabBarItem(title: "Auxiliary Streams", image: nil, tag: TabBarItemType.auxiliaryVide.rawValue)
+        self.participantsItem = UITabBarItem(title: "Participants", image: nil, tag: TabBarItemType.participants.rawValue)
+        
         //tab bar image
-        self.participantsItem.image =
+        self.participantsItem?.image =
             UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.participantsItem.selectedImage =
+        self.participantsItem?.selectedImage =
             UIImage.fontAwesomeIcon(name: .users, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.callControlItem.image =
+        self.callControlItem?.image =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.callControlItem.selectedImage =
+        self.callControlItem?.selectedImage =
             UIImage.fontAwesomeIcon(name: .cogs, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryStreamItem.image =
+        self.auxiliaryStreamItem?.image =
             UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.labelGreyColor(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
-        self.auxiliaryStreamItem.selectedImage =
+        self.auxiliaryStreamItem?.selectedImage =
             UIImage.fontAwesomeIcon(name: .fileVideo, type: .regular, textColor: UIColor.buttonBlueHightlight(), size: CGSize.init(width: 32*Utils.WIDTH_SCALE, height: 32*Utils.HEIGHT_SCALE))
+        
+        if webexSDK?.phone.videoStreamMode == .auxiliary {
+            callFunctionTabBar.items = [self.callControlItem!, self.auxiliaryStreamItem!, self.participantsItem!]
+        }else {
+            callFunctionTabBar.items = [self.callControlItem!, self.participantsItem!]
+        }
         
         callFunctionTabBar.delegate = self
         self.participantsTableView.dataSource = self
         self.participantsTableView.delegate = self
         self.participantsTableView.allowsSelection = true
         self.callFunctionTabBar.selectedItem = callControlItem
+        
         
         for index in 0..<self.auxVideoViews.count {
             self.auxiliaryVideoUI.append(AuxiliaryStreamUICollection.init(nameLabel: auxVideoNameLabels[index],mediaRenderView: auxVideoViews[index]))
@@ -784,7 +794,6 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
             self.frontCameraImage.image = VideoCallViewController.uncheckImage
         }
     }
-    
     
     private func setupAvatarView(_ remoteAddr: String) {
         self.avatarImageView.image = UIImage(named: "DefaultAvatar")
@@ -1168,12 +1177,12 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
     
     func updateBadgeValue() {
         if let auxStreamCount = self.currentCall?.availableAuxStreamCount, auxStreamCount != 0 {
-            self.auxiliaryStreamItem.badgeValue = String(auxStreamCount)
+            self.auxiliaryStreamItem?.badgeValue = String(auxStreamCount)
         } else {
-            self.auxiliaryStreamItem.badgeValue = nil
+            self.auxiliaryStreamItem?.badgeValue = nil
         }
         
-        self.participantsItem.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .waiting}.count)
+        self.participantsItem?.badgeValue = self.participantArray.count == 0 ? nil:String(self.participantArray.filter{$0.state == .joined || $0.state == .waiting}.count)
     }
     
     // MARK: Slide In View SetUp

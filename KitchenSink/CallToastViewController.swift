@@ -121,7 +121,7 @@ class CallToastViewController: BaseViewController {
         if let incomingCall = self.incomingCall{
             for member in incomingCall.memberships {
                 if member.isInitiator == true {
-                    nameLabel.text = member.displayName ?? "Unknow"
+                    nameLabel.text = member.displayName ?? "Unknown"
                 }
             }
         }
@@ -144,7 +144,7 @@ class CallToastViewController: BaseViewController {
         if let incomingCall = self.incomingCall{
             for member in incomingCall.memberships {
                 if member.isInitiator == true {
-                    nameLabel.text = member.displayName ?? "Unknow"
+                    nameLabel.text = member.displayName ?? "Unknown"
                 }
             }
         }

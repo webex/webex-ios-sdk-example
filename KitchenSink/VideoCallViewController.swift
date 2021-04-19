@@ -398,44 +398,44 @@ class VideoCallViewController: BaseViewController,MultiStreamObserver {
                     switch memberShipChangeType {
                         /* This might be triggered when membership joined the call */
                     case .joined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " joined")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " joined")
                         break
                         /* This might be triggered when membership left the call */
                     case .left(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " left")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " left")
                         /* This might be triggered when membership declined the call */
                     case .declined(let memberShip):
-                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " declined")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " declined")
                         /* This might be triggered when membership mute/unmute the audio */
                     case .sendingAudio(let memberShip):
                         if memberShip.sendingAudio {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute audio")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " unmute audio")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute audio")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " mute audio")
                         }
                         break
                         /* This might be triggered when membership mute/unmute the video */
                     case .sendingVideo(let memberShip):
                         if memberShip.sendingVideo {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " unmute video")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " unmute video")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " mute video")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " mute video")
                         }
                         break
                         /* This might be triggered when membership start/end the screen share */
                     case .sendingScreenShare(let memberShip):
                         if memberShip.sendingScreenShare {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " share screen")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " share screen")
                         }
                         else {
-                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " stop share")
+                            strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " stop share")
                         }
                         break
                         /* This might be triggered when membership is waiting in lobby */
                     case .waiting(let memberShip, _):
-                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknow membership")) + " inLobby")
+                        strongSelf.slideInStateView(slideInMsg: (memberShip.displayName ?? (memberShip.sipUrl ?? "Unknown membership")) + " inLobby")
                         break
                     /* This might be triggered when membership is muted/unmuted by other membership, such as the host*/
                     case .audioMutedControlled(let memberShip):

@@ -20,6 +20,8 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
     private var textInputView: KitchensinkInputView?
     private var receivedFiles: [RemoteFile]? = [RemoteFile]()
     private var currentMessage: Message?
+    private var isMessageEditing: Bool = false
+    private var editButton: UIButton?
     
     /// saparkSDK reperesent for the WebexSDK API instance
     var webexSDK: Webex?
@@ -47,10 +49,14 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                     if self.currentMessage?.id == messageId {
                         self.updateMessageAcitivty(self.currentMessage, files: files)
                     }
+                case .message:
+                    if self.currentMessage?.id == messageId {
+                        self.currentMessage?.update(type)
+                        self.updateMessageAcitivty(self.currentMessage, files: nil)
+                    }
                 }
                 break
             }
-            
         }
     }
     
@@ -86,7 +92,6 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
                         files?.append(file)
                     }
                 }
-                
             }catch{
                 print("image convert failed")
                 return
@@ -102,6 +107,36 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         if let str = finalStr {
             text = Message.Text.html(html: str)
         }
+        
+        if isMessageEditing {
+            guard let message = currentMessage else {
+                Utils.showAlert(self, title: "", message: "No message to edit")
+                return
+            }
+            if message.files != nil || files != nil {
+                Utils.showAlert(self, title: "", message: "Only support editing message without attachment")
+                return
+            }
+            guard let text = text else {
+                return
+            }
+            self.webexSDK?.messages.edit(text, parent: message, mentions: mentions, completionHandler: {[weak self] (response) in
+                switch response.result{
+                case .success(let message):
+                    self?.title = "Edit Sucess!"
+                    self?.currentMessage = message
+                    self?.updateMessageAcitivty(message)
+                    self?.endEditingMessage()
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        print(error)
+                        self?.title = "Edit Fail!"
+                    }
+                }
+            })
+            return
+        }
+        
         if let space = self.spaceModel{
             self.webexSDK?.messages.post(text, toSpace: space.id!, mentions: mentions, withFiles: files, completionHandler: { (response) in
                 switch response.result{
@@ -204,6 +239,13 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
     
     // MARK: - UI Implementation
     public func setupView(){
+        editButton = UIButton(frame: CGRect(x: 0, y: 0, width: 60, height: 44))
+        editButton!.setTitle("Edit", for: .normal)
+        editButton!.setTitle("Editing", for: .selected)
+        editButton!.setTitleColor(.black, for: .normal)
+        editButton!.addTarget(self, action: #selector(editMessage(_:)), for: .touchUpInside)
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: editButton!)
+        
         self.view.backgroundColor = UIColor.white
         if let space = self.spaceModel{
             self.title = space.title
@@ -291,6 +333,19 @@ class SpaceDetailViewController: BaseViewController, UIImagePickerControllerDele
         let file = self.receivedFiles![index]
         self.downLoadFile(file: file, onView: recognizer.view!)
         
+    }
+    
+    @objc func editMessage(_ button: UIButton) {
+        button.isSelected.toggle()
+        isMessageEditing = button.isSelected
+        if isMessageEditing {
+            textInputView?.textView?.becomeFirstResponder()
+        }
+    }
+    
+    func endEditingMessage() {
+        isMessageEditing = false
+        editButton?.isSelected = false
     }
     
     override func didReceiveMemoryWarning() {

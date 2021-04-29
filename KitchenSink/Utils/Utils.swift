@@ -74,4 +74,18 @@ class Utils {
         
         parentView.present(alert, animated: true, completion: nil)
     }
+    
+    static func showAlert(_ parentView: UIViewController, title: String?, message: String?, cancel:(() -> Void)? = nil, confirm:(() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+            cancel?()
+        }))
+        if let confirm = confirm {
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+                confirm()
+            }))
+        }
+        parentView.present(alert, animated: true, completion: nil)
+    }
+    
 }

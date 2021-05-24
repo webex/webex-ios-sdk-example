@@ -43,3 +43,6 @@ playground.xcworkspace
 
 # Carthage
 Carthage/Build
+
+# Secrets
+Secrets.plist

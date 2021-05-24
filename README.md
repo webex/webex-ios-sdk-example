@@ -36,7 +36,7 @@ This demo supports iOS device with **iOS 13** or later
 ## Download App
 You can download our Demo App from TestFlight.
 1. Download TestFlight from App Stroe.
-1. Open the public url(https://testflight.apple.com/join/HWhcEPFe) from your iPhone browser.
+1. Open the public url(https://testflight.apple.com/join/obJ7Inof) from your iPhone browser.
 1. Start Testing and install Ktichen Sink App from TestFlight.
 
 ## Setup

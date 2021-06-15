@@ -59,8 +59,15 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
     pod install
     ```
 
+1. To the app’s `Info.plist`, please add an entry `GroupIdentifier` with the value as your app's GroupIdentifier. This is required so that we can get a path to store the local data warehouse. Note: You'll need to claim your own GroupIdentifier from Apple developer site.
+
+1. If you'll be using [WebexBroadcastExtensionKit](https://cocoapods.org/pods/WebexBroadcastExtensionKit), You also need to add an entry `GroupIdentifier` with the value as your app's GroupIdentifier to your Broadcast Extension target. This is required so that we that we can communicate with the main app for screen sharing.
+
+1. Modify the `Signing & Capabilities` section in your xcode project as follows 
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/images/signing_and_capabilities.png" width="80%" height="80%">
+
 ## Usage
- 
+
 1. Add **Secrets.plist** file in your project and add following fields:
     ```
     clientId

@@ -36,6 +36,7 @@
 		10BFA40C1F4D2B9400602908 /* SpaceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10BFA40B1F4D2B9400602908 /* SpaceTableViewCell.swift */; };
 		5051761E5B47490030477150 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EE716560FB3C1375DAEF7FF /* Pods_KitchenSink.framework */; };
 		5A82441E1DF9E5F900481A55 /* JWTLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */; };
+		8473C25426A7D92C005E138D /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8473C25326A7D92C005E138D /* Secrets.plist */; };
 		8F8B128CCE222CF5BE26A8B8 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA41AD21B1911C9FECEC254B /* Pods_KitchenSinkBroadcastExtension.framework */; };
 		C7371292210965E800FCBF82 /* ParticipantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7371291210965E700FCBF82 /* ParticipantTableViewCell.swift */; };
 		C762601C205F530800219F95 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C762601B205F530800219F95 /* ReplayKit.framework */; };
@@ -123,6 +124,7 @@
 		1EE716560FB3C1375DAEF7FF /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A82441D1DF9E5F900481A55 /* JWTLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JWTLoginViewController.swift; sourceTree = "<group>"; };
 		6B7D1333FFC05F77D945AF6E /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Pods/Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
+		8473C25326A7D92C005E138D /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 		87B55BD44833FEC88DC1F273 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7371291210965E700FCBF82 /* ParticipantTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantTableViewCell.swift; sourceTree = "<group>"; };
 		C762601A205F530800219F95 /* KitchenSinkBroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KitchenSinkBroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +221,7 @@
 				04AE182E1CDAD3D800A8F078 /* LaunchScreen.storyboard */,
 				04AE182C1CDAD3D800A8F078 /* Assets.xcassets */,
 				04AE18311CDAD3D800A8F078 /* Info.plist */,
+				8473C25326A7D92C005E138D /* Secrets.plist */,
 			);
 			path = KitchenSink;
 			sourceTree = "<group>";
@@ -496,6 +499,7 @@
 				04AE18301CDAD3D800A8F078 /* LaunchScreen.storyboard in Resources */,
 				04AE182D1CDAD3D800A8F078 /* Assets.xcassets in Resources */,
 				04AE182B1CDAD3D800A8F078 /* Main.storyboard in Resources */,
+				8473C25426A7D92C005E138D /* Secrets.plist in Resources */,
 				1054FC1A2010C9BD0020BE19 /* TestImage.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

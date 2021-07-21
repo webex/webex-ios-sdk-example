@@ -22,10 +22,14 @@ import Foundation
 
 ///Get your own App Client information from https://developer.webex.com
 class WebexEnvirmonment {
-    static let ClientId = "C416dd36dd57b536a35816978e4f063a98849d285ca191f5566a32c0f0c3481ab"
-    static let ClientSecret = ProcessInfo().environment["CLIENTSECRET"] ?? "bc851e0f4d4bd62c020a45de08e374101910200d43096f32d14b9e08164adac7"
+    static let keys = NSDictionary(contentsOfFile: Bundle.main.path(forResource: "Secrets", ofType: "plist")!)
+    
+    static let ClientId = keys?["clientId"] as? String ?? ""
+    static let ClientSecret = keys?["clientSecret"] as? String ?? ""
+    
+    ///Uri is that a user will be redirected to when completing an OAuth grant flow
+    static let RedirectUri = keys?["redirectUri"] as? String ?? ""
+    
     ///Scopes define the level of access that your integration requires
     static let Scope = "spark:all"
-    ///Uri is that a user will be redirected to when completing an OAuth grant flow
-    static let RedirectUri = "KitchenSink://response"
 }

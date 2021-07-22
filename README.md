@@ -21,23 +21,32 @@ You can download our Demo App from TestFlight.
 1. Open the public url(https://testflight.apple.com/join/HWhcEPFe) from your iPhone browser.
 1. Start Testing and install Ktichen Sink App from TestFlight.
 ## Setup
-Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
+Here are the steps to setup Xcode project and how to use [CocoaPods](http://cocoapods.org):
 
 1. Install CocoaPods:
     ```bash
     gem install cocoapods
     ```
 
-1. Setup Cocoapods:
+2. Setup Cocoapods:
     ```bash
     pod setup
     ```
 
-1. Install WebexSDK and other dependencies from your project directory:
+3. Install WebexSDK and other dependencies from your project directory:
 
     ```bash
     pod install
     ```
+    
+4. Add **Secrets.plist** file in your project and add following fields:
+    ```
+    clientId
+    clientSecret
+    redirectUri
+   ```
+   <img src="images/secrets.png" width="80%" height="80%">
+       
 ## Example
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  
 Below is code snippets of the SDK calling in the demo.

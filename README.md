@@ -45,7 +45,7 @@ Here are the steps to setup Xcode project and how to use [CocoaPods](http://coco
     clientSecret
     redirectUri
    ```
-   <img src="images/secrets.png" width="80%" height="80%">
+   <img src="https://github.com/webex/webex-ios-sdk-example/blob/master/images/secrets.png" width="80%" height="80%">
        
 ## Example
 The "// MARK: " labels in source code have distinguished the SDK calling and UI views paragraphes.  

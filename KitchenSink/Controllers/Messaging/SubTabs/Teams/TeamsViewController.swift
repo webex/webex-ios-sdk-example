@@ -11,7 +11,7 @@ final class TeamsViewController: BasicTableViewController<Team, ContactTableView
     }
     
     override func refreshList() {
-        webex.teams.list(max: nil, queue: DispatchQueue.global(qos: .default)) { [weak self] teams in
+        webex.teams.list(max: 100, queue: DispatchQueue.global(qos: .default)) { [weak self] teams in
             DispatchQueue.main.async {
                 switch teams {
                 case .success(let teams):

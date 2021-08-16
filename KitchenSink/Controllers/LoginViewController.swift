@@ -18,7 +18,7 @@ class LoginViewController: UIViewController {
         let webexLogo = UIImageView(frame: .zero)
         webexLogo.translatesAutoresizingMaskIntoConstraints = false
         webexLogo.contentMode = .scaleAspectFit
-        webexLogo.image = UIImage(named: "webex-teams-logo")
+        webexLogo.image = UIImage(named: "logo")
         return webexLogo
     }()
     
@@ -84,7 +84,7 @@ class LoginViewController: UIViewController {
     
     func initializeWebex() {
         webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
-        webex.logLevel = .error
+        webex.logLevel = .verbose
 
         // Always call webex.initialize before invoking any other method on the webex instance
         webex.initialize { [weak self] isLoggedIn in
@@ -217,18 +217,27 @@ class LoginViewController: UIViewController {
         if let authenticator = webex.authenticator as? JWTAuthenticator {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] _ in
                 let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
-                authenticator.authorizedWith(jwt: textField?.text ?? "", completionHandler: { success in
-                    guard success else {
+                authenticator.authorizedWith(jwt: textField?.text ?? "", completionHandler: { result in
+                    switch result {
+                    case .failure(let error):
                         self.loginWithJWTButton.setTitle("Login as Guest", for: .normal)
                         self.loginWithJWTButton.isEnabled = true
                         print("JWT Login failed")
-                        let emailErrorAlert = UIAlertController(title: "Error", message: "Unable to authenticate via JWT", preferredStyle: .alert)
+                        let emailErrorAlert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
                         emailErrorAlert.addAction(UIAlertAction.dismissAction())
                         self.present(emailErrorAlert, animated: true, completion: nil)
                         return
+                    case .success(let authenticated):
+                        if authenticated {
+                        UserDefaults.standard.setValue("jwt", forKey: "loginType")
+                        self.switchRootController()
+                        } else {
+                            print("JWT Login failed")
+                            let emailErrorAlert = UIAlertController(title: "Error", message: "JWT Login Failed!", preferredStyle: .alert)
+                            emailErrorAlert.addAction(UIAlertAction.dismissAction())
+                            self.present(emailErrorAlert, animated: true, completion: nil)
+                        }
                     }
-                    UserDefaults.standard.setValue("jwt", forKey: "loginType")
-                    self.switchRootController()
                 })
             }))
         } else {

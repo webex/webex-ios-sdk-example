@@ -318,6 +318,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         webex.phone.sharingMaxRxBandwidth = Phone.DefaultBandwidth.maxBandwidthSession.rawValue
         webex.phone.audioMaxRxBandwidth = Phone.DefaultBandwidth.maxBandwidthAudio.rawValue
         webex.phone.enableBackgroundConnection = true
+        webex.phone.defaultLoudSpeaker = false
         updateAdvancedSettings()
     }
     
@@ -751,6 +752,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         
         call.onMediaChanged = { [weak self] mediaEvents in
+            print("Call isSpeaker:", call.isSpeaker)
             if let self = self {
                 self.updateStates(callInfo: call)
                 switch mediaEvents {

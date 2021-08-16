@@ -18,7 +18,7 @@ class LoginViewController: UIViewController {
         let webexLogo = UIImageView(frame: .zero)
         webexLogo.translatesAutoresizingMaskIntoConstraints = false
         webexLogo.contentMode = .scaleAspectFit
-        webexLogo.image = UIImage(named: "webex-teams-logo")
+        webexLogo.image = UIImage(named: "logo")
         return webexLogo
     }()
     
@@ -134,7 +134,8 @@ class LoginViewController: UIViewController {
         
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
         if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, redirectUri: redirectUri, emailId: email.toString())
+            // The scope parameter can be a space separated list of scopes that you want your access token to possess
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: "spark:all", redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)
             self.initializeWebex()
             completion?(true)
@@ -160,7 +161,8 @@ class LoginViewController: UIViewController {
             
             UserDefaults.standard.setValue(email.toString(), forKey: "userEmail")
 
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, redirectUri: redirectUri, emailId: email.toString())
+            // The scope parameter can be a space separated list of scopes that you want your access token to possess
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: "spark:all", redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)
             self.initializeWebex()
             completion?(true)
@@ -217,18 +219,27 @@ class LoginViewController: UIViewController {
         if let authenticator = webex.authenticator as? JWTAuthenticator {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] _ in
                 let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
-                authenticator.authorizedWith(jwt: textField?.text ?? "", completionHandler: { success in
-                    guard success else {
+                authenticator.authorizedWith(jwt: textField?.text ?? "", completionHandler: { result in
+                    switch result {
+                    case .failure(let error):
                         self.loginWithJWTButton.setTitle("Login as Guest", for: .normal)
                         self.loginWithJWTButton.isEnabled = true
                         print("JWT Login failed")
-                        let emailErrorAlert = UIAlertController(title: "Error", message: "Unable to authenticate via JWT", preferredStyle: .alert)
+                        let emailErrorAlert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
                         emailErrorAlert.addAction(UIAlertAction.dismissAction())
                         self.present(emailErrorAlert, animated: true, completion: nil)
                         return
+                    case .success(let authenticated):
+                        if authenticated {
+                        UserDefaults.standard.setValue("jwt", forKey: "loginType")
+                        self.switchRootController()
+                        } else {
+                            print("JWT Login failed")
+                            let emailErrorAlert = UIAlertController(title: "Error", message: "JWT Login Failed!", preferredStyle: .alert)
+                            emailErrorAlert.addAction(UIAlertAction.dismissAction())
+                            self.present(emailErrorAlert, animated: true, completion: nil)
+                        }
                     }
-                    UserDefaults.standard.setValue("jwt", forKey: "loginType")
-                    self.switchRootController()
                 })
             }))
         } else {

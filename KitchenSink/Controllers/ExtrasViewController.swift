@@ -86,15 +86,16 @@ class ExtrasViewController: UIViewController {
     }
     
     @objc private func handleGetAccessTokenAction() {
-        webex.authenticator?.accessToken(completionHandler: { accessToken in
-            if let accessToken = accessToken {
+        webex.authenticator?.accessToken(completionHandler: { result in
+            switch result {
+            case .success(let accessToken):
                 let alert = UIAlertController(title: "Access Token", message: accessToken, preferredStyle: .alert)
                 alert.addAction(.dismissAction(withTitle: "Dismiss"))
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
                 }
-            } else {
-                let alert = UIAlertController(title: "No AccessToken yet", message: nil, preferredStyle: .alert)
+            case .failure(let error):
+                let alert = UIAlertController(title: "No AccessToken yet", message: error.localizedDescription, preferredStyle: .alert)
                 alert.addAction(.dismissAction(withTitle: "Dismiss"))
                 
                 DispatchQueue.main.async {
@@ -110,15 +111,16 @@ class ExtrasViewController: UIViewController {
             // This shouldn't happen as button itself is hidden
             return
         }
-        authenticator.refreshToken(completionHandler: { newAccessToken in
-            if let newAccessToken = newAccessToken {
-                let alert = UIAlertController(title: "New access Token", message: newAccessToken, preferredStyle: .alert)
+        authenticator.refreshToken(completionHandler: { result in
+            switch result {
+            case .success(let accessToken):
+                let alert = UIAlertController(title: "New access Token", message: accessToken, preferredStyle: .alert)
                 alert.addAction(.dismissAction(withTitle: "Dismiss"))
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)
                 }
-            } else {
-                let alert = UIAlertController(title: "No AccessToken yet", message: nil, preferredStyle: .alert)
+            case .failure(let error):
+                let alert = UIAlertController(title: "No AccessToken yet", message: error.localizedDescription, preferredStyle: .alert)
                 alert.addAction(.dismissAction(withTitle: "Dismiss"))
                 DispatchQueue.main.async {
                     self.present(alert, animated: true, completion: nil)

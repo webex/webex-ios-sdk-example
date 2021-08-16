@@ -84,7 +84,7 @@ class LoginViewController: UIViewController {
     
     func initializeWebex() {
         webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
-        webex.logLevel = .verbose
+        webex.logLevel = .error
 
         // Always call webex.initialize before invoking any other method on the webex instance
         webex.initialize { [weak self] isLoggedIn in

@@ -71,8 +71,13 @@ extension ContactSearchViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = dataSource[indexPath.row].displayName
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "ContactListCell")
+        let person = dataSource[indexPath.row]
+        cell.textLabel?.text = person.displayName
+        if let email = person.emails?.first?.toString() {
+            cell.detailTextLabel?.numberOfLines = 0
+            cell.detailTextLabel?.text = email
+        }
         return cell
     }
 }

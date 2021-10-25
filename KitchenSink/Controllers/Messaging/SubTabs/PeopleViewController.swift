@@ -89,7 +89,7 @@ extension PeopleViewController {
             return UITableViewCell()
         }
         let personItem = listItems[indexPath.row]
-        cell.setupCell(name: personItem.displayName, description: personItem.displayValue)
+        cell.setupCell(name: personItem.displayName, description: personItem.emails?.first?.toString() ?? personItem.displayValue)
         
         return cell
     }
@@ -114,6 +114,7 @@ extension PeopleViewController {
                 self?.postMessageByPersonEmail(byId: personId)
             })
         }
+        alertController.addAction(.dismissAction())
         present(alertController, animated: true)
     }
 }

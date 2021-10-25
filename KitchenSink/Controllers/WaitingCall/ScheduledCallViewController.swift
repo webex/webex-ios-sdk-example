@@ -178,7 +178,8 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
     }
     
     func webexCallStatesProcess(call: Call) {
-        call.onFailed = {
+        call.onFailed = { reason in
+            print(reason)
             self.player?.stop()
             self.tableData = self.tableData.filter { $0.currentCallId != call.callId }
             self.tableView.reloadData()

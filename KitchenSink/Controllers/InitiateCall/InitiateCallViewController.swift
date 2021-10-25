@@ -1,12 +1,13 @@
 import UIKit
 
 class InitiateCallViewController: UIPageViewController {
-    private let titles = ["Call", "Search", "History", "Spaces"]
-    private let controllers = [
+    private let titles = ["Call", "Search", "History", "Spaces", "Meetings"]
+    private let controllers:[NavigationItemSetupProtocol] = [
         DialCallViewController(),
         SearchContactViewController(),
         HistoryCallViewController(),
-        CallingSpacesListViewController()
+        CallingSpacesListViewController(),
+        CalendarMeetingsViewController()
     ]
     
     init() {
@@ -20,14 +21,16 @@ class InitiateCallViewController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .backgroundColor
-        navigationItem.titleView = initateCallSegmentControl
-        initateCallSegmentControl.selectedSegmentIndex = 0
+        navigationItem.titleView = initiateCallSegmentControl
+        initiateCallSegmentControl.selectedSegmentIndex = 0
         switchToTab(at: 0)
     }
     
     private func switchToTab(at index: Int) {
         guard index < controllers.count && index >= 0 else { return }
-        setViewControllers([controllers[index]], direction: .forward, animated: false)
+        let controller = controllers[index]
+        setViewControllers([controller], direction: .forward, animated: false)
+        navigationItem.setRightBarButtonItems(controller.rightBarButtonItems, animated: true)
         title = titles[index]
     }
     
@@ -35,10 +38,10 @@ class InitiateCallViewController: UIPageViewController {
         switchToTab(at: control.selectedSegmentIndex)
     }
     
-    private lazy var initateCallSegmentControl: UISegmentedControl = {
+    private lazy var initiateCallSegmentControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: titles)
         segmentControl.addTarget(self, action: #selector(self.handleSegmentChange(_:)), for: .valueChanged)
-        segmentControl.accessibilityIdentifier = "initateCallSegmentControl"
+        segmentControl.accessibilityIdentifier = "initiateCallSegmentControl"
         return segmentControl
     }()
 }

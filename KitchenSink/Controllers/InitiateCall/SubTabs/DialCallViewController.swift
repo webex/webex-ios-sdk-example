@@ -171,3 +171,9 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         }
     }
 }
+
+extension DialCallViewController: NavigationItemSetupProtocol {
+    var rightBarButtonItems: [UIBarButtonItem]? {
+        return nil
+    }
+}

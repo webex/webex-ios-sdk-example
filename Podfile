@@ -8,7 +8,7 @@ target 'KitchenSink' do
   use_frameworks!
 
   # Pods for KitchenSink
-	pod 'WebexSDK','~> 3.1'
+	pod 'WebexSDK','~> 3.2'
 
   target 'KitchenSinkUITests' do
   # Pods for testing
@@ -21,6 +21,6 @@ target 'KitchenSinkBroadcastExtension' do
   use_frameworks!
 
   # Pods for KitchenSinkBroadcastExtension 
-  pod 'WebexBroadcastExtensionKit','~> 3.1'
+  pod 'WebexBroadcastExtensionKit','~> 3.2'
   
 end

@@ -63,6 +63,9 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
             self.deviceRegistration()
         })
+        if !UserDefaults.standard.bool(forKey: "addedCustomBg") {
+            addCustomBackground()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -104,6 +107,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
                     self?.currentUserButton.layer.borderWidth = 2
                 case .failure(let error):
                     let userAlert = UIAlertController(title: "Error", message: "Error getting current user: " + error.localizedDescription, preferredStyle: .alert)
+                    userAlert.addAction(.dismissAction(withTitle: "Ok"))
                     self?.present(userAlert, animated: true, completion: nil)
                 }
             })
@@ -410,6 +414,35 @@ extension HomeViewController {
                     print("DEVICE REGISTRATION: \(response)")
                 }
             }.resume()
+        })
+    }
+    
+    func addCustomBackground() {
+        let  fileName = "Background"
+        let image = UIImage(named: "background-test")!
+        let resizedthumbnail = image.resizedImage(for: CGSize(width: 64, height: 64))
+
+        guard let imageData = image.pngData() else { return }
+        let path = FileUtils.writeToFile(data: imageData, fileName: fileName)
+        guard let imagePath = path?.absoluteString.replacingOccurrences(of: "file://", with: "") else { print("Failed to process image path"); return }
+
+        guard let thumbnailData = resizedthumbnail?.pngData() else { return }
+        let thumbnailFilePath = FileUtils.writeToFile(data: thumbnailData, fileName: "thumbnail\(fileName)")
+        guard let thumbnailPath = thumbnailFilePath?.absoluteString.replacingOccurrences(of: "file://", with: "") else { print("Failed to process thumbnail path"); return }
+        
+        let thumbnail = LocalFile.Thumbnail(path: thumbnailPath, mime: "png", width: Int(image.size.width), height: Int(image.size.height))
+        guard let localFile = LocalFile(path: imagePath, name: fileName, mime: "png", thumbnail: thumbnail) else { print("Failed to get local file"); return }
+        
+        webex.phone.addVirtualBackground(image: localFile, completionHandler: { result in
+            switch result {
+            case .success(let newItem):
+                UserDefaults.standard.setValue(true, forKey: "addedCustomBg")
+                print("new background item: \(newItem)")
+            case .failure(let error):
+                print("Failed uploading background with error: \(error)")
+            @unknown default:
+                print("Failed uploading background")
+            }
         })
     }
 }

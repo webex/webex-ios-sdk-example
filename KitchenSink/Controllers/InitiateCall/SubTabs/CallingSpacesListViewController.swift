@@ -80,3 +80,9 @@ class CallingSpacesListViewController: UIViewController, UITableViewDataSource {
         tableView.fillSuperView()
     }
 }
+
+extension CallingSpacesListViewController: NavigationItemSetupProtocol {
+    var rightBarButtonItems: [UIBarButtonItem]? {
+        return nil
+    }
+}

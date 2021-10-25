@@ -54,6 +54,20 @@ class LoginViewController: UIViewController {
         return view
     }()
     
+    private lazy var loginWithAccessTokenButton: UIButton = {
+        let view = UIButton(type: .system)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.addTarget(self, action: #selector(handleLoginWithAccessTokenAction), for: .touchUpInside)
+        view.setTitle("Login with Token", for: .normal)
+        view.titleLabel?.font = .preferredFont(forTextStyle: .title3)
+        view.setTitleColor(.white, for: .normal)
+        view.backgroundColor = .momentumBlue50
+        view.setHeight(50)
+        view.layer.cornerRadius = 25
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         setupViews()
@@ -77,6 +91,8 @@ class LoginViewController: UIViewController {
         guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
         if authType == "jwt" {
             initWebexUsingJWT()
+        } else if authType == "token" {
+            initWebexUsingToken()
         } else {
             initWebexUsingOauth(completion: nil)
         }
@@ -84,7 +100,7 @@ class LoginViewController: UIViewController {
     
     func initializeWebex() {
         webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
-        webex.logLevel = .error
+        webex.logLevel = .verbose
 
         // Always call webex.initialize before invoking any other method on the webex instance
         webex.initialize { [weak self] isLoggedIn in
@@ -131,11 +147,12 @@ class LoginViewController: UIViewController {
         let clientId = keys["clientId"] as? String ?? ""
         let clientSecret = keys["clientSecret"] as? String ?? ""
         let redirectUri = keys["redirectUri"] as? String ?? ""
+        let scopes = "spark:all" // spark:all is always mandatory
         
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
         if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: "spark:all", redirectUri: redirectUri, emailId: email.toString())
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)
             self.initializeWebex()
             completion?(true)
@@ -162,7 +179,7 @@ class LoginViewController: UIViewController {
             UserDefaults.standard.setValue(email.toString(), forKey: "userEmail")
 
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: "spark:all", redirectUri: redirectUri, emailId: email.toString())
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)
             self.initializeWebex()
             completion?(true)
@@ -173,6 +190,11 @@ class LoginViewController: UIViewController {
     
     func initWebexUsingJWT() {
         webex = Webex(authenticator: JWTAuthenticator())
+        initializeWebex()
+    }
+    
+    func initWebexUsingToken() {
+        webex = Webex(authenticator: TokenAuthenticator())
         initializeWebex()
     }
     
@@ -250,10 +272,50 @@ class LoginViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    @objc private func handleLoginWithAccessTokenAction() {
+        initWebexUsingToken()
+        loginWithAccessTokenButton.alpha = 0.7
+        loginWithAccessTokenButton.setTitle("Loading...", for: .normal)
+        loginWithAccessTokenButton.isEnabled = false
+        
+        let alert = UIAlertController(title: "Token Login", message: "Enter Access token", preferredStyle: .alert)
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Enter Access token"
+            textField.text = ""
+        }
+        if let authenticator = webex.authenticator as? TokenAuthenticator {
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] _ in
+                let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
+                authenticator.authorizedWith(accessToken: textField?.text ?? "", expiryInSeconds: nil, completionHandler: { result in 
+                    guard result == .success else {
+                        self.loginWithAccessTokenButton.setTitle("Login", for: .normal)
+                        self.loginWithAccessTokenButton.isEnabled = true
+                        print("Login failed!")
+                        return
+                    }
+                    
+                    UserDefaults.standard.setValue("token", forKey: "loginType")
+                    authenticator.onTokenExpired = {
+                        let alert = UIAlertController(title: "Token Expired", message: "User logged out because token expired", preferredStyle: .alert)
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                    self.switchRootController()
+                })
+            }))
+        } else {
+            print("Authenticator is nil")
+            return
+        }
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     func setupViews() {
         view.addSubview(webexLogoView)
         view.addSubview(loginButton)
         view.addSubview(loginWithJWTButton)
+        view.addSubview(loginWithAccessTokenButton)
         view.addSubview(ciscoLogoView)
     }
     
@@ -269,6 +331,10 @@ class LoginViewController: UIViewController {
         loginWithJWTButton.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 20).activate()
         loginWithJWTButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         loginWithJWTButton.fillWidth(of: view, padded: 64)
+        
+        loginWithAccessTokenButton.topAnchor.constraint(equalTo: loginWithJWTButton.bottomAnchor, constant: 20).activate()
+        loginWithAccessTokenButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+        loginWithAccessTokenButton.fillWidth(of: view, padded: 64)
         
         ciscoLogoView.setSize(width: 100, height: 100)
         ciscoLogoView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12).activate()

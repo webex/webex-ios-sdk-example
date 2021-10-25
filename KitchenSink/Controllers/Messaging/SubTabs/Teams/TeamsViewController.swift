@@ -70,8 +70,11 @@ extension TeamsViewController {
         }
     }
     
-    private func showUpdateTeamNameAlert(teamId: String) {
+    private func showUpdateTeamNameAlert(teamId: String, name: String?) {
         let alertController = UIAlertController.createWithTextField(title: "Update Team Name", message: "Enter the new name of the Team", style: .alert)
+        if let name = name {
+            alertController.textFields?.first?.text = name
+        }
         alertController.addAction(UIAlertAction(title: "Update", style: .default) { _ in
             guard let name = alertController.textFields?.first?.text else { return }
             alertController.dismiss(animated: true) {
@@ -98,9 +101,24 @@ extension TeamsViewController {
     @objc private func addTeam() {
         let alertController = UIAlertController.createWithTextField(title: "Add Team", message: "Enter the name of the new Team", style: .alert)
         alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
-            guard let name = alertController.textFields?.first?.text else { return }
-            webex.teams.create(name: name) { [weak self] _ in
+            guard let teamName = alertController.textFields?.first?.text else { return }
+            webex.teams.create(name: teamName) { [weak self] result in
+                let message: String = {
+                    switch result {
+                    case .success:
+                        return "Created new team: \(teamName)"
+                    case .failure:
+                        return "Failed to create new team: \(teamName)"
+                    }
+                }()
+                
                 self?.refreshList()
+                
+                let alertController = UIAlertController(title: "Create Team", message: message, preferredStyle: .alert)
+                alertController.addAction(.dismissAction(withTitle: "Ok"))
+                DispatchQueue.main.async {
+                    self?.present(alertController, animated: true)
+                }
             }
         })
         present(alertController, animated: true)
@@ -173,7 +191,7 @@ extension TeamsViewController {
             })
             
             alertController.addAction(UIAlertAction(title: "Update Team Name", style: .default) { [weak self] _ in
-                self?.showUpdateTeamNameAlert(teamId: teamId)
+                self?.showUpdateTeamNameAlert(teamId: teamId, name: self?.listItems[indexPath.row].name)
             })
             
             alertController.addAction(UIAlertAction(title: "Show Team Members", style: .default) { [weak self] _ in

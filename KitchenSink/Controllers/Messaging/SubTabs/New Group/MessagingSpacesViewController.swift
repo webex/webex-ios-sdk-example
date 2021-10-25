@@ -96,24 +96,32 @@ extension MessagingSpacesViewController {
         }
     }
     
-    private func deleteSpace(byId id: String) {
-        webex.spaces.delete(spaceId: id, queue: DispatchQueue.global(qos: .background)) { [weak self]  in
-            switch $0 {
-            case .success:
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: "Deleted Space", message: "", preferredStyle: .alert)
-                    alert.addAction(.dismissAction(withTitle: "Dismiss"))
-                    self?.present(alert, animated: true)
-                    self?.refreshList()
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: "Error Deleting Space", message: error.localizedDescription, preferredStyle: .alert)
-                    alert.addAction(.dismissAction(withTitle: "Dismiss"))
-                    self?.present(alert, animated: true)
+    private func deleteSpace(byId id: String, withTitle title: String?) {
+        let alertController = UIAlertController(title: "Please Confirm", message: "This action will delete the space: \(title.valueOrEmpty)", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction.dismissAction())
+        alertController.addAction(UIAlertAction(title: "Delete", style: .default) { _ in
+            alertController.dismiss(animated: true) {
+                webex.spaces.delete(spaceId: id, queue: DispatchQueue.global(qos: .background)) { [weak self]  in
+                    switch $0 {
+                    case .success:
+                        DispatchQueue.main.async {
+                            let alert = UIAlertController(title: "Deleted Space", message: "Deleted: \(title.valueOrEmpty)", preferredStyle: .alert)
+                            alert.addAction(.dismissAction(withTitle: "Dismiss"))
+                            self?.present(alert, animated: true)
+                            self?.refreshList()
+                        }
+                    case .failure(let error):
+                        DispatchQueue.main.async {
+                            let alert = UIAlertController(title: "Error Deleting Space", message: error.localizedDescription, preferredStyle: .alert)
+                            alert.addAction(.dismissAction(withTitle: "Dismiss"))
+                            self?.present(alert, animated: true)
+                        }
+                    }
                 }
             }
-        }
+        })
+
+        present(alertController, animated: true)
     }
     
     private func fetchMeetingInfo(byId id: String) {
@@ -170,8 +178,20 @@ extension MessagingSpacesViewController {
         }
     }
     
-    private func showUpdateSpaceNameAlert(spaceId: String) {
-        let alertController = UIAlertController.createWithTextField(title: "Update Space Name", message: "Enter the new name of the Space", style: .alert)
+    private func getSpaceNameFrom(spaceItem: SpaceItem) -> String? {
+        switch spaceItem {
+        case .space(let space):
+            return space.title
+        default:
+            return nil
+        }
+    }
+    
+    private func showUpdateSpaceNameAlert(spaceId: String, title: String?) {
+        let alertController = UIAlertController.createWithTextField(title: "Update Space Title", message: "Enter the new title of the Space", style: .alert)
+        if let title = title {
+            alertController.textFields?.first?.text = title
+        }
         alertController.addAction(UIAlertAction(title: "Update", style: .default) { _ in
             guard let title = alertController.textFields?.first?.text else { return }
             alertController.dismiss(animated: true) {
@@ -197,12 +217,12 @@ extension MessagingSpacesViewController {
                 switch result {
                 case .success:
                     return "Message marked read."
-                case .failure:
-                    return "Failed to mark message read."
+                case .failure(let error):
+                    return "Failed to mark message read. \(error)"
                 }
             }()
             let alert = UIAlertController(title: "Result", message: message, preferredStyle: .alert)
-            alert.addAction(.dismissAction())
+            alert.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async { [weak self] in
                 self?.present(alert, animated: true)
             }
@@ -368,11 +388,11 @@ extension MessagingSpacesViewController {
             })
             
             alertController.addAction(UIAlertAction(title: "Update Space Title", style: .default) { [weak self] _ in
-                self?.showUpdateSpaceNameAlert(spaceId: spaceId)
+                self?.showUpdateSpaceNameAlert(spaceId: spaceId, title: self?.getSpaceNameFrom(spaceItem: spaceItem))
             })
             
             alertController.addAction(UIAlertAction(title: "Delete Space", style: .default) { [weak self] _ in
-                self?.deleteSpace(byId: spaceId)
+                self?.deleteSpace(byId: spaceId, withTitle: self?.getSpaceNameFrom(spaceItem: spaceItem))
             })
             
             alertController.addAction(UIAlertAction(title: "Mark Space Read", style: .default) { [weak self] _ in
@@ -409,8 +429,8 @@ extension MessagingSpacesViewController: FilterSpacesDelegate {
                         alert.addAction(.dismissAction(withTitle: "Ok"))
                         self?.present(alert, animated: true)
                     }
-                case .success(let listspaces):
-                    self?.listItems = (listspaces ?? []).map { .space($0) }
+                case .success(let spaces):
+                    self?.listItems = (spaces ?? []).map { .space($0) }
                 }
             }
             

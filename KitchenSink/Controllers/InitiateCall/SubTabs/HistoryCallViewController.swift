@@ -71,3 +71,9 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
         tableView.fillSuperView()
     }
 }
+
+extension HistoryCallViewController: NavigationItemSetupProtocol {
+    var rightBarButtonItems: [UIBarButtonItem]? {
+        return nil
+    }
+}

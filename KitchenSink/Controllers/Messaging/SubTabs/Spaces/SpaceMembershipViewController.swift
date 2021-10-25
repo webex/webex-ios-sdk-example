@@ -85,7 +85,7 @@ extension SpaceMembershipViewController {
             }()
             
             let alertController = UIAlertController(title: "Fetch Membership", message: message, preferredStyle: .alert)
-            alertController.addAction(.dismissAction())
+            alertController.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async { [weak self] in
                 self?.present(alertController, animated: true)
             }
@@ -105,7 +105,7 @@ extension SpaceMembershipViewController {
             }()
             
             let alertController = UIAlertController(title: "Set Moderator", message: message, preferredStyle: .alert)
-            alertController.addAction(.dismissAction())
+            alertController.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async { [weak self] in
                 self?.present(alertController, animated: true)
             }
@@ -158,7 +158,7 @@ extension SpaceMembershipViewController {
                 }
             }()
             let alertController = UIAlertController(title: "Create Membership", message: message, preferredStyle: .alert)
-            alertController.addAction(.dismissAction())
+            alertController.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async {
                 self?.present(alertController, animated: true)
                 self?.refreshList()
@@ -177,7 +177,7 @@ extension SpaceMembershipViewController {
                 }
             }()
             let alertController = UIAlertController(title: "Create Membership", message: message, preferredStyle: .alert)
-            alertController.addAction(.dismissAction())
+            alertController.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async {
                 self?.present(alertController, animated: true)
                 self?.refreshList()

@@ -56,12 +56,12 @@ extension SpaceMessagesTableViewController {
                 switch result {
                 case .success:
                     return "Message marked read."
-                case .failure:
-                    return "Failed to mark message read."
+                case .failure(let error):
+                    return "Failed to mark message read. \(error)"
                 }
             }()
             let alert = UIAlertController(title: "Result", message: message, preferredStyle: .alert)
-            alert.addAction(.dismissAction())
+            alert.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async { [weak self] in
                 self?.present(alert, animated: true)
             }
@@ -79,7 +79,7 @@ extension SpaceMessagesTableViewController {
                 }
             }()
             let alertController = UIAlertController(title: "Get Message", message: messageBody, preferredStyle: .alert)
-            alertController.addAction(.dismissAction())
+            alertController.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async { [weak self] in
                 self?.present(alertController, animated: true)
             }

@@ -3,9 +3,10 @@ import ReplayKit
 import UIKit
 import WebexSDK
 
-class CallViewController: UIViewController, MultiStreamObserver, UICollectionViewDataSource {
+class CallViewController: UIViewController, MultiStreamObserver, UICollectionViewDataSource, UICollectionViewDelegate {
     // MARK: Properties
-    var space: Space
+    var space: Space?
+    var callInviteAddress: String?
     var oldCallId: String?
     var call: Call?
     var currentCallId: String?
@@ -32,6 +33,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var isModerator = false
     var pinOrPassword = ""
     var isCUCMCall = false
+    private let virtualBackgroundCell = "VirtualBackgroundCell"
+    private var backgroundItems: [Phone.VirtualBackground] = []
+    private var imagePicker = UIImagePickerController()
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
         self.space = space
@@ -45,6 +49,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         modalTransitionStyle = .crossDissolve
+    }
+    
+    init(callInviteAddress: String) {
+        super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
+        modalTransitionStyle = .crossDissolve
+        self.callInviteAddress = callInviteAddress
     }
     
     required init?(coder: NSCoder) {
@@ -84,7 +95,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .preferredFont(forTextStyle: .title1)
-        label.text = space.title
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.text = space?.title ?? call?.title ?? "Ongoing Call"
         label.accessibilityIdentifier = "nameLabel"
         return label
     }()
@@ -248,11 +261,30 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .backgroundColor
         view.dataSource = self
+        view.delegate = self
         view.register(AuxCollectionViewCell.self, forCellWithReuseIdentifier: kCellId)
         view.isScrollEnabled = false
         return view
     }()
     
+    private lazy var virtualBgcollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 50, height: 50)
+        layout.minimumLineSpacing = 20
+        layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
+        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        view.setHeight(80)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .lightGray
+        view.dataSource = self
+        view.delegate = self
+        view.register(VirtualBackgroundViewCell.self, forCellWithReuseIdentifier: virtualBackgroundCell)
+        view.isScrollEnabled = true
+        view.isHidden = true
+        return view
+    }()
+
     ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
     var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
     
@@ -269,6 +301,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         setupConstraints()
         checkIsOnHold()
         updatePhoneSettings()
+        imagePicker.delegate = self
         if !addedCall && !incomingCall {
             connectCall()
         } else if incomingCall {
@@ -285,11 +318,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.remoteVideoView.isUserInteractionEnabled = true
         remoteVideoView.addGestureRecognizer(tap)
         self.view.addGestureRecognizer(tap)
+        tap.cancelsTouchesInView = false
         if !isCUCMCall {
             DispatchQueue.main.async {
                 self.auxCollectionView.reloadData()
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateVirtualBackgrounds()
     }
     
     // MARK: Methods
@@ -348,14 +387,14 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     private func connectCall() {
-        guard let spaceId = space.id else {
+        guard let joinAddress = callInviteAddress ?? space?.id else {
             let alert = UIAlertController(title: "Error", message: "Calling address is null", preferredStyle: .alert)
             alert.addAction(.dismissAction(withTitle: "Ok"))
             self.present(alert, animated: true)
             return
         }
         let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword)
-        webex.phone.dial(spaceId, option: mediaOption, completionHandler: { result in
+        webex.phone.dial(joinAddress, option: mediaOption, completionHandler: { result in
             switch result {
             case .success(let call):
                 self.currentCallId = call.callId
@@ -471,29 +510,24 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     // MARK: Actions
     @objc private func handleEndCallAction(_ sender: UIButton) {
-        guard let call = self.call else {
-            let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
-                self.dismiss(animated: true)
-            }))
-            DispatchQueue.main.async {
-                self.present(alert, animated: true)
-            }
-            return
-        }
-        call.hangup(completionHandler: { error in
-            if error == nil {
-                self.dismiss(animated: true)
-            } else {
-                let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+        if let call = self.call {
+            call.hangup(completionHandler: { error in
+                if error == nil {
                     self.dismiss(animated: true)
-                }))
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true)
+                } else {
+                    let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                        self.dismiss(animated: true)
+                    }))
+                    DispatchQueue.main.async {
+                        self.present(alert, animated: true)
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            webex.phone.cancel()
+            self.dismiss(animated: true)
+        }
     }
     
     @objc private func showAudioRouteSelector(_ sender: UIButton) {
@@ -614,6 +648,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.setReceivingScreenshare(isReceiving: (!self.isReceivingScreenshare))
         })
         
+        if virtualBgcollectionView.isHidden {
+            alertController.addAction(UIAlertAction(title: "Change Virtual Background", style: .default) {  _ in
+                self.virtualBgAction(tag: 0)
+            })
+        } else {
+            alertController.addAction(UIAlertAction(title: "Add Virtual Background", style: .default) {  _ in
+                self.virtualBgAction(tag: 1)
+            })
+        }
+        
         present(alertController, animated: true)
     }
     
@@ -680,6 +724,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(endCallButton)
         view.addSubview(stackView)
         view.addSubview(bottomStackView)
+        view.addSubview(virtualBgcollectionView)
     }
     
     private func setupConstraints() {
@@ -712,12 +757,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         remoteVideoView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
         
         selfVideoView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).activate()
-        selfVideoView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -20).activate()
+        selfVideoView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -50).activate()
         
         auxCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: (view.bounds.height / 2) - 50).activate()
         auxCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
         auxCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         auxCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
+        
+        virtualBgcollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
+        virtualBgcollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
+        virtualBgcollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
     }
     
     public func ssoLogin (success: Bool?) {
@@ -865,10 +914,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
         }
         
-        call.onFailed = {
+        call.onFailed = { reason in
             print("Call Failed!")
             self.player.stop()
-            let alert = UIAlertController(title: "Call Failed", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Call Failed", message: reason, preferredStyle: .alert)
             alert.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async {
                 self.present(alert, animated: true, completion: {
@@ -1026,6 +1075,15 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
         }
         
+        call.onCpuHitThreshold = {
+            let alert = UIAlertController(title: "CPU Threshold Reached!", message: "Please stop video or remove virtual background", preferredStyle: .alert)
+            alert.addAction(.dismissAction(withTitle: "Ok"))
+            DispatchQueue.main.async {
+                self.present(alert, animated: true, completion: {
+                    self.dismiss(animated: true)
+                })
+            }
+        }
         print("UUID of Call: \(call.uuid)")
     }
     
@@ -1061,15 +1119,162 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return auxStreams.count
+        if  collectionView == auxCollectionView {
+            return auxStreams.count
+        } else {
+            return backgroundItems.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCellId, for: indexPath) as? AuxCollectionViewCell else { return UICollectionViewCell() }
-        auxIndexPath = indexPath
-        cell.updateCell(with: auxStreams[indexPath.item])
-        auxView = cell.auxView
-        return cell
+        if collectionView == auxCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCellId, for: indexPath) as? AuxCollectionViewCell else { return UICollectionViewCell() }
+            auxIndexPath = indexPath
+            cell.updateCell(with: auxStreams[indexPath.item])
+            auxView = cell.auxView
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: virtualBackgroundCell, for: indexPath) as? VirtualBackgroundViewCell else { return UICollectionViewCell() }
+            cell.setupCell(with: backgroundItems[indexPath.item], buttonActionHandler: { [weak self] in self?.deleteItem(item: self?.backgroundItems[indexPath.item]) })
+            return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == virtualBgcollectionView {
+            DispatchQueue.main.async {
+                webex.phone.applyVirtualBackground(background: self.backgroundItems[indexPath.row], mode: .call, completionHandler: { result in
+                    switch result {
+                    case .success(_):
+                        DispatchQueue.main.async {
+                            self.slideInStateView(slideInMsg: "Successfully updated background")
+                            let item = self.navigationItem.rightBarButtonItem
+                            item?.image = UIImage(named: "virtual-bg")
+                            item?.tag = 0
+                            self.virtualBgcollectionView.isHidden = true
+                            self.updateVirtualBackgrounds()
+                        }
+                    case .failure(let error):
+                        self.slideInStateView(slideInMsg: "Failed updating background with error: \(error)")
+                    @unknown default:
+                        self.slideInStateView(slideInMsg: "Failed updating background")
+                    }
+                })
+            }
+        }
+    }
+    
+    private func slideInStateView(slideInMsg: String) {
+        let alert = UIAlertController(title: nil, message: slideInMsg, preferredStyle: .alert)
+        self.present(alert, animated: true)
+        let duration: Double = 2
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
+            alert.dismiss(animated: true)
+        }
+    }
+    
+    @objc private func virtualBgAction(tag: Int) {
+        guard let sendingVideo = call?.sendingVideo else {
+            print("call.sending video is null")
+            return
+        }
+        if !sendingVideo {
+            let alert = UIAlertController(title: "Camera is off", message: "Please enable camera for selecting virtual background", preferredStyle: .alert)
+            alert.addAction(.dismissAction(withTitle: "Ok"))
+            self.present(alert, animated: true)
+        } else if tag == 0 {
+            virtualBgcollectionView.reloadData()
+            virtualBgcollectionView.isHidden = false
+        } else if tag == 1 {
+            if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum) {
+                imagePicker.sourceType = .photoLibrary
+                imagePicker.allowsEditing = false
+                present(imagePicker, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    private func updateVirtualBackgrounds() {
+        print("Limit of virtual backgroud is: \(webex.phone.virtualBackgroundLimit)")
+        webex.phone.fetchVirtualBackgrounds(completionHandler: { result in
+            switch result {
+            case .success(let backgrounds):
+                self.backgroundItems = backgrounds
+                self.virtualBgcollectionView.reloadData()
+            case .failure(let error):
+                print("Error: \(error)")
+            @unknown default:
+                print("Error")
+            }
+        })
+    }
+}
+
+extension CallViewController {
+    func deleteItem(item: Phone.VirtualBackground?) {
+        guard let item = item else {
+            print("Virtual background item is nil")
+            return
+        }
+        webex.phone.removeVirtualBackground(background: item, completionHandler: { result in
+            switch result {
+            case .success(_):
+                self.slideInStateView(slideInMsg: "Successfully deleted background")
+                self.updateVirtualBackgrounds()
+            case .failure(let error):
+                self.slideInStateView(slideInMsg: "Failed deleting background with error: \(error)")
+            @unknown default:
+                self.slideInStateView(slideInMsg: "Failed updating background")
+            }
+        })
+    }
+}
+
+extension CallViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        guard let image = info[.originalImage] as? UIImage else {
+            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+        }
+        var fileName = ""
+        var fileType = ""
+        
+        if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
+            fileName = url.lastPathComponent
+            fileType = url.pathExtension
+        }
+        
+        let resizedthumbnail = image.resizedImage(for: CGSize(width: 64, height: 64))
+
+        guard let imageData = image.pngData() else { return }
+        let path = FileUtils.writeToFile(data: imageData, fileName: fileName)
+        guard let imagePath = path?.absoluteString.replacingOccurrences(of: "file://", with: "") else { print("Failed to process image path"); return }
+
+        guard let thumbnailData = resizedthumbnail?.pngData() else { return }
+        let thumbnailFilePath = FileUtils.writeToFile(data: thumbnailData, fileName: "thumbnail\(fileName)")
+        guard let thumbnailPath = thumbnailFilePath?.absoluteString.replacingOccurrences(of: "file://", with: "") else { print("Failed to process thumbnail path"); return }
+        
+        let thumbnail = LocalFile.Thumbnail(path: thumbnailPath, mime: fileType, width: Int(image.size.width), height: Int(image.size.height))
+        guard let localFile = LocalFile(path: imagePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { print("Failed to get local file"); return }
+        
+        webex.phone.addVirtualBackground(image: localFile, completionHandler: { result in
+            picker.dismiss(animated: true, completion: nil)
+            switch result {
+            case .success(let newItem):
+                DispatchQueue.main.async {
+                    print("new background item: \(newItem)")
+                    self.slideInStateView(slideInMsg: "Successfully uploaded background")
+                    self.updateVirtualBackgrounds()
+                }
+            case .failure(let error):
+                self.slideInStateView(slideInMsg: "Failed uploading background with error: \(error)")
+            @unknown default:
+                self.slideInStateView(slideInMsg: "Failed uploading background")
+            }
+        })
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
 }
 

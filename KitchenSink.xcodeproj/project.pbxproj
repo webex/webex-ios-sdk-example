@@ -57,6 +57,14 @@
 		9D3951AD256D0D5400B4718D /* MessageComposerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3951AC256D0D5400B4718D /* MessageComposerViewController.swift */; };
 		9D3F77E224C604A400A6FB59 /* ParticipantListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3F77D524C604A400A6FB59 /* ParticipantListViewController.swift */; };
 		9D807AE924B3A8C700D56A92 /* KitchenSinkUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D807AD524B3A2F000D56A92 /* KitchenSinkUITests.swift */; };
+		9D82368F2726EA270099D44D /* CalendarMeetingDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */; };
+		9D8236902726EA270099D44D /* CalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */; };
+		9D8236912726EA270099D44D /* CalendarAtendeesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */; };
+		9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */; };
+		9D8236952726EA330099D44D /* CalendarMeetingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */; };
+		9D8236962726EA330099D44D /* VirtualBackgroundViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */; };
+		9D8236992726EA420099D44D /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236972726EA420099D44D /* DateUtils.swift */; };
+		9D82369A2726EA420099D44D /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236982726EA420099D44D /* FileUtils.swift */; };
 		9DA5F01B257F865200A1340C /* call_1_1_ringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9DA5F019257F864D00A1340C /* call_1_1_ringtone.wav */; };
 		9DA5F01C257F865200A1340C /* call_1_1_ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9DA5F01A257F865100A1340C /* call_1_1_ringback.wav */; };
 		9DAFA61524C9760C00A47221 /* ParticipantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAFA5B524C6D71700A47221 /* ParticipantTableViewCell.swift */; };
@@ -194,6 +202,14 @@
 		9D807ABA24B3A2BF00D56A92 /* KitchenSinkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenSinkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D807AD524B3A2F000D56A92 /* KitchenSinkUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KitchenSinkUITests.swift; sourceTree = "<group>"; };
 		9D807AD624B3A2F000D56A92 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingDetailViewController.swift; sourceTree = "<group>"; };
+		9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingsViewController.swift; sourceTree = "<group>"; };
+		9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarAtendeesTableViewController.swift; sourceTree = "<group>"; };
+		9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterCalendarMeetingsViewController.swift; sourceTree = "<group>"; };
+		9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingTableViewCell.swift; sourceTree = "<group>"; };
+		9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualBackgroundViewCell.swift; sourceTree = "<group>"; };
+		9D8236972726EA420099D44D /* DateUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		9D8236982726EA420099D44D /* FileUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUtils.swift; sourceTree = "<group>"; };
 		9DA5F019257F864D00A1340C /* call_1_1_ringtone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = call_1_1_ringtone.wav; sourceTree = "<group>"; };
 		9DA5F01A257F865100A1340C /* call_1_1_ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = call_1_1_ringback.wav; sourceTree = "<group>"; };
 		9DAFA5B524C6D71700A47221 /* ParticipantTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantTableViewCell.swift; sourceTree = "<group>"; };
@@ -386,6 +402,17 @@
 			path = KitchenSinkUITests;
 			sourceTree = SOURCE_ROOT;
 		};
+		9D82368A2726EA270099D44D /* CalendarMeetings */ = {
+			isa = PBXGroup;
+			children = (
+				9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */,
+				9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */,
+				9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */,
+				9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */,
+			);
+			path = CalendarMeetings;
+			sourceTree = "<group>";
+		};
 		9DA5F014257F851400A1340C /* Sound */ = {
 			isa = PBXGroup;
 			children = (
@@ -443,6 +470,8 @@
 		9DD2D6B524AA5FB9005F4ABE /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				9D8236972726EA420099D44D /* DateUtils.swift */,
+				9D8236982726EA420099D44D /* FileUtils.swift */,
 				9D1CCC262657FD3300EB302C /* CallObjectStorage.swift */,
 				9DDC82C424AA36A300F06E31 /* ColorUtils.swift */,
 				2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */,
@@ -517,6 +546,7 @@
 		9DDC82B724AA36A300F06E31 /* SubTabs */ = {
 			isa = PBXGroup;
 			children = (
+				9D82368A2726EA270099D44D /* CalendarMeetings */,
 				9DDC82B824AA36A300F06E31 /* DialCallViewController.swift */,
 				9DDC82B924AA36A300F06E31 /* CallingSpacesListViewController.swift */,
 				9DDC82BA24AA36A300F06E31 /* HistoryCallViewController.swift */,
@@ -539,6 +569,8 @@
 		9DDC82C524AA36A300F06E31 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */,
+				9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */,
 				9D1CCC282657FD4600EB302C /* AuxCollectionViewCell.swift */,
 				9DB243E2260CC458006B18C5 /* Dropdown.swift */,
 				9DDC82C624AA36A300F06E31 /* DialButton.swift */,
@@ -827,6 +859,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E621CBE24EEA5F1009E64F6 /* ReusableCell.swift in Sources */,
+				9D8236962726EA330099D44D /* VirtualBackgroundViewCell.swift in Sources */,
 				9DDC82DA24AA36A300F06E31 /* DialButton.swift in Sources */,
 				9DB243E3260CC458006B18C5 /* Dropdown.swift in Sources */,
 				9DDC82DB24AA36A300F06E31 /* FeatureCollectionViewCell.swift in Sources */,
@@ -837,6 +870,7 @@
 				9DDC82D324AA36A300F06E31 /* CallViewController.swift in Sources */,
 				9DDC82D124AA36A300F06E31 /* HistoryCallViewController.swift in Sources */,
 				2E57915224CA15AE00B196A9 /* BasicTableViewController.swift in Sources */,
+				9D8236902726EA270099D44D /* CalendarMeetingsViewController.swift in Sources */,
 				1FEE696E253E45170070E6C9 /* WebhooksViewController.swift in Sources */,
 				9D39519A256BD4CD00B4718D /* GetMeViewController.swift in Sources */,
 				9DDC829324AA35E400F06E31 /* AppDelegate.swift in Sources */,
@@ -847,12 +881,15 @@
 				2E9FA34F24D99E0700C914D4 /* String+Extension.swift in Sources */,
 				2E9FA34D24D9967100C914D4 /* SpaceMessagesTableViewController.swift in Sources */,
 				9DDC82CE24AA36A300F06E31 /* InitiateCallViewController.swift in Sources */,
+				9D82368F2726EA270099D44D /* CalendarMeetingDetailViewController.swift in Sources */,
 				08CE26C22582620100F041DA /* EncryptionUtils.swift in Sources */,
 				9D1CCC292657FD4600EB302C /* AuxCollectionViewCell.swift in Sources */,
+				9D82369A2726EA420099D44D /* FileUtils.swift in Sources */,
 				1FEE6970253E52050070E6C9 /* WebhookTableViewCell.swift in Sources */,
 				9DD5215B252F8B4E008727E1 /* AttachmentPreviewViewController.swift in Sources */,
 				9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */,
 				9DDC82D624AA36A300F06E31 /* HomeViewController.swift in Sources */,
+				9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */,
 				9D37019B24ABDD02004E480E /* ConstraintsExtension.swift in Sources */,
 				9DDC82CD24AA36A300F06E31 /* ViewUtils.swift in Sources */,
 				2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */,
@@ -862,6 +899,7 @@
 				9DB243DC260CC412006B18C5 /* SetupViewController.swift in Sources */,
 				9DDC82D924AA36A300F06E31 /* ColorUtils.swift in Sources */,
 				08CE26ED258339E200F041DA /* SwCrypt.swift in Sources */,
+				9D8236912726EA270099D44D /* CalendarAtendeesTableViewController.swift in Sources */,
 				2EAFB41424FEB8B700494183 /* SpaceMembershipReadStatusViewController.swift in Sources */,
 				9DB243CD260CC3EC006B18C5 /* ScheduledCallViewController.swift in Sources */,
 				9DDC82D524AA36A300F06E31 /* IncomingCallViewController.swift in Sources */,
@@ -869,12 +907,14 @@
 				90F9B01924B7AC7800447A9D /* NavigationItemSetupProtocol.swift in Sources */,
 				9DB243DD260CC412006B18C5 /* ExtrasViewController.swift in Sources */,
 				2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */,
+				9D8236952726EA330099D44D /* CalendarMeetingTableViewCell.swift in Sources */,
 				9C3E5A0424DC3FDD0030855E /* PeopleViewController.swift in Sources */,
 				9DAFA61524C9760C00A47221 /* ParticipantTableViewCell.swift in Sources */,
 				9DDC82D224AA36A300F06E31 /* SearchContactViewController.swift in Sources */,
 				9DDC82CC24AA36A300F06E31 /* Feature.swift in Sources */,
 				9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */,
 				0864BA1D2582285F0029C3AF /* PushNotificationHandler.swift in Sources */,
+				9D8236992726EA420099D44D /* DateUtils.swift in Sources */,
 				2E176D2924D9E3E7004BB3F6 /* MessageTableViewCell.swift in Sources */,
 				9DDC82D824AA36A300F06E31 /* LoginViewController.swift in Sources */,
 				904F184024F71C3300FA043A /* TeamMembershipViewController.swift in Sources */,
@@ -1290,7 +1330,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1312,7 +1352,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1348,7 +1388,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1367,7 +1407,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.2.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

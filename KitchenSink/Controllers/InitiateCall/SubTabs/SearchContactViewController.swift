@@ -98,3 +98,9 @@ class SearchContactViewController: UIViewController, UITableViewDataSource, UISe
         tableView.fillWidth(of: view)
     }
 }
+
+extension SearchContactViewController: NavigationItemSetupProtocol {
+    var rightBarButtonItems: [UIBarButtonItem]? {
+        return nil
+    }
+}

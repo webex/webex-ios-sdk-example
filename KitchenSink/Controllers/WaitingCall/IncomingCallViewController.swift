@@ -184,9 +184,9 @@ class IncomingCallViewController: UIViewController {
     }
     
     func webexCallStatesProcess(call: Call) {
-        call.onFailed = {
+        call.onFailed = { reason in
             self.player?.stop()
-            let alert = UIAlertController(title: "Call failed!", message: "", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Call failed!", message: reason, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 self?.toggleIncomingCallView(show: false)
             }))

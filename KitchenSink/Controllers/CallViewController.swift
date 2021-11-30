@@ -850,6 +850,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     DispatchQueue.main.async {
                         self.swapCameraButton.isHidden = !isSending
                         if isSending {
+                            call.forceSendingVideoLandscape(forceLandscape: false, completionHandler: { success in
+                                if success {
+                                    print("forceSendingVideoLandscape: \(success)")
+                                }
+                            })
                             self.selfVideoView.alpha = 1
                         } else {
                             self.selfVideoView.alpha = 0

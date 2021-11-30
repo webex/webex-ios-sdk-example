@@ -24,7 +24,8 @@ class MessageComposerViewController: UIViewController {
     var hasMentions = false
     public var parentMessage: Message?
     public var isMessageBeingEdited = false
-    
+    private let attachmentCell = "attachmentCell"
+
     init(id: String, type: SendMessageType) {
         self.id = id
         self.type = type
@@ -89,17 +90,6 @@ class MessageComposerViewController: UIViewController {
         return stack
     }()
     
-    private lazy var previewImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.setWidth(100)
-        imageView.setHeight(100)
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.isHidden = true
-        return imageView
-    }()
-    
     private lazy var sendButton: UIButton = {
         let view = UIButton(type: .system)
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -125,6 +115,22 @@ class MessageComposerViewController: UIViewController {
         return view
     }()
     
+    private lazy var attachmentCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: 120, height: 125)
+        layout.minimumLineSpacing = 20
+        layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        view.setHeight(125)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.dataSource = self
+        view.register(UICollectionViewCell.self, forCellWithReuseIdentifier: attachmentCell)
+        view.isScrollEnabled = true
+        view.isHidden = true
+        return view
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Message Composer"
@@ -142,7 +148,7 @@ class MessageComposerViewController: UIViewController {
         view.addSubview(stackView)
         
         if !isMessageBeingEdited {
-            view.addSubview(previewImage)
+            view.addSubview(attachmentCollectionView)
             view.addSubview(attachmentButton)
         }
         
@@ -150,6 +156,7 @@ class MessageComposerViewController: UIViewController {
     }
     
     func setupConstraints() {
+        attachmentCollectionView.fillWidth(of: view, padded: 20)
         sendButton.fillWidth(of: view, padded: 60)
         messageText.fillWidth(of: view, padded: 50)
         NSLayoutConstraint.activate([
@@ -164,11 +171,11 @@ class MessageComposerViewController: UIViewController {
                 attachmentButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
                 attachmentButton.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 10),
                 
-                previewImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                previewImage.topAnchor.constraint(equalTo: attachmentButton.bottomAnchor, constant: 10),
+                attachmentCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                attachmentCollectionView.topAnchor.constraint(equalTo: attachmentButton.bottomAnchor, constant: 10),
                 
                 sendButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                sendButton.topAnchor.constraint(equalTo: previewImage.bottomAnchor, constant: 20)
+                sendButton.topAnchor.constraint(equalTo: attachmentCollectionView.bottomAnchor, constant: 20)
             ])
         } else {
             NSLayoutConstraint.activate([
@@ -236,7 +243,7 @@ class MessageComposerViewController: UIViewController {
                 alertController.addAction(.dismissAction(withTitle: "Ok"))
                 self?.localFiles = []
                 DispatchQueue.main.async {
-                    self?.previewImage.isHidden = true
+                    self?.attachmentCollectionView.isHidden = true
                     self?.messageText.text = ""
                     self?.mentions = []
                     self?.present(alertController, animated: true)
@@ -255,7 +262,7 @@ class MessageComposerViewController: UIViewController {
                 alertController.addAction(.dismissAction(withTitle: "Ok"))
                 self?.localFiles = []
                 DispatchQueue.main.async {
-                    self?.previewImage.isHidden = true
+                    self?.attachmentCollectionView.isHidden = true
                     self?.messageText.text = ""
                     self?.mentions = []
                     self?.present(alertController, animated: true)
@@ -277,7 +284,7 @@ class MessageComposerViewController: UIViewController {
                             alertController.addAction(.dismissAction(withTitle: "Ok"))
                             self?.localFiles = []
                             DispatchQueue.main.async {
-                                self?.previewImage.isHidden = true
+                                self?.attachmentCollectionView.isHidden = true
                                 self?.messageText.text = ""
                                 self?.mentions = []
                                 self?.present(alertController, animated: true)
@@ -358,13 +365,11 @@ extension MessageComposerViewController: UINavigationControllerDelegate, UIImage
         }
         var fileName = ""
         var fileType = ""
-        
         if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
             fileName = url.lastPathComponent
             fileType = url.pathExtension
         }
-        previewImage.image = image
-        previewImage.isHidden = false
+        attachmentCollectionView.isHidden = false
         guard let data = image.pngData() else { return }
         let path = writeToFile(data: data, fileName: fileName)
         
@@ -372,10 +377,27 @@ extension MessageComposerViewController: UINavigationControllerDelegate, UIImage
         
         let thumbnail = LocalFile.Thumbnail(path: filePath, mime: fileType, width: Int(image.size.width), height: Int(image.size.height))
         
-        guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { return }
-        localFiles = []
-        localFiles.append(localFile)
+        let duplicate = localFiles.contains { // checking if already attached
+            let url1 = URL(fileURLWithPath: $0.path)
+            let url2 = URL(fileURLWithPath: filePath)
+            
+            if let data1 = try? Data(contentsOf: url1), let data2 = try? Data(contentsOf: url2) {
+                return data1 == data2
+            } else {
+                return false
+            }
+        }
+        
         picker.dismiss(animated: true, completion: nil)
+        
+        if duplicate { // if already attached returning
+            return
+        }
+        
+        guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { return }
+        
+        localFiles.append(localFile)
+        reloadattachmentCollectionView()
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -409,5 +431,41 @@ extension MessageComposerViewController: MakeDropDownDataSourceProtocol {
         dropDown.setRowHeight(height: 30)
         dropDown.width = self.messageText.frame.width
         self.view.addSubview(dropDown)
+    }
+}
+
+extension MessageComposerViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return localFiles.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: attachmentCell, for: indexPath)
+        let imageview = UIImageView(frame: CGRect(x: 0, y: 0, width: 120, height: 120))
+        imageview.contentMode = .scaleToFill
+        let img = UIImage(contentsOfFile: localFiles[indexPath.row].path)
+        imageview.image = img
+        cell.contentView.addSubview(imageview)
+        let deleteButton = UIButton(type: .system)
+        deleteButton.frame = CGRect(x: 100, y: 0, width: 20, height: 20)
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        deleteButton.setBackgroundImage(UIImage(named: "delete"), for: .normal)
+        deleteButton.backgroundColor = .momentumRed50
+        deleteButton.layer.cornerRadius = 10
+        deleteButton.addTarget(self, action: #selector(deleteAttachment(_:)), for: .touchUpInside)
+        deleteButton.tag = indexPath.row
+        cell.contentView.addSubview(deleteButton)
+        return cell
+    }
+    
+    @objc func deleteAttachment(_ sender: UIButton) {
+        localFiles.remove(at: sender.tag)
+        reloadattachmentCollectionView()
+    }
+    
+    func reloadattachmentCollectionView() {
+        DispatchQueue.main.async { [weak self] in
+            self?.attachmentCollectionView.reloadData()
+        }
     }
 }

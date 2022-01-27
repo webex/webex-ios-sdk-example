@@ -6,10 +6,11 @@ This demo supports iOS device with **iOS 13** or later
 
 ## Table of Contents
 
-- [Download App](#download-app)
-- [Setup](#setup)
-- [Usage](#usage)
-- [API Reference](#api-reference)
+  - [Screenshots](#screenshots)
+  - [Download App](#download-app)
+  - [Setup](#setup)
+  - [Usage](#usage)
+  - [API Reference](#api-reference)
 
 
 ## Screenshots 
@@ -36,12 +37,16 @@ This demo supports iOS device with **iOS 13** or later
 ## Download App
 You can download our Demo App from TestFlight.
 1. Download TestFlight from App Stroe.
-1. Open the public url(https://testflight.apple.com/join/obJ7Inof) from your iPhone browser.
+1. Contact Webex Dev Support to get access to the KitchenSink-Beta builds.
 1. Start Testing and install Ktichen Sink App from TestFlight.
 
 ## Setup
 
 Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
+
+1. Download WebexSDK and WebexBroadcastExtensionKit zip from here https://github.com/webex/webex-ios-sdk/tree/Beta/3.3.0 and extract the contents inside the Frameworks folder in root of this repo.
+
+<img src="https://github.com/webex/webex-ios-sdk-example/blob/Beta/3.3.0/images/Frameworks_path.png" width="80%" height="80%">
 
 1. Install CocoaPods:
     ```bash

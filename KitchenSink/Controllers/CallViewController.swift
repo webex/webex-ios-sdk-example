@@ -26,6 +26,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var auxStreams: [AuxStream?] = []
     var compositedLayout: MediaOption.CompositedVideoLayout = .single
     var renderMode: Call.VideoRenderMode = .fit
+    var torchMode: Call.TorchMode = .off
+    var flashMode: Call.FlashMode = .off
+    var cameraTargetBias: Call.CameraExposureTargetBias?
+    var cameraISO: Call.CameraExposureISO?
+    var cameraDuration: Call.CameraExposureDuration?
+    var zoomFactor: Float = 1.0
     private let kCellId: String = "AuxCell"
     var auxIndexPath = IndexPath(item: 0, section: 0)
     var auxView: MediaRenderView?
@@ -36,6 +42,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private let virtualBackgroundCell = "VirtualBackgroundCell"
     private var backgroundItems: [Phone.VirtualBackground] = []
     private var imagePicker = UIImagePickerController()
+    private var canControlWXA = false
+    private var isWXAEnabled = false
+    private var transcriptionItems: [Transcription] = []
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
         self.space = space
@@ -285,6 +294,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         return view
     }()
 
+    private lazy var transcriptionsTable: UITableView = {
+        let tv = UITableView()
+        tv.setHeight(200)
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.backgroundColor = .lightGray
+        tv.dataSource = self
+        tv.isScrollEnabled = true
+        tv.isHidden = true
+        return tv
+    }()
+    
     ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
     var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
     
@@ -335,6 +355,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     private func updateStates(callInfo: Call) {
         self.renderMode = callInfo.remoteVideoRenderMode
+        self.torchMode = callInfo.cameraTorchMode
+        self.flashMode = callInfo.cameraFlashMode
+        self.cameraTargetBias = callInfo.exposureTargetBias
+        self.cameraISO = callInfo.exposureISO
+        self.cameraDuration = callInfo.exposureDuration
+        self.zoomFactor = callInfo.zoomFactor
         self.compositedLayout = callInfo.compositedVideoLayout ?? .single
         self.isLocalAudioMuted = !callInfo.sendingAudio
         self.isLocalVideoMuted = !callInfo.sendingVideo
@@ -343,7 +369,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.isReceivingVideo = callInfo.receivingVideo
         self.isReceivingScreenshare = callInfo.receivingScreenShare
         self.isFrontCamera = callInfo.facingMode == .user ? true : false
+        self.canControlWXA = callInfo.wxa.canControlWXA
+        self.isWXAEnabled = callInfo.wxa.isEnabled
         self.showVideo()
+        self.updateMuteState()
     }
     
     private func updatePhoneSettings() {
@@ -382,6 +411,20 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             DispatchQueue.main.async {
                 self.stackView.addArrangedSubview(self.startScreenShareButton)
                 self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
+    private func updateMuteState() {
+        if self.isLocalAudioMuted {
+            DispatchQueue.main.async {
+                self.muteButton.setImage(UIImage(named: "microphone-muted"), for: .normal)
+                self.muteButton.backgroundColor = .systemGray6
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.muteButton.setImage(UIImage(named: "microphone"), for: .normal)
+                self.muteButton.backgroundColor = .systemGray2
             }
         }
     }
@@ -457,9 +500,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword)
+        self.webexCallStatesProcess(call: call)
         call.answer(option: mediaOption, completionHandler: { error in
-            if error == nil {
-                self.webexCallStatesProcess(call: call)
+            if error != nil {
+                print("Answer call error:\(String(describing: error))")
             }
         })
     }
@@ -606,9 +650,18 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleMoreAction(_ sender: UIButton) {
+        self.torchMode = call?.cameraTorchMode ?? .off
+        self.flashMode = call?.cameraFlashMode ?? .off
+        self.cameraTargetBias = call?.exposureTargetBias
+        self.cameraISO = call?.exposureISO
+        self.cameraDuration = call?.exposureDuration
+        self.zoomFactor = call?.zoomFactor ?? 1.0
+
         let compositedLayouts: [MediaOption.CompositedVideoLayout] = [.single, .grid, .filmstrip, .notSupported]
         let renderModes: [Call.VideoRenderMode] = [.fit, .cropFill, .stretchFill]
-        
+        let flashModes: [Call.FlashMode] = [.on, .off, .auto]
+        let torchModes: [Call.TorchMode] = [.on, .off, .auto]
+
         let alertController = UIAlertController(title: "", message: nil, preferredStyle: .actionSheet)
         
         alertController.addAction(.dismissAction(withTitle: "Cancel"))
@@ -658,6 +711,173 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             })
         }
         
+        // Transcriptions
+        if let call = call {
+            if call.wxa.isEnabled {
+                alertController.addAction(UIAlertAction(title: "\(transcriptionsTable.isHidden ? "Show":"Hide") Transcriptions", style: .default) { [self] _ in
+                    self.transcriptionsTable.isHidden = !transcriptionsTable.isHidden
+                    self.transcriptionsTable.reloadData()
+                })
+            }
+            
+            var wxaText: String
+            if call.wxa.canControlWXA {
+                wxaText = "\(call.wxa.isEnabled ? "Disable" : "Enable") WebEx Assistant"
+            } else {
+                wxaText = "WebEx Assistant \(call.wxa.isEnabled ? "enabled" : "disabled")"
+            }
+            
+            let wxaToggleAction = UIAlertAction(title: wxaText, style: .default) { [self] _ in
+                
+                let isWXAEnabled = !call.wxa.isEnabled
+                call.wxa.enableWXA(isEnabled: isWXAEnabled, callback: { success in
+                    print("setting WXA to: \(isWXAEnabled) operation returned: \(success)")
+                    var message: String
+                    if success {
+                        message = isWXAEnabled ? "WXA enabled" : "WXA disabled"
+                    } else {
+                        message = isWXAEnabled ? "Could not enable WXA" : "Could not disable WXA"
+                    }
+                    self.slideInStateView(slideInMsg: message)
+                })
+            }
+            if !call.wxa.canControlWXA {
+                // Disable WebEx Assistant toggle if user doesn't have permissions to control it
+                wxaToggleAction.isEnabled = false
+            }
+            
+            alertController.addAction(wxaToggleAction)
+        }
+        
+        alertController.addAction(UIAlertAction(title: "Video Torch Mode - \(String(describing: self.torchMode))", style: .default) {  _ in
+            guard var index = torchModes.firstIndex(of: self.torchMode) else { return }
+            if index == torchModes.count - 1 {
+                index = 0
+            } else {
+                index += 1
+            }
+            self.setTorchMode(mode: torchModes[index])
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Video Flash Mode - \(String(describing: self.flashMode))", style: .default) {  _ in
+            guard var index = flashModes.firstIndex(of: self.flashMode) else { return }
+            if index == flashModes.count - 1 {
+                index = 0
+            } else {
+                index += 1
+            }
+            self.setFlashMode(mode: flashModes[index])
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Camera Zoom Factor: Zoom- \(zoomFactor)", style: .default) {  _ in
+            let alertController = UIAlertController(title: "Camera Zoom Factor", message: "", preferredStyle: .alert)
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter Zoom value"
+            }
+            
+            let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                let firstTextField = alertController.textFields![0] as UITextField
+                if let zoom = firstTextField.text {
+                    self.call?.zoomFactor = Float(zoom) ?? 1.0
+                }
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Auto Exposure: Target Bias- \(cameraTargetBias?.current ?? 0)", style: .default) {  _ in
+            let alertController = UIAlertController(title: "Camera Auto Exposure", message: "", preferredStyle: .alert)
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter Target Bias value"
+            }
+            
+            let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                let firstTextField = alertController.textFields![0] as UITextField
+                if let targetBias = firstTextField.text {
+                    if !(self.call?.setCameraAutoExposure(targetBias: Float(targetBias) ?? 0.0) ?? false) {
+                        print("Error: setCameraAutoExposure failed")
+                    }
+                }
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Custom Exposure: Duration- \(cameraDuration?.current ?? 0) ISO- \(cameraISO?.current ?? 0)", style: .default) {  _ in
+            let alertController = UIAlertController(title: "Camera Custom Exposure", message: "", preferredStyle: .alert)
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter Duration value"
+            }
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter ISO value"
+            }
+            
+            let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                let firstTextField = alertController.textFields![0] as UITextField
+                let secondTextField = alertController.textFields![1] as UITextField
+                if let duration = firstTextField.text, let iso = secondTextField.text {
+                    if !(self.call?.setCameraCustomExposure(duration: UInt64(duration) ?? 0, iso: Float(iso) ?? 0) ?? false) {
+                        print("Error: setCameraCustomExposure failed")
+                    }
+                }
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Set Camera Focus", style: .default) {  _ in
+            let alertController = UIAlertController(title: "Camera Focus", message: "", preferredStyle: .alert)
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter point X value"
+            }
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter point Y value"
+            }
+            
+            let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                let firstTextField = alertController.textFields![0] as UITextField
+                let secondTextField = alertController.textFields![1] as UITextField
+                if let x = firstTextField.text, let y = secondTextField.text {
+                    if !(self.call?.setCameraFocusAtPoint(pointX: Float(x) ?? 0, pointY: Float(y) ?? 0) ?? false) {
+                        print("Error: camerFocusAtPoint failed")
+                    }
+                }
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        })
+        alertController.addAction(UIAlertAction(title: "Take Photo", style: .default) {  _ in
+            if !(self.call?.takePhoto() ?? false) {
+                print("Error: takePhoto")
+            }
+        })
+        
         present(alertController, animated: true)
     }
     
@@ -684,6 +904,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private func setRenderMode(mode: Call.VideoRenderMode) {
         self.renderMode = mode
         self.call?.remoteVideoRenderMode = mode
+    }
+    
+    private func setTorchMode(mode: Call.TorchMode) {
+        self.torchMode = mode
+        self.call?.cameraTorchMode = mode
+    }
+
+    private func setFlashMode(mode: Call.FlashMode) {
+        self.flashMode = mode
+        self.call?.cameraFlashMode = mode
     }
     
     private func showVideo() {
@@ -725,6 +955,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(stackView)
         view.addSubview(bottomStackView)
         view.addSubview(virtualBgcollectionView)
+        view.addSubview(transcriptionsTable)
     }
     
     private func setupConstraints() {
@@ -767,6 +998,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         virtualBgcollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
         virtualBgcollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         virtualBgcollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
+        
+        transcriptionsTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
+        transcriptionsTable.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
+        transcriptionsTable.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
     }
     
     public func ssoLogin (success: Bool?) {
@@ -829,23 +1064,25 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 /* This might be triggered when the local party muted or unmuted the audio. */
                 case .sendingAudio(let isSending):
                     self.isLocalAudioMuted = !isSending
-                    if self.isLocalAudioMuted {
-                        DispatchQueue.main.async {
-                            self.muteButton.setImage(UIImage(named: "microphone-muted"), for: .normal)
-                            self.muteButton.backgroundColor = .systemGray6
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.muteButton.setImage(UIImage(named: "microphone"), for: .normal)
-                            self.muteButton.backgroundColor = .systemGray2
-                        }
-                    }
+                    self.updateMuteState()
                     
                 /* This might be triggered when the local party muted or unmuted the video. */
                 case .sendingVideo(let isSending):
                     self.isLocalVideoMuted = !isSending
                     if isSending {
                         call.videoRenderViews = (self.selfVideoView, self.remoteVideoView)
+                        print("wme-camera zoomFactor", call.zoomFactor)
+                        print("wme-camera cameraFlashMode", call.cameraFlashMode)
+                        print("wme-camera cameraTorchMode", call.cameraTorchMode)
+                        print("wme-camera exposureDuration min", call.exposureDuration.min)
+                        print("wme-camera exposureDuration max", call.exposureDuration.max)
+                        print("wme-camera exposureDuration current", call.exposureDuration.current)
+                        print("wme-camera exposureISO min", call.exposureISO.min)
+                        print("wme-camera exposureISO max", call.exposureISO.max)
+                        print("wme-camera exposureISO current", call.exposureISO.current)
+                        print("wme-camera exposureTargetBias min", call.exposureTargetBias.min)
+                        print("wme-camera exposureTargetBias max", call.exposureTargetBias.max)
+                        print("wme-camera exposureTargetBias current", call.exposureTargetBias.current)
                     }
                     DispatchQueue.main.async {
                         self.swapCameraButton.isHidden = !isSending
@@ -989,6 +1226,19 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         
         call.onInfoChanged = {
             self.onHold = call.isOnHold
+            
+            if self.isWXAEnabled != call.wxa.isEnabled {
+                self.isWXAEnabled = call.wxa.isEnabled
+                self.slideInStateView(slideInMsg: "WXA \(self.isWXAEnabled ? "enabled" : "disabled")")
+            }
+            
+            if self.canControlWXA != call.wxa.canControlWXA {
+                self.canControlWXA = call.wxa.canControlWXA
+                if self.canControlWXA {
+                    self.slideInStateView(slideInMsg: "You can now control WXA")
+                }
+            }
+            
             DispatchQueue.main.async {
                 call.videoRenderViews?.local.isHidden = self.onHold
                 call.videoRenderViews?.remote.isHidden = self.onHold
@@ -1089,7 +1339,30 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 })
             }
         }
+        
+        call.wxa.onTranscriptionArrived = { [self] transcription in
+            transcriptionItems.append(transcription)
+            transcriptionsTable.reloadData()
+            let indexPath = IndexPath(item: transcriptionItems.count - 1, section: 0)
+            transcriptionsTable.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
         print("UUID of Call: \(call.uuid)")
+        
+        call.onPhotoCaptured = { imageData in
+            let showAlert = UIAlertController(title: "Take Photo Result", message: nil, preferredStyle: .alert)
+            let imageView = UIImageView(frame: CGRect(x: 10, y: 50, width: 250, height: 230))
+            imageView.image = UIImage(data: imageData ?? Data())
+            showAlert.view.addSubview(imageView)
+            let height = NSLayoutConstraint(item: showAlert.view as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 320)
+            let width = NSLayoutConstraint(item: showAlert.view as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 250)
+            showAlert.view.addConstraint(height)
+            showAlert.view.addConstraint(width)
+            showAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            }))
+            DispatchQueue.main.async {
+                self.present(showAlert, animated: true, completion: nil)
+            }
+        }
     }
     
     private func openedAuxiliaryUI(view: MediaRenderView, auxStream: AuxStream) {
@@ -1288,5 +1561,25 @@ extension CallViewController: UIAdaptivePresentationControllerDelegate {
         if #available(iOS 13, *) {
             checkIsOnHold()
         }
+    }
+}
+
+extension CallViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return transcriptionItems.count
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Transcriptions"
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "TranscriptionCellIdentifier")
+        let transcriptionItem = transcriptionItems[indexPath.row]
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.text = "\(transcriptionItem.personName) \(transcriptionItem.timestamp)"
+        cell.detailTextLabel?.numberOfLines = 0
+        cell.detailTextLabel?.text = transcriptionItem.content
+        return cell
     }
 }

@@ -1,17 +1,14 @@
 # Uncomment the next line to define a global platform for your project
 # platform :ios, '13.0'
 
-source 'https://github.com/CocoaPods/Specs.git'
-
 target 'KitchenSink' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   # Pods for KitchenSink
-	pod 'WebexSDK','~> 3.2.1'
-
+    pod 'WebexSDK', :path => './Frameworks/WebexSDK'
   target 'KitchenSinkUITests' do
-  # Pods for testing
+    # Pods for testing
   end
 
 end
@@ -21,6 +18,5 @@ target 'KitchenSinkBroadcastExtension' do
   use_frameworks!
 
   # Pods for KitchenSinkBroadcastExtension 
-  pod 'WebexBroadcastExtensionKit','~> 3.2.1'
-  
+  pod 'WebexBroadcastExtensionKit',:path => './Frameworks/WebexBroadcastExtensionKit'
 end

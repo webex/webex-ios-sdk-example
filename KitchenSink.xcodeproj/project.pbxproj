@@ -14,6 +14,7 @@
 		1FEE696E253E45170070E6C9 /* WebhooksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F221977253E2B9B00384AA4 /* WebhooksViewController.swift */; };
 		1FEE6970253E52050070E6C9 /* WebhookTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE696F253E52050070E6C9 /* WebhookTableViewCell.swift */; };
 		1FEE6973253E67190070E6C9 /* NewWebhookFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEE6972253E67190070E6C9 /* NewWebhookFormViewController.swift */; };
+		1FFACBAA279FAF7700376AD1 /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 9DD11CCA2567CAC500B2C2CA /* KitchenSinkBroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2E176D2924D9E3E7004BB3F6 /* MessageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E176D2824D9E3E7004BB3F6 /* MessageTableViewCell.swift */; };
 		2E39A40B24BCAAA90081D077 /* UILabel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E39A40A24BCAAA90081D077 /* UILabel+Extensions.swift */; };
 		2E39A41124BCC8360081D077 /* MessagingSpacesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E39A41024BCC8360081D077 /* MessagingSpacesTests.swift */; };
@@ -37,7 +38,6 @@
 		2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */; };
 		2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */; };
 		592BABD224D3378C0071B85B /* MessagingReadStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */; };
-		84BB78D7316E71528EEE714D /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */; };
 		90301A2A24BE594C00DDD9DB /* MessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90301A2924BE594C00DDD9DB /* MessagingTests.swift */; };
 		904F184024F71C3300FA043A /* TeamMembershipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904F183F24F71C3300FA043A /* TeamMembershipViewController.swift */; };
 		906DC95924BFB781006BE784 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DC95824BFB781006BE784 /* Array+Extensions.swift */; };
@@ -46,7 +46,7 @@
 		9C3E5A0424DC3FDD0030855E /* PeopleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3E5A0324DC3FDD0030855E /* PeopleViewController.swift */; };
 		9C5E417624DD914B002C95DD /* MessagingPeopleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5E417524DD914B002C95DD /* MessagingPeopleTests.swift */; };
 		9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6DE76C24F46B610055D500 /* SpaceMembershipViewController.swift */; };
-		9CB90C0824E72685009D9D75 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		9CB90C0824E72685009D9D75 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		9CB90C0924E72685009D9D75 /* FilterSpacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB90C0724E72685009D9D75 /* FilterSpacesViewController.swift */; };
 		9D1CCC272657FD3400EB302C /* CallObjectStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CCC262657FD3300EB302C /* CallObjectStorage.swift */; };
 		9D1CCC292657FD4600EB302C /* AuxCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CCC282657FD4600EB302C /* AuxCollectionViewCell.swift */; };
@@ -56,15 +56,15 @@
 		9D39519A256BD4CD00B4718D /* GetMeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D395199256BD4CC00B4718D /* GetMeViewController.swift */; };
 		9D3951AD256D0D5400B4718D /* MessageComposerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3951AC256D0D5400B4718D /* MessageComposerViewController.swift */; };
 		9D3F77E224C604A400A6FB59 /* ParticipantListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3F77D524C604A400A6FB59 /* ParticipantListViewController.swift */; };
+		9D52510B27048A16009407CC /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D52510A27048A16009407CC /* FileUtils.swift */; };
+		9D52510D27048A1F009407CC /* VirtualBackgroundViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D52510C27048A1F009407CC /* VirtualBackgroundViewCell.swift */; };
 		9D807AE924B3A8C700D56A92 /* KitchenSinkUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D807AD524B3A2F000D56A92 /* KitchenSinkUITests.swift */; };
-		9D82368F2726EA270099D44D /* CalendarMeetingDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */; };
-		9D8236902726EA270099D44D /* CalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */; };
-		9D8236912726EA270099D44D /* CalendarAtendeesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */; };
-		9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */; };
-		9D8236952726EA330099D44D /* CalendarMeetingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */; };
-		9D8236962726EA330099D44D /* VirtualBackgroundViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */; };
-		9D8236992726EA420099D44D /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236972726EA420099D44D /* DateUtils.swift */; };
-		9D82369A2726EA420099D44D /* FileUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236982726EA420099D44D /* FileUtils.swift */; };
+		9D8236822726E7870099D44D /* CalendarMeetingDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82367E2726E7870099D44D /* CalendarMeetingDetailViewController.swift */; };
+		9D8236832726E7870099D44D /* CalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D82367F2726E7870099D44D /* CalendarMeetingsViewController.swift */; };
+		9D8236842726E7870099D44D /* CalendarAtendeesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236802726E7870099D44D /* CalendarAtendeesTableViewController.swift */; };
+		9D8236852726E7870099D44D /* FilterCalendarMeetingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236812726E7870099D44D /* FilterCalendarMeetingsViewController.swift */; };
+		9D8236872726E7A20099D44D /* CalendarMeetingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236862726E7A20099D44D /* CalendarMeetingTableViewCell.swift */; };
+		9D8236892726E7BB0099D44D /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8236882726E7BB0099D44D /* DateUtils.swift */; };
 		9DA5F01B257F865200A1340C /* call_1_1_ringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9DA5F019257F864D00A1340C /* call_1_1_ringtone.wav */; };
 		9DA5F01C257F865200A1340C /* call_1_1_ringback.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9DA5F01A257F865100A1340C /* call_1_1_ringback.wav */; };
 		9DAFA61524C9760C00A47221 /* ParticipantTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DAFA5B524C6D71700A47221 /* ParticipantTableViewCell.swift */; };
@@ -75,7 +75,6 @@
 		9DB243DD260CC412006B18C5 /* ExtrasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB243DB260CC412006B18C5 /* ExtrasViewController.swift */; };
 		9DB243E3260CC458006B18C5 /* Dropdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DB243E2260CC458006B18C5 /* Dropdown.swift */; };
 		9DD11CCB2567CAC500B2C2CA /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D645241255AC54E0084A2C1 /* ReplayKit.framework */; };
-		9DD11D292567D40900B2C2CA /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 9DD11CCA2567CAC500B2C2CA /* KitchenSinkBroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9DD11D9A2568D77600B2C2CA /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD11D8D2568D77500B2C2CA /* SampleHandler.swift */; };
 		9DD5215B252F8B4E008727E1 /* AttachmentPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD5215A252F8B4E008727E1 /* AttachmentPreviewViewController.swift */; };
 		9DDC829324AA35E400F06E31 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC829224AA35E400F06E31 /* AppDelegate.swift */; };
@@ -98,11 +97,16 @@
 		9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */; };
 		9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C924AA36A300F06E31 /* DialPadView.swift */; };
 		9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82CA24AA36A300F06E31 /* CallButton.swift */; };
-		BAA37468A542E413CC3757EE /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D4575D5F504F97009561C9 /* Pods_KitchenSinkBroadcastExtension.framework */; };
-		ED0FD0C041B89731978DC64D /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A00357CAA9196A7949B28BD /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1FFACBAB279FAF7700376AD1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9DAA01CA2450BBB1009C85F8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9DD11CC92567CAC500B2C2CA;
+			remoteInfo = KitchenSinkBroadcastExtension;
+		};
 		9D807ABF24B3A2C000D56A92 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9DAA01CA2450BBB1009C85F8 /* Project object */;
@@ -110,17 +114,10 @@
 			remoteGlobalIDString = 9DDC828F24AA35E400F06E31;
 			remoteInfo = KitchenSink;
 		};
-		9DD11D2A2567D40900B2C2CA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9DAA01CA2450BBB1009C85F8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9DD11CC92567CAC500B2C2CA;
-			remoteInfo = KitchenSinkBroadcastExtension;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		9DB24431260D08FF006B18C5 /* Embed Frameworks */ = {
+		1FFACBA5279FADA100376AD1 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -130,13 +127,23 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9DD11CBE2567C75100B2C2CA /* Embed App Extensions */ = {
+		1FFACBA9279FADFE00376AD1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FFACBAD279FAF7700376AD1 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				9DD11D292567D40900B2C2CA /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */,
+				1FFACBAA279FAF7700376AD1 /* KitchenSinkBroadcastExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,8 +154,6 @@
 		0864BA1C2582285F0029C3AF /* PushNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationHandler.swift; sourceTree = "<group>"; };
 		08CE26C12582620100F041DA /* EncryptionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionUtils.swift; sourceTree = "<group>"; };
 		08CE26EC258339E200F041DA /* SwCrypt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwCrypt.swift; sourceTree = "<group>"; };
-		0EC0396A2E449A5E82A0897C /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
-		14094E3E0DE1A00B673EF12C /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
 		1F221977253E2B9B00384AA4 /* WebhooksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhooksViewController.swift; sourceTree = "<group>"; };
 		1FEE696F253E52050070E6C9 /* WebhookTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookTableViewCell.swift; sourceTree = "<group>"; };
 		1FEE6972253E67190070E6C9 /* NewWebhookFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebhookFormViewController.swift; sourceTree = "<group>"; };
@@ -174,16 +179,12 @@
 		2EB6BD7224B79A2900DC3B7D /* MessagingSpacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MessagingSpacesViewController.swift; path = "../New Group/MessagingSpacesViewController.swift"; sourceTree = "<group>"; };
 		2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
 		2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertAction+Extensions.swift"; sourceTree = "<group>"; };
-		4A00357CAA9196A7949B28BD /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingReadStatusUITests.swift; sourceTree = "<group>"; };
-		5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		71CD1C4163EDAD74F9E7F7C3 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		90301A2924BE594C00DDD9DB /* MessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingTests.swift; sourceTree = "<group>"; };
 		904F183F24F71C3300FA043A /* TeamMembershipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMembershipViewController.swift; sourceTree = "<group>"; };
 		906DC95824BFB781006BE784 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		90F9B00A24B79FB200447A9D /* TeamsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsViewController.swift; sourceTree = "<group>"; };
 		90F9B01824B7AC7800447A9D /* NavigationItemSetupProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationItemSetupProtocol.swift; sourceTree = "<group>"; };
-		966F4558D3928CFC079BB11A /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		9C3E5A0324DC3FDD0030855E /* PeopleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleViewController.swift; sourceTree = "<group>"; };
 		9C5E417524DD914B002C95DD /* MessagingPeopleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingPeopleTests.swift; sourceTree = "<group>"; };
 		9C6DE76C24F46B610055D500 /* SpaceMembershipViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceMembershipViewController.swift; sourceTree = "<group>"; };
@@ -197,19 +198,19 @@
 		9D395199256BD4CC00B4718D /* GetMeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetMeViewController.swift; sourceTree = "<group>"; };
 		9D3951AC256D0D5400B4718D /* MessageComposerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageComposerViewController.swift; sourceTree = "<group>"; };
 		9D3F77D524C604A400A6FB59 /* ParticipantListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantListViewController.swift; sourceTree = "<group>"; };
+		9D52510A27048A16009407CC /* FileUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUtils.swift; sourceTree = "<group>"; };
+		9D52510C27048A1F009407CC /* VirtualBackgroundViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualBackgroundViewCell.swift; sourceTree = "<group>"; };
 		9D645241255AC54E0084A2C1 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		9D64524D255AC54F0084A2C1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		9D807ABA24B3A2BF00D56A92 /* KitchenSinkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KitchenSinkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D807AD524B3A2F000D56A92 /* KitchenSinkUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KitchenSinkUITests.swift; sourceTree = "<group>"; };
 		9D807AD624B3A2F000D56A92 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingDetailViewController.swift; sourceTree = "<group>"; };
-		9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingsViewController.swift; sourceTree = "<group>"; };
-		9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarAtendeesTableViewController.swift; sourceTree = "<group>"; };
-		9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterCalendarMeetingsViewController.swift; sourceTree = "<group>"; };
-		9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingTableViewCell.swift; sourceTree = "<group>"; };
-		9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualBackgroundViewCell.swift; sourceTree = "<group>"; };
-		9D8236972726EA420099D44D /* DateUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
-		9D8236982726EA420099D44D /* FileUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileUtils.swift; sourceTree = "<group>"; };
+		9D82367E2726E7870099D44D /* CalendarMeetingDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingDetailViewController.swift; sourceTree = "<group>"; };
+		9D82367F2726E7870099D44D /* CalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingsViewController.swift; sourceTree = "<group>"; };
+		9D8236802726E7870099D44D /* CalendarAtendeesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarAtendeesTableViewController.swift; sourceTree = "<group>"; };
+		9D8236812726E7870099D44D /* FilterCalendarMeetingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterCalendarMeetingsViewController.swift; sourceTree = "<group>"; };
+		9D8236862726E7A20099D44D /* CalendarMeetingTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarMeetingTableViewCell.swift; sourceTree = "<group>"; };
+		9D8236882726E7BB0099D44D /* DateUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
 		9DA5F019257F864D00A1340C /* call_1_1_ringtone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = call_1_1_ringtone.wav; sourceTree = "<group>"; };
 		9DA5F01A257F865100A1340C /* call_1_1_ringback.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = call_1_1_ringback.wav; sourceTree = "<group>"; };
 		9DAFA5B524C6D71700A47221 /* ParticipantTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantTableViewCell.swift; sourceTree = "<group>"; };
@@ -247,9 +248,6 @@
 		9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactTableViewCell.swift; sourceTree = "<group>"; };
 		9DDC82C924AA36A300F06E31 /* DialPadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialPadView.swift; sourceTree = "<group>"; };
 		9DDC82CA24AA36A300F06E31 /* CallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallButton.swift; sourceTree = "<group>"; };
-		A7D4575D5F504F97009561C9 /* Pods_KitchenSinkBroadcastExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSinkBroadcastExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B67D7D5EBE0FAD45936C9713 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; sourceTree = "<group>"; };
-		C3B7121FA6FE87A92B3CDEC6 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,7 +255,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED0FD0C041B89731978DC64D /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +263,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DD11CCB2567CAC500B2C2CA /* ReplayKit.framework in Frameworks */,
-				BAA37468A542E413CC3757EE /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,7 +271,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D35B01124B491120005E83A /* Security.framework in Frameworks */,
-				84BB78D7316E71528EEE714D /* Pods_KitchenSink.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,19 +292,6 @@
 				1FEE6972253E67190070E6C9 /* NewWebhookFormViewController.swift */,
 			);
 			path = Webhook;
-			sourceTree = "<group>";
-		};
-		26E709D229B141D8DEC609F0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				14094E3E0DE1A00B673EF12C /* Pods-KitchenSink.debug.xcconfig */,
-				0EC0396A2E449A5E82A0897C /* Pods-KitchenSink.release.xcconfig */,
-				966F4558D3928CFC079BB11A /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */,
-				B67D7D5EBE0FAD45936C9713 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */,
-				C3B7121FA6FE87A92B3CDEC6 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */,
-				71CD1C4163EDAD74F9E7F7C3 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		2E39A41D24BCDED40081D077 /* Messaging */ = {
@@ -391,6 +373,13 @@
 			path = Teams;
 			sourceTree = "<group>";
 		};
+		94CA89DBD7E1DD36F6F8EDC9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		9D807AD424B3A2F000D56A92 /* KitchenSinkUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -402,13 +391,13 @@
 			path = KitchenSinkUITests;
 			sourceTree = SOURCE_ROOT;
 		};
-		9D82368A2726EA270099D44D /* CalendarMeetings */ = {
+		9D82367D2726E7870099D44D /* CalendarMeetings */ = {
 			isa = PBXGroup;
 			children = (
-				9D82368B2726EA270099D44D /* CalendarMeetingDetailViewController.swift */,
-				9D82368C2726EA270099D44D /* CalendarMeetingsViewController.swift */,
-				9D82368D2726EA270099D44D /* CalendarAtendeesTableViewController.swift */,
-				9D82368E2726EA270099D44D /* FilterCalendarMeetingsViewController.swift */,
+				9D82367E2726E7870099D44D /* CalendarMeetingDetailViewController.swift */,
+				9D82367F2726E7870099D44D /* CalendarMeetingsViewController.swift */,
+				9D8236802726E7870099D44D /* CalendarAtendeesTableViewController.swift */,
+				9D8236812726E7870099D44D /* FilterCalendarMeetingsViewController.swift */,
 			);
 			path = CalendarMeetings;
 			sourceTree = "<group>";
@@ -430,7 +419,7 @@
 				9DDC829124AA35E400F06E31 /* KitchenSink */,
 				9D807AD424B3A2F000D56A92 /* KitchenSinkUITests */,
 				9DAA01D42450BBB1009C85F8 /* Products */,
-				26E709D229B141D8DEC609F0 /* Pods */,
+				94CA89DBD7E1DD36F6F8EDC9 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -450,9 +439,6 @@
 				9D35B00424B491120005E83A /* Security.framework */,
 				9D645241255AC54E0084A2C1 /* ReplayKit.framework */,
 				9D64524D255AC54F0084A2C1 /* UIKit.framework */,
-				5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */,
-				4A00357CAA9196A7949B28BD /* Pods_KitchenSink_KitchenSinkUITests.framework */,
-				A7D4575D5F504F97009561C9 /* Pods_KitchenSinkBroadcastExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -470,8 +456,8 @@
 		9DD2D6B524AA5FB9005F4ABE /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				9D8236972726EA420099D44D /* DateUtils.swift */,
-				9D8236982726EA420099D44D /* FileUtils.swift */,
+				9D8236882726E7BB0099D44D /* DateUtils.swift */,
+				9D52510A27048A16009407CC /* FileUtils.swift */,
 				9D1CCC262657FD3300EB302C /* CallObjectStorage.swift */,
 				9DDC82C424AA36A300F06E31 /* ColorUtils.swift */,
 				2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */,
@@ -546,7 +532,7 @@
 		9DDC82B724AA36A300F06E31 /* SubTabs */ = {
 			isa = PBXGroup;
 			children = (
-				9D82368A2726EA270099D44D /* CalendarMeetings */,
+				9D82367D2726E7870099D44D /* CalendarMeetings */,
 				9DDC82B824AA36A300F06E31 /* DialCallViewController.swift */,
 				9DDC82B924AA36A300F06E31 /* CallingSpacesListViewController.swift */,
 				9DDC82BA24AA36A300F06E31 /* HistoryCallViewController.swift */,
@@ -569,8 +555,8 @@
 		9DDC82C524AA36A300F06E31 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */,
-				9D8236942726EA330099D44D /* VirtualBackgroundViewCell.swift */,
+				9D8236862726E7A20099D44D /* CalendarMeetingTableViewCell.swift */,
+				9D52510C27048A1F009407CC /* VirtualBackgroundViewCell.swift */,
 				9D1CCC282657FD4600EB302C /* AuxCollectionViewCell.swift */,
 				9DB243E2260CC458006B18C5 /* Dropdown.swift */,
 				9DDC82C624AA36A300F06E31 /* DialButton.swift */,
@@ -593,11 +579,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9D807ACF24B3A2C000D56A92 /* Build configuration list for PBXNativeTarget "KitchenSinkUITests" */;
 			buildPhases = (
-				A7F57EEF814CA27382F308E9 /* [CP] Check Pods Manifest.lock */,
 				9D807AB624B3A2BF00D56A92 /* Sources */,
 				9D807AB724B3A2BF00D56A92 /* Frameworks */,
 				9D807AB824B3A2BF00D56A92 /* Resources */,
-				717DE35BBAFA4DF90A57293A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -613,10 +597,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9DD11CDB2567CAC600B2C2CA /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtension" */;
 			buildPhases = (
-				A91B33D6BE2A16EB61C68327 /* [CP] Check Pods Manifest.lock */,
 				9DD11CC62567CAC500B2C2CA /* Sources */,
 				9DD11CC72567CAC500B2C2CA /* Frameworks */,
 				9DD11CC82567CAC500B2C2CA /* Resources */,
+				1FFACBA9279FADFE00376AD1 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -631,18 +615,16 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9DDC82AF24AA35E800F06E31 /* Build configuration list for PBXNativeTarget "KitchenSink" */;
 			buildPhases = (
-				9A2735A511DA401DFC0B7982 /* [CP] Check Pods Manifest.lock */,
 				9DDC828C24AA35E400F06E31 /* Sources */,
 				9DDC828D24AA35E400F06E31 /* Frameworks */,
 				9DDC828E24AA35E400F06E31 /* Resources */,
-				9DD11CBE2567C75100B2C2CA /* Embed App Extensions */,
-				9DB24431260D08FF006B18C5 /* Embed Frameworks */,
-				BCDFC200D597DCCA739D4724 /* [CP] Embed Pods Frameworks */,
+				1FFACBA5279FADA100376AD1 /* Embed Frameworks */,
+				1FFACBAD279FAF7700376AD1 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				9DD11D2B2567D40900B2C2CA /* PBXTargetDependency */,
+				1FFACBAC279FAF7700376AD1 /* PBXTargetDependency */,
 			);
 			name = KitchenSink;
 			productName = KitchenSink;
@@ -721,109 +703,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		717DE35BBAFA4DF90A57293A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9A2735A511DA401DFC0B7982 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A7F57EEF814CA27382F308E9 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-KitchenSinkUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A91B33D6BE2A16EB61C68327 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KitchenSinkBroadcastExtension-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BCDFC200D597DCCA739D4724 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		9D807AB624B3A2BF00D56A92 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -859,7 +738,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E621CBE24EEA5F1009E64F6 /* ReusableCell.swift in Sources */,
-				9D8236962726EA330099D44D /* VirtualBackgroundViewCell.swift in Sources */,
 				9DDC82DA24AA36A300F06E31 /* DialButton.swift in Sources */,
 				9DB243E3260CC458006B18C5 /* Dropdown.swift in Sources */,
 				9DDC82DB24AA36A300F06E31 /* FeatureCollectionViewCell.swift in Sources */,
@@ -867,13 +745,14 @@
 				9CB90C0924E72685009D9D75 /* FilterSpacesViewController.swift in Sources */,
 				9DB243CE260CC3EC006B18C5 /* IncomingCallViewCell.swift in Sources */,
 				2E621CCC24EEA624009E64F6 /* SpaceTableViewCell.swift in Sources */,
+				9D52510D27048A1F009407CC /* VirtualBackgroundViewCell.swift in Sources */,
 				9DDC82D324AA36A300F06E31 /* CallViewController.swift in Sources */,
 				9DDC82D124AA36A300F06E31 /* HistoryCallViewController.swift in Sources */,
 				2E57915224CA15AE00B196A9 /* BasicTableViewController.swift in Sources */,
-				9D8236902726EA270099D44D /* CalendarMeetingsViewController.swift in Sources */,
 				1FEE696E253E45170070E6C9 /* WebhooksViewController.swift in Sources */,
 				9D39519A256BD4CD00B4718D /* GetMeViewController.swift in Sources */,
 				9DDC829324AA35E400F06E31 /* AppDelegate.swift in Sources */,
+				9D8236872726E7A20099D44D /* CalendarMeetingTableViewCell.swift in Sources */,
 				2EB6BD7024B7996800DC3B7D /* MessagingViewController.swift in Sources */,
 				9D1CCC272657FD3400EB302C /* CallObjectStorage.swift in Sources */,
 				2E39A40B24BCAAA90081D077 /* UILabel+Extensions.swift in Sources */,
@@ -881,15 +760,12 @@
 				2E9FA34F24D99E0700C914D4 /* String+Extension.swift in Sources */,
 				2E9FA34D24D9967100C914D4 /* SpaceMessagesTableViewController.swift in Sources */,
 				9DDC82CE24AA36A300F06E31 /* InitiateCallViewController.swift in Sources */,
-				9D82368F2726EA270099D44D /* CalendarMeetingDetailViewController.swift in Sources */,
 				08CE26C22582620100F041DA /* EncryptionUtils.swift in Sources */,
 				9D1CCC292657FD4600EB302C /* AuxCollectionViewCell.swift in Sources */,
-				9D82369A2726EA420099D44D /* FileUtils.swift in Sources */,
 				1FEE6970253E52050070E6C9 /* WebhookTableViewCell.swift in Sources */,
 				9DD5215B252F8B4E008727E1 /* AttachmentPreviewViewController.swift in Sources */,
 				9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */,
 				9DDC82D624AA36A300F06E31 /* HomeViewController.swift in Sources */,
-				9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */,
 				9D37019B24ABDD02004E480E /* ConstraintsExtension.swift in Sources */,
 				9DDC82CD24AA36A300F06E31 /* ViewUtils.swift in Sources */,
 				2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */,
@@ -899,47 +775,50 @@
 				9DB243DC260CC412006B18C5 /* SetupViewController.swift in Sources */,
 				9DDC82D924AA36A300F06E31 /* ColorUtils.swift in Sources */,
 				08CE26ED258339E200F041DA /* SwCrypt.swift in Sources */,
-				9D8236912726EA270099D44D /* CalendarAtendeesTableViewController.swift in Sources */,
 				2EAFB41424FEB8B700494183 /* SpaceMembershipReadStatusViewController.swift in Sources */,
 				9DB243CD260CC3EC006B18C5 /* ScheduledCallViewController.swift in Sources */,
 				9DDC82D524AA36A300F06E31 /* IncomingCallViewController.swift in Sources */,
+				9D52510B27048A16009407CC /* FileUtils.swift in Sources */,
 				2EB6BD7324B79A2900DC3B7D /* MessagingSpacesViewController.swift in Sources */,
 				90F9B01924B7AC7800447A9D /* NavigationItemSetupProtocol.swift in Sources */,
 				9DB243DD260CC412006B18C5 /* ExtrasViewController.swift in Sources */,
 				2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */,
-				9D8236952726EA330099D44D /* CalendarMeetingTableViewCell.swift in Sources */,
 				9C3E5A0424DC3FDD0030855E /* PeopleViewController.swift in Sources */,
+				9D8236842726E7870099D44D /* CalendarAtendeesTableViewController.swift in Sources */,
 				9DAFA61524C9760C00A47221 /* ParticipantTableViewCell.swift in Sources */,
+				9D8236832726E7870099D44D /* CalendarMeetingsViewController.swift in Sources */,
+				9D8236822726E7870099D44D /* CalendarMeetingDetailViewController.swift in Sources */,
 				9DDC82D224AA36A300F06E31 /* SearchContactViewController.swift in Sources */,
 				9DDC82CC24AA36A300F06E31 /* Feature.swift in Sources */,
 				9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */,
 				0864BA1D2582285F0029C3AF /* PushNotificationHandler.swift in Sources */,
-				9D8236992726EA420099D44D /* DateUtils.swift in Sources */,
 				2E176D2924D9E3E7004BB3F6 /* MessageTableViewCell.swift in Sources */,
 				9DDC82D824AA36A300F06E31 /* LoginViewController.swift in Sources */,
 				904F184024F71C3300FA043A /* TeamMembershipViewController.swift in Sources */,
 				2E621CCE24EEB4CD009E64F6 /* ContactSearchViewController.swift in Sources */,
 				9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */,
 				90F9B00B24B79FB200447A9D /* TeamsViewController.swift in Sources */,
-				9CB90C0824E72685009D9D75 /* (null) in Sources */,
+				9CB90C0824E72685009D9D75 /* BuildFile in Sources */,
+				9D8236852726E7870099D44D /* FilterCalendarMeetingsViewController.swift in Sources */,
 				9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */,
 				9D3701A924ABDD43004E480E /* ImageExtension.swift in Sources */,
 				9DDC82D024AA36A300F06E31 /* CallingSpacesListViewController.swift in Sources */,
+				9D8236892726E7BB0099D44D /* DateUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1FFACBAC279FAF7700376AD1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9DD11CC92567CAC500B2C2CA /* KitchenSinkBroadcastExtension */;
+			targetProxy = 1FFACBAB279FAF7700376AD1 /* PBXContainerItemProxy */;
+		};
 		9D807AC024B3A2C000D56A92 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9DDC828F24AA35E400F06E31 /* KitchenSink */;
 			targetProxy = 9D807ABF24B3A2C000D56A92 /* PBXContainerItemProxy */;
-		};
-		9DD11D2B2567D40900B2C2CA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9DD11CC92567CAC500B2C2CA /* KitchenSinkBroadcastExtension */;
-			targetProxy = 9DD11D2A2567D40900B2C2CA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -957,7 +836,6 @@
 /* Begin XCBuildConfiguration section */
 		9D807AC124B3A2C000D56A92 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 966F4558D3928CFC079BB11A /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1002,7 +880,6 @@
 		};
 		9D807AC224B3A2C000D56A92 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B67D7D5EBE0FAD45936C9713 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1212,7 +1089,6 @@
 		};
 		9DD11CDC2567CAC600B2C2CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C3B7121FA6FE87A92B3CDEC6 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1229,9 +1105,14 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1246,7 +1127,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
@@ -1258,12 +1139,12 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Debug;
 		};
 		9DD11CDD2567CAC600B2C2CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 71CD1C4163EDAD74F9E7F7C3 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1280,10 +1161,14 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 11;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1294,7 +1179,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.3.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1306,14 +1191,13 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Release;
 		};
 		9DDC82A124AA35E800F06E31 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 14094E3E0DE1A00B673EF12C /* Pods-KitchenSink.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1330,7 +1214,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1352,7 +1236,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1369,9 +1253,7 @@
 		};
 		9DDC82A224AA35E800F06E31 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0EC0396A2E449A5E82A0897C /* Pods-KitchenSink.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1388,7 +1270,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 11;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1407,7 +1289,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

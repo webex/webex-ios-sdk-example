@@ -21,7 +21,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GroupIdentifier</key>
-	<string>group.com.webex.sdk.KitchenSinkv3.0</string>
+	<string>group.com.webex.sdk.KitchenSinkv3</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

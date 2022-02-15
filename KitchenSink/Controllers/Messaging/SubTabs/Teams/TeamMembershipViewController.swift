@@ -191,7 +191,7 @@ extension TeamMembershipViewController {
         
         let teamMembership = listItems[indexPath.row]
         
-        let alertController = UIAlertController(title: "Membership Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Membership Actions", message: nil, sourceView: self.view)
         
         alertController.addAction(UIAlertAction(title: "Fetch Team Membership by ID", style: .default) { [weak self] _ in
             self?.fetchTeamMembership(byId: membershipId)
@@ -212,7 +212,7 @@ extension TeamMembershipViewController: ContactSearchViewControllerDelegate {
         guard let personId = person.id, let emailAddress = person.emails?.first else { return }
         
         let personDisplayName = person.displayName.valueOrEmpty
-        let alertController = UIAlertController(title: "Add Team Membership", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Add Team Membership", message: nil, sourceView: self.view)
         alertController.addAction(UIAlertAction(title: "By Person Id", style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.createTeamMembershipWithId(personId, teamId: self.teamId, personDisplayName: personDisplayName)

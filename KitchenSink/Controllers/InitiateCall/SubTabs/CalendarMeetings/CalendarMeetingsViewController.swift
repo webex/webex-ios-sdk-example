@@ -119,7 +119,7 @@ class CalendarMeetingsViewController: UIViewController, UITableViewDataSource {
     // MARK: Methods
     private func joinMeeting(meeting: WebexSDK.Meeting) {
         // Present joining options
-        let alertController = UIAlertController(title: "Join Meeting", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Join Meeting", message: nil, sourceView: self.view)
         alertController.addAction(UIAlertAction(title: "Join by Meeting Id", style: .default) { _ in
             let callVC = CallViewController(callInviteAddress: meeting.meetingId)
             self.present(callVC, animated: true)

@@ -89,7 +89,7 @@ extension WebhooksViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let alertController = UIAlertController(title: "Webhook Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Webhook Actions", message: nil, sourceView: self.view)
         if let webhookId = listItems[indexPath.row].id {
             alertController.addAction(UIAlertAction(title: "Fetch Webhook by Id", style: .default) { [weak self] _ in
                 webex.webhooks.get(webhookId: webhookId, queue: DispatchQueue.global(qos: .default)) { [weak self] in

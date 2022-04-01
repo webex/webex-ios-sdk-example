@@ -36,40 +36,66 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
     public var tableData: [Meeting] = []
     
     func setIncomingCallListener() {
-        webex.phone.onIncoming = { call in
-            self.call = call
-            CallObjectStorage.self.shared.addCallObject(call: call)
-            call.onScheduleChanged = { _ in
-                DispatchQueue.main.async {
-                    self.getUpdatedSchedule(call: call)
-                    self.tableView.reloadData()
-                }
+        // get all objects from storage to showthem in sync manner
+        CallObjectStorage.self.shared.registerCallObjectsFromStorage(onScheduleChanged: { call in
+            DispatchQueue.main.async {
+                self.getUpdatedSchedule(call: call)
+                self.tableView.reloadData()
             }
+        }, updateSchedule: { call in
             DispatchQueue.main.async {
                 self.getUpdatedSchedule(call: call)
                 self.webexCallStatesProcess(call: call)
                 self.tableView.reloadData()
+            }
+        }) {
+                webex.phone.onIncoming = { call in
+                self.call = call
+                CallObjectStorage.self.shared.addCallObject(call: call)
+                call.onScheduleChanged = { call in
+                    DispatchQueue.main.async {
+                        self.getUpdatedSchedule(call: call)
+                        self.tableView.reloadData()
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.getUpdatedSchedule(call: call)
+                    self.webexCallStatesProcess(call: call)
+                    self.tableView.reloadData()
+                }
             }
         }
     }
 
     func getUpdatedSchedule(call: Call) {
         guard let callSchedule = call.schedules else {
-            //Case : One to one call ( Only utilizes the title, Space, callId and isScheduledCall)
+            // Case : One to one call ( Only utilizes the title, Space, callId and isScheduledCall)
             currentCallId = call.callId
             space = Space(id: call.spaceId ?? "", title: call.title ?? "")
             let newCall = Meeting(organizer: call.title ?? "", start: Date(), end: Date(), meetingId: "", link: "", subject: "", isScheduledCall: false, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: currentCallId ?? "")
-            tableData.append(newCall)
+            // Flag to check if meeting is already scheduled (To enter change in the schedule)
+            var isExistingScheduleModified = false
+            for (rowNumber, var _) in self.tableData.enumerated() where newCall.currentCallId == tableData[rowNumber].currentCallId {
+                // Use meeting Id to check if it already exists
+                tableData.remove(at: rowNumber)
+                tableData.append(newCall)
+                isExistingScheduleModified = true
+                break
+            }
+            if !isExistingScheduleModified {
+                // Append new Scheduled Meeting
+                tableData.append(newCall)
+            }
             self.startRinging()
             return
         }
 
-        //Case 2 : Scheduled Meeting
+        // Case 2 : Scheduled Meeting
         for item in callSchedule {
             let newMeetingId = Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? "")
-            //Flag to check if meeting is already scheduled (To enter change in the schedule)
+            // Flag to check if meeting is already scheduled (To enter change in the schedule)
             var isExistingScheduleModified = false
-            for (rowNumber, var _) in self.tableData.enumerated() where newMeetingId.meetingId == tableData[rowNumber].meetingId {
+            for (rowNumber, var _) in self.tableData.enumerated() where (newMeetingId.currentCallId == tableData[rowNumber].currentCallId || newMeetingId.meetingId == tableData[rowNumber].meetingId) {
                 // Use meeting Id to check if it already exists
                 tableData.remove(at: rowNumber)
                 tableData.append(newMeetingId)
@@ -77,28 +103,41 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
                 break
             }
             if !isExistingScheduleModified {
-                //Append new Scheduled Meeting
+                // Append new Scheduled Meeting
                 self.tableData.append(Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? ""))
                 break
             }
+        }
+    }
+    
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        self.player?.stop()
+        if parent == nil {
+            debugPrint("Back Button pressed.")
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView = UITableView(frame: self.view.bounds, style: UITableView.Style.plain)
-        setIncomingCallListener()
         configureTable()
+        setIncomingCallListener()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopRinging()
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        //Custom cell for one to one call
+        // Custom cell for one to one call
         if tableData[indexPath.row].isScheduledCall == false {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: IncomingCallViewCell.reuseIdentifier, for: indexPath) as? IncomingCallViewCell else { return UITableViewCell() }
             cell.setupCallCell(name: tableData[indexPath.row].organizer, connectButtonActionHandler: { [weak self] in self?.connectCallTapped(indexPath: indexPath) }, endButtonActionHandler: { [weak self] in self?.endCallTapped(indexPath: indexPath) })
         return cell
         } else {
-        //Custom cell for Scheduled Meeting
+        // Custom cell for Scheduled Meeting
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduledMeetingTableViewCell.reuseIdentifier, for: indexPath) as? ScheduledMeetingTableViewCell else { return UITableViewCell() }
             cell.setupCell(name: tableData[indexPath.row].subject, start: tableData[indexPath.row].start, end: tableData[indexPath.row].end, joinButtonActionHandler: { [weak self] in self?.joinButtonTapped(indexPath: indexPath)
         })
@@ -165,7 +204,9 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
     }
 
     func startRinging() {
-        let path = Bundle.main.path(forResource: "call_1_1_ringtone", ofType: "wav")!
+        guard let path = Bundle.main.path(forResource: "call_1_1_ringtone", ofType: "wav") else {
+            return
+        }
         let url = URL(fileURLWithPath: path)
         do {
             self.player = try AVAudioPlayer(contentsOf: url)
@@ -177,10 +218,14 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
         }
     }
     
+    func stopRinging() {
+       self.player?.stop()
+    }
+    
     func webexCallStatesProcess(call: Call) {
         call.onFailed = { reason in
             print(reason)
-            self.player?.stop()
+            self.stopRinging()
             self.tableData = self.tableData.filter { $0.currentCallId != call.callId }
             self.tableView.reloadData()
         }
@@ -222,7 +267,7 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
                 print(reason)
             }
             
-            self.player?.stop()
+            self.stopRinging()
             self.tableData = self.tableData.filter { $0.currentCallId != call.callId }
             self.tableView.reloadData()
         }

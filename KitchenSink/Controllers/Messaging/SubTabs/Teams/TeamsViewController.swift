@@ -179,7 +179,7 @@ extension TeamsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let alertController = UIAlertController(title: "Team Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Team Actions", message: nil, sourceView: self.view)
         alertController.addAction(UIAlertAction(title: "Add Space to Team", style: .default) { [weak self] _ in
             guard let teamId = self?.listItems[indexPath.row].id else { return }
             self?.showCreateSpaceAlert(teamId: teamId)

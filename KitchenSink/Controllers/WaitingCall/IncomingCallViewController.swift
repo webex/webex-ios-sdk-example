@@ -104,6 +104,11 @@ class IncomingCallViewController: UIViewController {
         getIncomingCall()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopRinging()
+    }
+
     // MARK: Actions
     @objc private func handleConnectCallAction(_ sender: UIButton) {
         self.player?.stop()
@@ -183,9 +188,13 @@ class IncomingCallViewController: UIViewController {
         }
     }
     
+    func stopRinging() {
+       self.player?.stop()
+    }
+
     func webexCallStatesProcess(call: Call) {
         call.onFailed = { reason in
-            self.player?.stop()
+            self.stopRinging()
             let alert = UIAlertController(title: "Call failed!", message: reason, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
                 self?.toggleIncomingCallView(show: false)
@@ -194,7 +203,7 @@ class IncomingCallViewController: UIViewController {
         }
         
         call.onDisconnected = { reason in
-            self.player?.stop()
+            self.stopRinging()
             switch reason {
             case .callEnded:
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")

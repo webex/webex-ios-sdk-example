@@ -304,7 +304,7 @@ extension HomeViewController: WebexUCLoginDelegate {
 // MARK: Feedback
 extension HomeViewController {
     func manageFeedback() {
-        let alert = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .actionSheet)
+        let alert = UIAlertController.actionSheetWith(title: "Choose Topic", message: nil, sourceView: self.view)
         Feedback.allCases.forEach { feedback in
             alert.addAction(UIAlertAction(title: feedback.title, style: .default, handler: { [weak self] _ in self?.configureMail(for: feedback) }))
         }

@@ -344,7 +344,7 @@ extension MessagingSpacesViewController {
     // MARK: UITableViewDelegate
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let spaceItem = listItems[indexPath.row]
-        let alertController = UIAlertController(title: "Space Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Space Actions", message: nil, sourceView: self.view)
         
         alertController.addAction(.dismissAction(withTitle: "Cancel"))
         

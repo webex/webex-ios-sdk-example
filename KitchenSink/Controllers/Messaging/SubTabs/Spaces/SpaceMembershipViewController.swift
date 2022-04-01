@@ -262,7 +262,7 @@ extension SpaceMembershipViewController {
         guard let membershipId = listItems[indexPath.row].id, self.personEmail == nil && self.personId == nil else { tableView.deselectRow(at: indexPath, animated: true); return }
         
         let membership = listItems[indexPath.row]
-        let alertController = UIAlertController(title: "Membership Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Membership Actions", message: nil, sourceView: self.view)
         
         alertController.addAction(UIAlertAction(title: "Fetch Membership by ID", style: .default) { [weak self] _ in
             self?.fetchMembership(byId: membershipId)
@@ -279,6 +279,13 @@ extension SpaceMembershipViewController {
         }
         alertController.addAction(buildSetModeratorAction(membership: membership))
         alertController.addAction(.dismissAction())
+        
+        
+        if let popoverController = alertController.popoverPresentationController {
+          popoverController.sourceView = self.view
+          popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+          popoverController.permittedArrowDirections = []
+        }
         
         present(alertController, animated: true) { [weak tableView] in
             tableView?.deselectRow(at: indexPath, animated: true)
@@ -301,7 +308,7 @@ extension SpaceMembershipViewController: ContactSearchViewControllerDelegate {
             let personId = person.id,
             let emailAddress = person.emails?.first else { return }
         let personDisplayName = person.displayName.valueOrEmpty
-        let alertController = UIAlertController(title: "Add Membership", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Add Membership", message: nil, sourceView: self.view)
         alertController.addAction(UIAlertAction(title: "By Person Id", style: .default) { [weak self] _ in
             self?.createMembershipWithId(personId, spaceId: spaceId, personDisplayName: personDisplayName)
         })

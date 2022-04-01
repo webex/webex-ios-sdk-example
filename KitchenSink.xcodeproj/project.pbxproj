@@ -36,6 +36,7 @@
 		2EB6BD7324B79A2900DC3B7D /* MessagingSpacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD7224B79A2900DC3B7D /* MessagingSpacesViewController.swift */; };
 		2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */; };
 		2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */; };
+		4F238BA227BBEB5C0035754A /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */; };
 		592BABD224D3378C0071B85B /* MessagingReadStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */; };
 		84BB78D7316E71528EEE714D /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */; };
 		90301A2A24BE594C00DDD9DB /* MessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90301A2924BE594C00DDD9DB /* MessagingTests.swift */; };
@@ -175,6 +176,7 @@
 		2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
 		2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertAction+Extensions.swift"; sourceTree = "<group>"; };
 		4A00357CAA9196A7949B28BD /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingReadStatusUITests.swift; sourceTree = "<group>"; };
 		5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		71CD1C4163EDAD74F9E7F7C3 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
@@ -382,6 +384,14 @@
 			path = SubTabs;
 			sourceTree = "<group>";
 		};
+		4F238BA027BBEB3C0035754A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		904F183E24F71BB700FA043A /* Teams */ = {
 			isa = PBXGroup;
 			children = (
@@ -490,6 +500,7 @@
 		9DDC829124AA35E400F06E31 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				4F238BA027BBEB3C0035754A /* Extensions */,
 				9DD2D6B424AA52F4005F4ABE /* KitchenSink.entitlements */,
 				08CE26FA2583687A00F041DA /* ThirdPary */,
 				9DD2D6B524AA5FB9005F4ABE /* Utils */,
@@ -888,6 +899,7 @@
 				1FEE6970253E52050070E6C9 /* WebhookTableViewCell.swift in Sources */,
 				9DD5215B252F8B4E008727E1 /* AttachmentPreviewViewController.swift in Sources */,
 				9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */,
+				4F238BA227BBEB5C0035754A /* UIAlertController+Extension.swift in Sources */,
 				9DDC82D624AA36A300F06E31 /* HomeViewController.swift in Sources */,
 				9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */,
 				9D37019B24ABDD02004E480E /* ConstraintsExtension.swift in Sources */,
@@ -1229,7 +1241,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1246,7 +1258,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
@@ -1280,7 +1292,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 13;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1294,7 +1306,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.3.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1330,7 +1342,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1352,7 +1364,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1388,7 +1400,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1407,7 +1419,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.2.1;
+				MARKETING_VERSION = 3.3.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

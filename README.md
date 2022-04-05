@@ -44,7 +44,7 @@ You can download our Demo App from TestFlight.
 
 Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
 
-1. Download WebexSDK and WebexBroadcastExtensionKit zip from here https://github.com/webex/webex-ios-sdk/tree/Beta/3.3.0 and extract the contents inside the Frameworks folder in root of this repo.
+1. Download WebexSDK and WebexBroadcastExtensionKit zip from here https://github.com/webex/webex-ios-sdk/tree/Beta/3.4.0 and extract the contents inside the Frameworks folder in root of this repo.
 
 <img src="https://github.com/webex/webex-ios-sdk-example/blob/Beta/3.3.0/images/Frameworks_path.png" width="80%" height="80%">
 

@@ -114,13 +114,13 @@ extension SpaceMessagesTableViewController {
     }
     
     @objc private func showFilterMessagesByMention() {
-        let actionSheet = UIAlertController(title: "Filter by Mention", message: nil, preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController.actionSheetWith(title: "Filter by Mention", message: nil, sourceView: self.view)
         
         actionSheet.addAction(.dismissAction())
         
         actionSheet.addAction(UIAlertAction(title: "All", style: .default) { [weak self] _ in
             webex.messages.list(spaceId: self?.spaceId ?? "", mentionedPeople: [], queue: .global(qos: .background)) { result in
-                self?.listItems = result.data ?? []
+                self?.listItems = result.data?.reversed() ?? []
             }
         })
         
@@ -139,7 +139,7 @@ extension SpaceMessagesTableViewController {
         let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         var docString = documentDirectory?.absoluteString ?? ""
         docString = docString.replacingOccurrences(of: "file://", with: "")
-        let actionSheet = UIAlertController(title: "Download Progress", message: "", preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController.actionSheetWith(title: "Download Progress", message: nil, sourceView: self.view)
         present(actionSheet, animated: true, completion: nil)
         webex.messages.downloadFile(remoteFile, to: URL(string: docString), progressHandler: { progress in
             DispatchQueue.main.async {
@@ -215,7 +215,7 @@ extension SpaceMessagesTableViewController {
     // MARK: UITableViewDelegate
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let alertController = UIAlertController(title: "Message Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "Message Actions", message: nil, sourceView: self.view)
         let message = listItems[indexPath.row]
         if let messageId = message.id {
             alertController.addAction(UIAlertAction(title: "Fetch Message by Id", style: .default) { [weak self] _ in
@@ -249,7 +249,7 @@ extension SpaceMessagesTableViewController {
             alertController.addAction(UIAlertAction(title: "Fetch Messages Before This MessageId", style: .default) { [weak self] _ in
                 guard let self = self else { return }
                 webex.messages.list(spaceId: self.spaceId, before: .message(messageId), queue: DispatchQueue.global(qos: .default)) { [weak self] in
-                    self?.listItems = $0.data ?? []
+                    self?.listItems = $0.data?.reversed() ?? []
                 }
             })
             
@@ -267,7 +267,7 @@ extension SpaceMessagesTableViewController {
             alertController.addAction(UIAlertAction(title: "Fetch Messages Before This Date", style: .default) { [weak self] _ in
                 guard let self = self else { return }
                 webex.messages.list(spaceId: self.spaceId, before: .date(createdDate), queue: DispatchQueue.global(qos: .default)) { [weak self] in
-                    self?.listItems = $0.data ?? []
+                    self?.listItems = $0.data?.reversed() ?? []
                 }
             })
         }
@@ -325,7 +325,7 @@ extension SpaceMessagesTableViewController: SpaceMembershipViewControllerDelegat
     func spaceMembershipViewControllerDidSelectMembership(membership: Membership) {
         navigationController?.popViewController(animated: true)
         webex.messages.list(spaceId: spaceId, mentionedPeople: [], queue: .global(qos: .default)) { [weak self] result in
-            self?.listItems = result.data ?? []
+            self?.listItems = result.data?.reversed() ?? []
         }
     }
 }

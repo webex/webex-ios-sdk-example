@@ -305,6 +305,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         return tv
     }()
     
+    private lazy var badNetworkIcon: CallButton = {
+        var button = CallButton(style: .outlined, size: .large, type: .qualityIndicator)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setWidth(50)
+        button.setHeight(50)
+        button.isHidden = true
+        button.accessibilityIdentifier = "badNetworkIcon"
+        button.addTarget(self, action: #selector(handleMuteCallAction(_:)), for: .touchUpInside)
+        return button
+    }()
+
     ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
     var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
     
@@ -641,7 +652,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     @objc private func handleScreenShareAction(_ sender: UIButton) {
         let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-        broadcastPicker.preferredExtension =  "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
+        broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
         for subview in broadcastPicker.subviews {
             if let button = subview as? UIButton {
                 button.sendActions(for: .allTouchEvents)
@@ -662,7 +673,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         let flashModes: [Call.FlashMode] = [.on, .off, .auto]
         let torchModes: [Call.TorchMode] = [.on, .off, .auto]
 
-        let alertController = UIAlertController(title: "", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "", message: nil, sourceView: self.view)
         
         alertController.addAction(.dismissAction(withTitle: "Cancel"))
         
@@ -710,7 +721,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.virtualBgAction(tag: 1)
             })
         }
-        
+        // Media Quality Indicator
+        alertController.addAction(UIAlertAction(title: "receive MediaQualityInfoChangedCallback- \(self.call?.onMediaQualityInfoChanged != nil)", style: .default) {  _ in
+            if self.call?.onMediaQualityInfoChanged == nil {
+                self.badNetworkIcon.isHidden = false
+                self.setMediaQualityInfoChangedCallback()
+            } else {
+                self.badNetworkIcon.isHidden = true
+                self.call?.onMediaQualityInfoChanged = nil
+            }
+        })
         // Transcriptions
         if let call = call {
             if call.wxa.isEnabled {
@@ -927,6 +947,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     private func showScreenShare() {
+        call?.screenShareRenderView = self.screenShareView
         isCallControlsHidden = true
         toggleControls()
     }
@@ -950,6 +971,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(selfVideoView)
         view.addSubview(swapCameraButton)
         view.addSubview(callingLabel)
+        view.addSubview(badNetworkIcon)
         view.addSubview(nameLabel)
         view.addSubview(endCallButton)
         view.addSubview(stackView)
@@ -965,6 +987,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         nameLabel.topAnchor.constraint(equalTo: callingLabel.topAnchor, constant: 44).activate()
         
+        badNetworkIcon.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).activate()
+        badNetworkIcon.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30).activate()
+
         endCallButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         endCallButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -140).activate()
         
@@ -1012,6 +1037,51 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.present(alert, animated: true )
     }
     
+    func setMediaQualityInfoChangedCallback() {
+        self.call?.onMediaQualityInfoChanged = { indicator in
+            var msg = ""
+            switch indicator {
+            case .Good:
+                    msg = "good"
+                    self.badNetworkIcon.tintColor = .systemGreen
+                    self.badNetworkIcon.imageView?.tintColor = .systemGreen
+            case .PoorUplink:
+                    msg = "PoorUplink!"
+                    self.badNetworkIcon.tintColor = .systemYellow
+                    self.badNetworkIcon.imageView?.tintColor = .systemYellow
+            case .PoorDownlink:
+                    msg = "PoorDownlink!"
+                    self.badNetworkIcon.tintColor = .systemYellow
+                    self.badNetworkIcon.imageView?.tintColor = .systemYellow
+            case .NetworkLost:
+                    msg = "networkLost!"
+                    self.badNetworkIcon.tintColor = .systemRed
+                    self.badNetworkIcon.imageView?.tintColor = .systemRed
+            case .DeviceLimitation:
+                    msg = "CPUStaticCondition!"
+                    self.badNetworkIcon.tintColor = .systemYellow
+                    self.badNetworkIcon.imageView?.tintColor = .systemYellow
+            case .HighCpuUsage:
+                    msg = "CPUDynamicCondition!"
+                    self.badNetworkIcon.tintColor = .systemYellow
+                    self.badNetworkIcon.imageView?.tintColor = .systemYellow
+            @unknown default:
+                    msg = "good"
+                    self.badNetworkIcon.tintColor = .systemGreen
+                    self.badNetworkIcon.imageView?.tintColor = .systemGreen
+            }
+            let alert = UIAlertController(title: "Network Quality Info", message: msg, preferredStyle: .alert)
+            alert.addAction(.dismissAction(withTitle: "Ok"))
+            if !msg.isEmpty {
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true, completion: {
+                       // self.dismiss(animated: true)
+                    })
+                }
+            }
+        }
+    }
+    
     func webexCallStatesProcess(call: Call) {
         print("Call Status: \(call.status)")
         self.updateStates(callInfo: call)
@@ -1019,6 +1089,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.onConnected = { [weak self] in
             guard let self = self else { return }
             self.player.stop()
+            if self.call?.onMediaChanged != nil{
+                self.badNetworkIcon.isHidden = false
+            }
+            self.setMediaQualityInfoChangedCallback()
             DispatchQueue.main.async {
                 call.videoRenderViews = (self.selfVideoView, self.remoteVideoView)
                 call.screenShareRenderView = self.screenShareView
@@ -1034,6 +1108,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.updateStates(callInfo: call)
             self.updateUI(isCUCM: call.isCUCMCall)
         }
+        
         
         call.onMediaChanged = { [weak self] mediaEvents in
             print("Call isSpeaker:", call.isSpeaker)
@@ -1140,11 +1215,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     }
                     
                 /* Whether local began to send Screen share */
-                case .sendingScreenShare(let startedSending):
-                    if startedSending {
-                        call.screenShareRenderView = self.screenShareView
-                    }
-                    
+                case .sendingScreenShare(let _):
+                    break
                 /* This might be triggered when the remote video's speaker has changed.
                  */
                 case .activeSpeakerChangedEvent(let from, let to):

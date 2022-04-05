@@ -100,7 +100,7 @@ extension PeopleViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let alertController = UIAlertController(title: "People Actions", message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController.actionSheetWith(title: "People Actions", message: nil, sourceView: self.view)
         if let personId = listItems[indexPath.row].id {
             alertController.addAction(UIAlertAction(title: "Fetch Person by Id", style: .default) { [weak self] _ in
                 self?.fetchPerson(byId: personId)

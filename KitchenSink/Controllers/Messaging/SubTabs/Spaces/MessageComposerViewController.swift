@@ -12,6 +12,10 @@ struct PersonData {
     var personName: String
 }
 
+enum MessageType:String {
+    case plain, html, markdown
+}
+
 class MessageComposerViewController: UIViewController {
     var imagePicker = UIImagePickerController()
     var id: String?
@@ -25,6 +29,7 @@ class MessageComposerViewController: UIViewController {
     public var parentMessage: Message?
     public var isMessageBeingEdited = false
     private let attachmentCell = "attachmentCell"
+    private var msgType = MessageType.plain
 
     init(id: String, type: SendMessageType) {
         self.id = id
@@ -50,43 +55,41 @@ class MessageComposerViewController: UIViewController {
         textField.borderStyle = .line
         textField.setHeight(50)
         textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        textField.returnKeyType = .done
         return textField
     }()
     
-    private lazy var markdownToggle: UISwitch = {
-        let toggle = UISwitch(frame: .zero)
-        toggle.isOn = isMarkdownEnabled
-        toggle.setHeight(30)
-        toggle.onTintColor = .momentumBlue50
-        toggle.addTarget(self, action: #selector(switchValueDidChange(_:)), for: .valueChanged)
-        toggle.translatesAutoresizingMaskIntoConstraints = false
-        return toggle
+    private let messageTypePicker = UIPickerView()
+    private let messageType = [MessageType.plain, MessageType.html, MessageType.markdown]
+
+    
+    private lazy var messageTypeText: UITextField = {
+        let tf = UITextField()
+        tf.accessibilityIdentifier = "messageTypeValue"
+        tf.placeholder = "Type"
+        tf.borderStyle = .roundedRect
+        tf.tintColor = .clear
+        tf.text = "\(msgType.rawValue)"
+        return tf
     }()
     
-    private lazy var plainTextImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = UIImage(named: "text")
-        imageView.setWidth(30)
-        imageView.setHeight(30)
-        return imageView
-    }()
-    
-    private lazy var markdownImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = UIImage(named: "markdown")
-        imageView.setWidth(30)
-        imageView.setHeight(30)
-        return imageView
+    private let messageTypeLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "messageTypeLabel"
+        label.text = "Message Type"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .preferredFont(forTextStyle: .title3)
+        label.textColor = .black
+        return label
     }()
     
     private lazy var stackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [plainTextImage, markdownToggle, markdownImage])
+        let stack = UIStackView(arrangedSubviews: [messageTypeLabel, messageTypeText])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
-        stack.spacing = 20
-        stack.alignment = .fill
+        stack.spacing = 30
+        stack.distribution = .fill
         return stack
     }()
     
@@ -131,6 +134,19 @@ class MessageComposerViewController: UIViewController {
         return view
     }()
     
+    private func pickerViewToolBar(inputView: UITextField) -> UIToolbar {
+        let toolBar = UIToolbar()
+        toolBar.barStyle = UIBarStyle.default
+        toolBar.isTranslucent = true
+        toolBar.sizeToFit()
+
+        let closeButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.done, target: inputView, action: #selector(inputView.resignFirstResponder))
+
+        toolBar.setItems([closeButton], animated: false)
+        toolBar.isUserInteractionEnabled = true
+        return toolBar
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Message Composer"
@@ -138,8 +154,16 @@ class MessageComposerViewController: UIViewController {
         setupViews()
         setupConstraints()
         imagePicker.delegate = self
+        messageText.delegate = self
         if type == .spaceId {
             getListOfAllMentions()
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let index = messageType.firstIndex(of: msgType) {
+            messageTypePicker.selectRow(index, inComponent: 0, animated: true)
         }
     }
     
@@ -153,6 +177,11 @@ class MessageComposerViewController: UIViewController {
         }
         
         view.addSubview(sendButton)
+        
+        messageTypePicker.delegate = self
+        messageTypePicker.dataSource = self
+        messageTypeText.inputView = messageTypePicker
+        messageTypeText.inputAccessoryView = pickerViewToolBar(inputView: messageTypeText)
     }
     
     func setupConstraints() {
@@ -192,9 +221,12 @@ class MessageComposerViewController: UIViewController {
     @objc func handleSendAction(_ sender: UIButton) {
         guard let text = messageText.text, let spaceId = id else { return }
         let message: Message.Text = {
-            if isMarkdownEnabled {
-                return Message.Text.markdown(markdown: text, html: "<h2>text</h2> html version")
-            } else {
+            switch(msgType){
+            case MessageType.html:
+                return Message.Text.html(html: text)
+            case MessageType.markdown:
+                return Message.Text.markdown(markdown: text)
+            default:
                 return Message.Text.plain(plain: text)
             }
         }()
@@ -467,5 +499,45 @@ extension MessageComposerViewController: UICollectionViewDataSource {
         DispatchQueue.main.async { [weak self] in
             self?.attachmentCollectionView.reloadData()
         }
+    }
+}
+
+extension MessageComposerViewController: UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        switch pickerView {
+        case messageTypePicker:
+            return messageType.count
+        default:
+            return 0
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        switch pickerView {
+        case messageTypePicker:
+            return "\(messageType[row].rawValue)"
+        default:
+            return ""
+        }
+    }
+}
+
+extension MessageComposerViewController: UIPickerViewDelegate {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        if pickerView == messageTypePicker {
+            msgType = messageType[row]
+            messageTypeText.text = "\(msgType.rawValue)"
+        }
+    }
+}
+
+extension MessageComposerViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }

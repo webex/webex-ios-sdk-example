@@ -39,7 +39,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             self?.navigationController?.pushViewController(ExtrasViewController(), animated: true)
         }),
         Feature(title: "Logout", icon: "sign-out", tileColor: .momentumRed50, action: {
-            webex.authenticator?.deauthorize {
+            webex.authenticator?.deauthorize(completionHandler: {
                 DispatchQueue.main.async { [weak self] in
                     guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else { fatalError() }
                     self?.navigationController?.dismiss(animated: true)
@@ -47,7 +47,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
                     UserDefaults.standard.removeObject(forKey: "userEmail")
                     appDelegate.navigateToLoginViewController()
                 }
-            }
+            })
         })
     ]
     
@@ -66,6 +66,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         if !UserDefaults.standard.bool(forKey: "addedCustomBg") {
             addCustomBackground()
         }
+        setIncomingCallListener()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -204,43 +205,52 @@ extension HomeViewController {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true )
         } else {
-            let alert = UIAlertController(title: "UC Login", message: "Enter UC Domain or Server Address to proceed", preferredStyle: .alert)
-            var ucDomain: String?
-            var serverAddress: String?
-            alert.addTextField { textField in
-                textField.placeholder = "Enter UC Domain"
-                ucDomain = textField.text
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "UC Login", message: "Enter UC Domain or Server Address to proceed", preferredStyle: .alert)
+                var ucDomainTF: UITextField?
+                var serverAddressTF: UITextField?
+                alert.addTextField { textField in
+                    textField.placeholder = "Enter UC Domain"
+                    ucDomainTF = textField
+                }
+                alert.addTextField { textField in
+                    textField.placeholder = "Enter Server Address"
+                    serverAddressTF = textField
+                }
+                alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { [weak self] _ in
+                    let ucDomain = ucDomainTF?.text ?? ""
+                    let serverAddress = serverAddressTF?.text ?? ""
+                    webex.ucLoginDelegate = self
+                    webex.setUCDomainServerUrl(ucDomain: ucDomain, serverUrl: serverAddress)
+                }))
+                self.present(alert, animated: true)
             }
-            alert.addTextField { textField in
-                textField.placeholder = "Enter Server Address"
-                serverAddress = textField.text
-            }
-            alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.cancel, handler: nil))
-            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: { [weak self] _ in
-                ucDomain = alert.textFields![0].text
-                serverAddress = alert.textFields![1].text
-                webex.ucLoginDelegate = self
-                webex.setUCDomainServerUrl(ucDomain: ucDomain ?? "", serverUrl: serverAddress ?? "")
-            }))
-            self.present(alert, animated: true)
         }
     }
     
     func nonSSOLogin() {
         let alert = UIAlertController(title: "UC Login", message: "Enter username and password to proceed", preferredStyle: .alert)
-        var username: String?
-        var password: String?
+        var usernameTF: UITextField?
+        var passwordTF: UITextField?
+
         alert.addTextField { textField in
             textField.placeholder = "Enter your username"
-            username = textField.text
+            usernameTF = textField
         }
         alert.addTextField { textField in
             textField.placeholder = "Enter password"
-            password = textField.text
+            passwordTF = textField
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Login", style: UIAlertAction.Style.default, handler: { _ in
-            guard let username = username, let password = password else { return }
+            
+            let username = usernameTF?.text ?? ""
+            let password = passwordTF?.text ?? ""
+            if username.isEmpty || password.isEmpty {
+                alert.title = "Invalid credentials. Try again"
+                return
+            }
             webex.setCUCMCredential(username: username, password: password)
         }))
         self.present(alert, animated: true)
@@ -289,7 +299,9 @@ extension HomeViewController: WebexUCLoginDelegate {
     }
     
     func showUCNonSSOLoginView() {
-        nonSSOLogin()
+        DispatchQueue.main.async {
+            self.nonSSOLogin()
+        }
     }
         
     func onUCLoggedIn() {
@@ -304,7 +316,7 @@ extension HomeViewController: WebexUCLoginDelegate {
 // MARK: Feedback
 extension HomeViewController {
     func manageFeedback() {
-        let alert = UIAlertController(title: nil, message: "Choose Topic", preferredStyle: .actionSheet)
+        let alert = UIAlertController.actionSheetWith(title: "Choose Topic", message: nil, sourceView: self.view)
         Feedback.allCases.forEach { feedback in
             alert.addAction(UIAlertAction(title: feedback.title, style: .default, handler: { [weak self] _ in self?.configureMail(for: feedback) }))
         }
@@ -444,5 +456,126 @@ extension HomeViewController {
                 print("Failed uploading background")
             }
         })
+    }
+}
+
+extension HomeViewController {  // waiting call related code
+    func setIncomingCallListener() {
+        webex.phone.onIncoming = { call in
+            CallObjectStorage.self.shared.addCallObject(call: call)
+            call.onScheduleChanged = { c in
+                self.getUpdatedSchedule(call: c)
+                self.notifyIncomingCallListChanged(true)
+            }
+            self.getUpdatedSchedule(call: call)
+            self.webexCallStatesProcess(call: call)
+            self.notifyIncomingCallListChanged(true)
+        }
+        webex.calendarMeetings.onEvent = { event in // remove meeting if cancelled
+                    switch event {
+                    case .created(let meeting):
+                    print(meeting)
+                    case .updated(let meeting):
+                    print(meeting)
+                    case .removed(let meetingId):
+                    incomingCallData = incomingCallData.filter { $0.meetingId != meetingId }
+                    self.notifyIncomingCallListChanged(false)
+                    @unknown default:
+                        break
+                    }
+        }
+    }
+    
+    func notifyIncomingCallListChanged(_ ring: Bool) {
+        NotificationCenter.default.post(name: Notification.Name("IncomingCallListChanged"), object: nil, userInfo: ["ring": ring])
+    }
+    
+    func getUpdatedSchedule(call: Call) {
+        guard let callSchedule = call.schedules else {
+            // Case : One to one call ( Only utilizes the title, Space, callId and isScheduledCall)
+            let newCall = Meeting(organizer: call.title ?? "", start: Date(), end: Date(), meetingId: "", link: "", subject: "", isScheduledCall: false, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? "")
+            // Flag to check if meeting is already scheduled (To enter change in the schedule)
+            var isExistingScheduleModified = false
+            for (rowNumber, var _) in incomingCallData.enumerated() where newCall.currentCallId == incomingCallData[rowNumber].currentCallId {
+                // Use meeting Id to check if it already exists
+                incomingCallData.remove(at: rowNumber)
+                incomingCallData.append(newCall)
+                isExistingScheduleModified = true
+                break
+            }
+            if !isExistingScheduleModified {
+                // Append new Scheduled Meeting
+                incomingCallData.append(newCall)
+            }
+            self.notifyIncomingCallListChanged(true)
+            return
+        }
+
+        // Case 2 : Scheduled Meeting
+        for item in callSchedule {
+            let newMeetingId = Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? "")
+            // Flag to check if meeting is already scheduled (To enter change in the schedule)
+            var isExistingScheduleModified = false
+            for (rowNumber, var _) in incomingCallData.enumerated() where (newMeetingId.currentCallId == incomingCallData[rowNumber].currentCallId || newMeetingId.meetingId == incomingCallData[rowNumber].meetingId) {
+                // Use meeting Id to check if it already exists
+                incomingCallData.remove(at: rowNumber)
+                incomingCallData.append(newMeetingId)
+                isExistingScheduleModified = true
+                break
+            }
+            if !isExistingScheduleModified {
+                // Append new Scheduled Meeting
+                incomingCallData.append(Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? ""))
+                break
+            }
+        }
+    }
+    
+    func webexCallStatesProcess(call: Call) {
+        call.onFailed = { [self] reason in
+            print(reason)
+            incomingCallData = incomingCallData.filter { $0.currentCallId != call.callId }
+            self.notifyIncomingCallListChanged(false)
+        }
+        
+        call.onDisconnected = { [self] reason in
+            switch reason {
+            case .callEnded:
+                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                DispatchQueue.main.async {
+                    self.dismiss(animated: true)
+                }
+            case .localLeft:
+                print(reason)
+                
+            case .localDecline:
+                print(reason)
+                
+            case .localCancel:
+                print(reason)
+                
+            case .remoteLeft:
+                print(reason)
+                
+            case .remoteDecline:
+                print(reason)
+                
+            case .remoteCancel:
+                print(reason)
+                
+            case .otherConnected:
+                print(reason)
+                
+            case .otherDeclined:
+                print(reason)
+                
+            case .error(let error):
+                print(error)
+            @unknown default:
+                print(reason)
+            }
+            incomingCallData = incomingCallData.filter { $0.currentCallId != call.callId }
+            self.notifyIncomingCallListChanged(false)
+        }
     }
 }

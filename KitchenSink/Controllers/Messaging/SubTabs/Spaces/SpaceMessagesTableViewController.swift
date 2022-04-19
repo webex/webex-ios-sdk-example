@@ -120,7 +120,7 @@ extension SpaceMessagesTableViewController {
         
         actionSheet.addAction(UIAlertAction(title: "All", style: .default) { [weak self] _ in
             webex.messages.list(spaceId: self?.spaceId ?? "", mentionedPeople: [], queue: .global(qos: .background)) { result in
-                self?.listItems = result.data ?? []
+                self?.listItems = result.data?.reversed() ?? []
             }
         })
         
@@ -249,7 +249,7 @@ extension SpaceMessagesTableViewController {
             alertController.addAction(UIAlertAction(title: "Fetch Messages Before This MessageId", style: .default) { [weak self] _ in
                 guard let self = self else { return }
                 webex.messages.list(spaceId: self.spaceId, before: .message(messageId), queue: DispatchQueue.global(qos: .default)) { [weak self] in
-                    self?.listItems = $0.data ?? []
+                    self?.listItems = $0.data?.reversed() ?? []
                 }
             })
             
@@ -267,7 +267,7 @@ extension SpaceMessagesTableViewController {
             alertController.addAction(UIAlertAction(title: "Fetch Messages Before This Date", style: .default) { [weak self] _ in
                 guard let self = self else { return }
                 webex.messages.list(spaceId: self.spaceId, before: .date(createdDate), queue: DispatchQueue.global(qos: .default)) { [weak self] in
-                    self?.listItems = $0.data ?? []
+                    self?.listItems = $0.data?.reversed() ?? []
                 }
             })
         }
@@ -325,7 +325,7 @@ extension SpaceMessagesTableViewController: SpaceMembershipViewControllerDelegat
     func spaceMembershipViewControllerDidSelectMembership(membership: Membership) {
         navigationController?.popViewController(animated: true)
         webex.messages.list(spaceId: spaceId, mentionedPeople: [], queue: .global(qos: .default)) { [weak self] result in
-            self?.listItems = result.data ?? []
+            self?.listItems = result.data?.reversed() ?? []
         }
     }
 }

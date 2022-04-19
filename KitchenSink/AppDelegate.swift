@@ -25,6 +25,7 @@ import WebexSDK
 var webex: Webex!
 var token: String?
 var voipToken: String?
+var incomingCallData: [Meeting] = []  // have to keep this in centralised place to update it realtime
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

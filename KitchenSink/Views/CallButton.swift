@@ -2,8 +2,8 @@ import UIKit
 
 class CallButton: UIButton {
     enum ActionType {
-        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more
-        
+        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more, qualityIndicator
+
         var imageName: String {
             switch self {
             case .connectCall: return "audio-call"
@@ -19,6 +19,7 @@ class CallButton: UIButton {
             case .toggleVideo: return "audio-video"
             case .screenShare: return "screen-share"
             case .more: return "more"
+            case .qualityIndicator: return "quality-Indicator"
             }
         }
         
@@ -37,6 +38,7 @@ class CallButton: UIButton {
             case .toggleVideo: return .systemGray2
             case .screenShare: return .systemGray2
             case .more: return .systemGray2
+            case .qualityIndicator: return .systemGreen
             }
         }
     }
@@ -46,12 +48,13 @@ class CallButton: UIButton {
     }
     
     enum Size {
-        case small, medium
-        
+        case small, medium, large
+
         var cgSize: CGSize {
             switch self {
             case .small: return CGSize(width: 22, height: 22)
             case .medium: return CGSize(width: 26, height: 26)
+            case .large: return CGSize(width: 40, height: 40)
             }
         }
     }

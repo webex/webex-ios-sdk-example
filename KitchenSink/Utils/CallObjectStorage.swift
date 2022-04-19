@@ -5,16 +5,6 @@ final class CallObjectStorage {
     let serialQueue = DispatchQueue(label: "com.call.addCallObject")
     private var callObjects: [Call] = []
     
-    func registerCallObjectsFromStorage(onScheduleChanged: @escaping ((Call) -> Void), updateSchedule: ((Call) -> Void), completion: (() -> Void)) {
-        serialQueue.sync {
-            for call in callObjects {
-                call.onScheduleChanged = onScheduleChanged
-                updateSchedule(call)
-            }
-            completion()
-        }
-    }
-    
     func addCallObject(call: Call) {
         let callObj = getCallObject(callId: call.callId ?? "")
         serialQueue.sync {

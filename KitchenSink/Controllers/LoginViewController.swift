@@ -297,8 +297,13 @@ class LoginViewController: UIViewController {
                     
                     UserDefaults.standard.setValue("token", forKey: "loginType")
                     authenticator.onTokenExpired = {
+                        // Handle when auth token has expired.
+                        // When a token expires, new instances of `Webex` and `Authenticator` need to be created and used with a new token
                         let alert = UIAlertController(title: "Token Expired", message: "User logged out because token expired", preferredStyle: .alert)
-                        self.present(alert, animated: true, completion: nil)
+                        self.present(alert, animated: true) { [self] in
+                            // Request for a new token by creating new instances of Webex and TokenAuthenticator
+                            self.handleLoginWithAccessTokenAction()
+                        }
                     }
                     self.switchRootController()
                 })

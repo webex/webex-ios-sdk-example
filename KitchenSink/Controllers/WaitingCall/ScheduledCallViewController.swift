@@ -30,85 +30,7 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
     var player: AVAudioPlayer?
     var currentCallId: String?
     var space: Space?
-    var call: Call?
-    
     public var tableView = UITableView()
-    public var tableData: [Meeting] = []
-    
-    func setIncomingCallListener() {
-        // get all objects from storage to showthem in sync manner
-        CallObjectStorage.self.shared.registerCallObjectsFromStorage(onScheduleChanged: { call in
-            DispatchQueue.main.async {
-                self.getUpdatedSchedule(call: call)
-                self.tableView.reloadData()
-            }
-        }, updateSchedule: { call in
-            DispatchQueue.main.async {
-                self.getUpdatedSchedule(call: call)
-                self.webexCallStatesProcess(call: call)
-                self.tableView.reloadData()
-            }
-        }) {
-                webex.phone.onIncoming = { call in
-                self.call = call
-                CallObjectStorage.self.shared.addCallObject(call: call)
-                call.onScheduleChanged = { call in
-                    DispatchQueue.main.async {
-                        self.getUpdatedSchedule(call: call)
-                        self.tableView.reloadData()
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.getUpdatedSchedule(call: call)
-                    self.webexCallStatesProcess(call: call)
-                    self.tableView.reloadData()
-                }
-            }
-        }
-    }
-
-    func getUpdatedSchedule(call: Call) {
-        guard let callSchedule = call.schedules else {
-            // Case : One to one call ( Only utilizes the title, Space, callId and isScheduledCall)
-            currentCallId = call.callId
-            space = Space(id: call.spaceId ?? "", title: call.title ?? "")
-            let newCall = Meeting(organizer: call.title ?? "", start: Date(), end: Date(), meetingId: "", link: "", subject: "", isScheduledCall: false, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: currentCallId ?? "")
-            // Flag to check if meeting is already scheduled (To enter change in the schedule)
-            var isExistingScheduleModified = false
-            for (rowNumber, var _) in self.tableData.enumerated() where newCall.currentCallId == tableData[rowNumber].currentCallId {
-                // Use meeting Id to check if it already exists
-                tableData.remove(at: rowNumber)
-                tableData.append(newCall)
-                isExistingScheduleModified = true
-                break
-            }
-            if !isExistingScheduleModified {
-                // Append new Scheduled Meeting
-                tableData.append(newCall)
-            }
-            self.startRinging()
-            return
-        }
-
-        // Case 2 : Scheduled Meeting
-        for item in callSchedule {
-            let newMeetingId = Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? "")
-            // Flag to check if meeting is already scheduled (To enter change in the schedule)
-            var isExistingScheduleModified = false
-            for (rowNumber, var _) in self.tableData.enumerated() where (newMeetingId.currentCallId == tableData[rowNumber].currentCallId || newMeetingId.meetingId == tableData[rowNumber].meetingId) {
-                // Use meeting Id to check if it already exists
-                tableData.remove(at: rowNumber)
-                tableData.append(newMeetingId)
-                isExistingScheduleModified = true
-                break
-            }
-            if !isExistingScheduleModified {
-                // Append new Scheduled Meeting
-                self.tableData.append(Meeting(organizer: item.organzier ?? "", start: item.start, end: item.end, meetingId: item.meetingId ?? "", link: item.link ?? "", subject: item.subject ?? "", isScheduledCall: true, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? ""))
-                break
-            }
-        }
-    }
     
     override func didMove(toParent parent: UIViewController?) {
         super.didMove(toParent: parent)
@@ -122,9 +44,18 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
         super.viewDidLoad()
         tableView = UITableView(frame: self.view.bounds, style: UITableView.Style.plain)
         configureTable()
-        setIncomingCallListener()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.incomingCallListChanged(notification:)), name: Notification.Name("IncomingCallListChanged"), object: nil)
     }
-
+    
+    @objc func incomingCallListChanged(notification: Notification) {
+        if let info = notification.userInfo {
+            info["ring"] as? Bool ?? false ? startRinging() : stopRinging()
+        }
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopRinging()
@@ -132,54 +63,63 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Custom cell for one to one call
-        if tableData[indexPath.row].isScheduledCall == false {
+        if incomingCallData[indexPath.row].isScheduledCall == false {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: IncomingCallViewCell.reuseIdentifier, for: indexPath) as? IncomingCallViewCell else { return UITableViewCell() }
-            cell.setupCallCell(name: tableData[indexPath.row].organizer, connectButtonActionHandler: { [weak self] in self?.connectCallTapped(indexPath: indexPath) }, endButtonActionHandler: { [weak self] in self?.endCallTapped(indexPath: indexPath) })
+            
+            cell.setupCallCell(name: incomingCallData[indexPath.row].organizer, connectButtonActionHandler: { [weak self] in self?.connectCallTapped(indexPath: indexPath) }, endButtonActionHandler: { [weak self] in self?.endCallTapped(indexPath: indexPath) })
         return cell
         } else {
         // Custom cell for Scheduled Meeting
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ScheduledMeetingTableViewCell.reuseIdentifier, for: indexPath) as? ScheduledMeetingTableViewCell else { return UITableViewCell() }
-            cell.setupCell(name: tableData[indexPath.row].subject, start: tableData[indexPath.row].start, end: tableData[indexPath.row].end, joinButtonActionHandler: { [weak self] in self?.joinButtonTapped(indexPath: indexPath)
+            cell.setupCell(name: incomingCallData[indexPath.row].subject, start: incomingCallData[indexPath.row].start, end: incomingCallData[indexPath.row].end, joinButtonActionHandler: { [weak self] in self?.joinButtonTapped(indexPath: indexPath)
         })
             return cell
         }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableData.count
+        return incomingCallData.count
     }
 
     private func joinButtonTapped(indexPath: IndexPath) {
-        guard let space = tableData[indexPath.row].space, let currentCallId = tableData[indexPath.row].currentCallId else {
+        guard let space = incomingCallData[indexPath.row].space, let currentCallId = incomingCallData[indexPath.row].currentCallId else {
             let alert = UIAlertController(title: "Alert", message: "Join Failed", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
             return }
-        let callVC = CallViewController(space: space, addedCall: false, currentCallId: currentCallId, incomingCall: true, call: call)
-        self.present(callVC, animated: true)
+        if let callId = incomingCallData[indexPath.row].currentCallId, let call = CallObjectStorage.self.shared.getCallObject(callId: callId) {
+            let callVC = CallViewController(space: space, addedCall: false, currentCallId: currentCallId, incomingCall: true, call: call)
+            self.present(callVC, animated: true)
+        }
     }
 
     private func connectCallTapped(indexPath: IndexPath) {
         self.player?.stop()
-        guard let space = space, let currentCallId = currentCallId else {
+        guard let space = incomingCallData[indexPath.row].space, let currentCallId = incomingCallData[indexPath.row].currentCallId else {
             let alert = UIAlertController(title: "Alert", message: "Connect Call Failed", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
             return }
         DispatchQueue.main.async {
-            self.tableData.remove(at: indexPath.row)
+            incomingCallData.remove(at: indexPath.row)
             self.tableView.reloadData()
         }
-        let callVC = CallViewController(space: space, addedCall: false, currentCallId: currentCallId, incomingCall: true, call: call)
-        self.present(callVC, animated: true)
+        if let callId = incomingCallData[indexPath.row].currentCallId, let call = CallObjectStorage.self.shared.getCallObject(callId: callId) {
+            let callVC = CallViewController(space: space, addedCall: false, currentCallId: currentCallId, incomingCall: true, call: call)
+            self.present(callVC, animated: true)
+        }
     }
 
     private func endCallTapped(indexPath: IndexPath) {
-        call?.reject(completionHandler: { error in
+        guard let callId = incomingCallData[indexPath.row].currentCallId, let call = CallObjectStorage.self.shared.getCallObject(callId: callId) else {
+            return
+        }
+        
+        call.reject(completionHandler: { error in
             if error == nil {
                 self.player?.stop()
                 DispatchQueue.main.async {
-                    self.tableData.remove(at: indexPath.row)
+                    incomingCallData.remove(at: indexPath.row)
                     self.tableView.reloadData()
                 }
             } else {
@@ -193,7 +133,7 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let currentCell = "Organizer : \(tableData[indexPath.row].organizer), Start : \(String(describing: tableData[indexPath.row].start)), End : \(String(describing: tableData[indexPath.row].end)), Link : \(tableData[indexPath.row].link), Meeting Id : \(tableData[indexPath.row].meetingId), Subject : \(tableData[indexPath.row].subject)"
+        let currentCell = "Organizer : \(incomingCallData[indexPath.row].organizer), Start : \(String(describing: incomingCallData[indexPath.row].start)), End : \(String(describing: incomingCallData[indexPath.row].end)), Link : \(incomingCallData[indexPath.row].link), Meeting Id : \(incomingCallData[indexPath.row].meetingId), Subject : \(incomingCallData[indexPath.row].subject)"
         showDialog(text: currentCell)
     }
 
@@ -220,57 +160,6 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
     
     func stopRinging() {
        self.player?.stop()
-    }
-    
-    func webexCallStatesProcess(call: Call) {
-        call.onFailed = { reason in
-            print(reason)
-            self.stopRinging()
-            self.tableData = self.tableData.filter { $0.currentCallId != call.callId }
-            self.tableView.reloadData()
-        }
-        
-        call.onDisconnected = { reason in
-            switch reason {
-            case .callEnded:
-                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true)
-                }
-            case .localLeft:
-                print(reason)
-                
-            case .localDecline:
-                print(reason)
-                
-            case .localCancel:
-                print(reason)
-                
-            case .remoteLeft:
-                print(reason)
-                
-            case .remoteDecline:
-                print(reason)
-                
-            case .remoteCancel:
-                print(reason)
-                
-            case .otherConnected:
-                print(reason)
-                
-            case .otherDeclined:
-                print(reason)
-                
-            case .error(let error):
-                print(error)
-            @unknown default:
-                print(reason)
-            }
-            
-            self.stopRinging()
-            self.tableData = self.tableData.filter { $0.currentCallId != call.callId }
-            self.tableView.reloadData()
-        }
     }
 }
 

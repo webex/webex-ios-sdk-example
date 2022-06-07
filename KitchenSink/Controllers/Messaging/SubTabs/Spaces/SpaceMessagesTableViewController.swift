@@ -32,6 +32,9 @@ final class SpaceMessagesTableViewController: BasicTableViewController<Message, 
             case .messageUpdated(let messageId, let type):
                 print("Message with id: \(messageId) had an update of type \(type)")
                 self.refreshList()
+            case .messagesUpdated(let messages):
+                print("Message  \(messages) updated")
+                self.refreshList()
             @unknown default:
                 self.refreshList()
             }

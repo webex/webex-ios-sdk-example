@@ -12,63 +12,30 @@ class AuxCollectionViewCell: UICollectionViewCell {
         fatalError()
     }
     
-    private var tileView: UIView = {
-        let view = UIView(frame: .zero)
+    public var streamView: MediaStreamView = {
+        let view = MediaStreamView(frame: .zero)
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
         return view
     }()
     
-    var auxView: MediaRenderView = {
-        let auxView = MediaRenderView()
-        auxView.translatesAutoresizingMaskIntoConstraints = false
-        auxView.contentMode = .scaleAspectFit
-        return auxView
-    }()
-    
-    var label: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        label.textColor = .labelColor
-        return label
-    }()
-    
     func updateCell(with auxStream: AuxStream?) {
-        if let auxStream = auxStream {
-            label.text = auxStream.person?.displayName
-            label.isHidden = false
-            auxView.isHidden = false
-            tileView.isHidden = false
-        } else {
-            label.isHidden = true
-            auxView.isHidden = true
-            tileView.isHidden = true
-        }
+        streamView.updateView(with: auxStream)
+    }
+    
+    func updateCell(with mediaStream: MediaStream?) {
+        streamView.updateView(with: mediaStream)
     }
     
     func setupViews() {
-        contentView.addSubview(tileView)
-        contentView.addSubview(auxView)
-        contentView.addSubview(label)
+        contentView.addSubview(streamView)
     }
     
     func setupConstraints() {
         var customConstraints: [NSLayoutConstraint] = []
-        
-        customConstraints.append(tileView.widthAnchor.constraint(equalToConstant: 170))
-        customConstraints.append(tileView.heightAnchor.constraint(equalToConstant: 130))
-        customConstraints.append(tileView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-        customConstraints.append(tileView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -12))
-        
-        customConstraints.append(auxView.widthAnchor.constraint(equalToConstant: 170))
-        customConstraints.append(auxView.heightAnchor.constraint(equalToConstant: 130))
-        customConstraints.append(auxView.centerXAnchor.constraint(equalTo: tileView.centerXAnchor))
-        customConstraints.append(auxView.centerYAnchor.constraint(equalTo: tileView.centerYAnchor))
-        
-        customConstraints.append(label.topAnchor.constraint(equalTo: tileView.bottomAnchor, constant: 8))
-        customConstraints.append(label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
-        
+        customConstraints.append(streamView.widthAnchor.constraint(equalTo: contentView.widthAnchor))
+        customConstraints.append(streamView.heightAnchor.constraint(equalTo: contentView.heightAnchor))
+        customConstraints.append(streamView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor))
+        customConstraints.append(streamView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor))
         NSLayoutConstraint.activate(customConstraints)
     }
 }

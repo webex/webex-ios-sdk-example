@@ -16,14 +16,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var isCallControlsHidden = false
     var participants: [CallMembership] = []
     var onHold = false
-    var addedCall: Bool = false
-    var incomingCall: Bool = false
+    var addedCall = false
+    var incomingCall = false
     var player = AVAudioPlayer()
     var isReceivingAudio = false
     var isReceivingVideo = false
     var isReceivingScreenshare = false
     var isFrontCamera = true
-    var auxStreams: [AuxStream?] = []
     var compositedLayout: MediaOption.CompositedVideoLayout = .single
     var renderMode: Call.VideoRenderMode = .fit
     var torchMode: Call.TorchMode = .off
@@ -33,9 +32,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var cameraDuration: Call.CameraExposureDuration?
     var zoomFactor: Float = 1.0
     private let kCellId: String = "AuxCell"
-    var auxIndexPath = IndexPath(item: 0, section: 0)
-    var auxView: MediaRenderView?
+    var auxViews: [MediaRenderView] = []
     var auxDict: [MediaRenderView: AuxStream] = [:]
+    var auxDictNew: [MediaRenderView: MediaStream] = [:]
     var isModerator = false
     var pinOrPassword = ""
     var isCUCMCall = false
@@ -45,6 +44,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var canControlWXA = false
     private var isWXAEnabled = false
     private var transcriptionItems: [Transcription] = []
+    
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
         self.space = space
@@ -79,8 +79,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         return view
     }()
     
-    private var remoteVideoView: MediaRenderView = {
-        let view = MediaRenderView()
+    private var remoteVideoView: MediaStreamView = {
+        let view = MediaStreamView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -302,6 +302,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         tv.dataSource = self
         tv.isScrollEnabled = true
         tv.isHidden = true
+        tv.allowsSelection = false
         return tv
     }()
     
@@ -315,14 +316,23 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.addTarget(self, action: #selector(handleMuteCallAction(_:)), for: .touchUpInside)
         return button
     }()
-
-    ///onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
+    
+    private lazy var multiStreamSettingsView: MultiStreamSettingsView = {
+        let view = MultiStreamSettingsView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.setHeight(250)
+        view.alpha = 1
+        view.delegate = self
+        return view
+    }()
+    
+    /// onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
     var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
     
-    ///onAuxStreamAvailable represent the call back when current call have a new auxiliary stream.
+    /// onAuxStreamAvailable represent the call back when current call have a new auxiliary stream.
     var onAuxStreamAvailable: (() -> MediaRenderView?)?
     
-    ///onAuxStreamUnavailable represent the call back when current call have an existing auxiliary stream being unavailable.
+    /// onAuxStreamUnavailable represent the call back when current call have an existing auxiliary stream being unavailable.
     var onAuxStreamUnavailable: (() -> MediaRenderView?)?
     
     override func viewDidLoad() {
@@ -355,6 +365,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.auxCollectionView.reloadData()
             }
         }
+        self.multiStreamSettingsView.isHidden = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -388,12 +399,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     private func updatePhoneSettings() {
         let isComposite = UserDefaults.standard.bool(forKey: "compositeMode")
+        let is1080pEnabled = UserDefaults.standard.bool(forKey: "VideoRes1080p")
         webex.phone.videoStreamMode = isComposite ? .composited : .auxiliary
         webex.phone.audioBNREnabled = true
         webex.phone.audioBNRMode = .LP
         webex.phone.defaultFacingMode = .user
-        webex.phone.videoMaxRxBandwidth = Phone.DefaultBandwidth.maxBandwidth720p.rawValue
-        webex.phone.videoMaxTxBandwidth = Phone.DefaultBandwidth.maxBandwidth720p.rawValue
+        webex.phone.videoMaxRxBandwidth = is1080pEnabled ? Phone.DefaultBandwidth.maxBandwidth1080p.rawValue : Phone.DefaultBandwidth.maxBandwidth720p.rawValue
+        webex.phone.videoMaxTxBandwidth = is1080pEnabled ? Phone.DefaultBandwidth.maxBandwidth1080p.rawValue : Phone.DefaultBandwidth.maxBandwidth720p.rawValue
         webex.phone.sharingMaxRxBandwidth = Phone.DefaultBandwidth.maxBandwidthSession.rawValue
         webex.phone.audioMaxRxBandwidth = Phone.DefaultBandwidth.maxBandwidthAudio.rawValue
         webex.phone.enableBackgroundConnection = true
@@ -523,7 +535,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         var mediaOption = MediaOption.audioOnly()
         let hasVideo = UserDefaults.standard.bool(forKey: "hasVideo")
         if hasVideo {
-            mediaOption = MediaOption.audioVideoScreenShare(video: (local: selfVideoView, remote: remoteVideoView), screenShare: screenShareView)
+            mediaOption = MediaOption.audioVideoScreenShare(video: (local: selfVideoView, remote: remoteVideoView.mediaRenderView), screenShare: screenShareView)
         }
         mediaOption.moderator = isModerator
         mediaOption.pin = pin
@@ -721,6 +733,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.virtualBgAction(tag: 1)
             })
         }
+        
+        if UserDefaults.standard.bool(forKey: "isMultiStreamEnabled") {
+            alertController.addAction(UIAlertAction(title: "Multi Stream Options", style: .default) {  _ in
+                self.showMultiStreamOptions()
+            })
+        }
+        
         // Media Quality Indicator
         alertController.addAction(UIAlertAction(title: "receive MediaQualityInfoChangedCallback- \(self.call?.onMediaQualityInfoChanged != nil)", style: .default) {  _ in
             if self.call?.onMediaQualityInfoChanged == nil {
@@ -968,16 +987,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(screenShareView)
         view.addSubview(remoteVideoView)
         view.addSubview(auxCollectionView)
-        view.addSubview(selfVideoView)
-        view.addSubview(swapCameraButton)
         view.addSubview(callingLabel)
         view.addSubview(badNetworkIcon)
         view.addSubview(nameLabel)
-        view.addSubview(endCallButton)
+        view.addSubview(multiStreamSettingsView)
         view.addSubview(stackView)
         view.addSubview(bottomStackView)
         view.addSubview(virtualBgcollectionView)
         view.addSubview(transcriptionsTable)
+        view.addSubview(selfVideoView)
+        view.addSubview(swapCameraButton)
+        view.addSubview(endCallButton)
     }
     
     private func setupConstraints() {
@@ -1023,6 +1043,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         virtualBgcollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
         virtualBgcollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         virtualBgcollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
+        
+        multiStreamSettingsView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
+        multiStreamSettingsView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).activate()
+        multiStreamSettingsView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).activate()
         
         transcriptionsTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
         transcriptionsTable.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
@@ -1082,18 +1106,160 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
     }
     
+    fileprivate func registerNewMultiStreamCallBacks(_ call: Call) {
+        call.onMediaStreamAvailabilityListener = { [weak self] available, stream in
+            if available, let strongSelf = self {
+                if stream.streamType == .Stream1 { // remote view
+                    strongSelf.remoteVideoView.updateView(with: stream)
+                    stream.setOnMediaStreamInfoChanged { [weak self] type, info in
+                        self?.onMediaStreamChanged(type: type, info: info)
+                    }
+                } else { // aux view
+                    let view = MediaRenderView()
+                    view.translatesAutoresizingMaskIntoConstraints = false
+                    view.setSize(width: 150, height: 150)
+                    strongSelf.auxViews.append(view)
+                    strongSelf.auxDictNew[view] = stream
+                    stream.renderView = strongSelf.auxViews[strongSelf.auxViews.count - 1]
+                    strongSelf.auxCollectionView.reloadData()
+                }
+                
+                stream.setOnMediaStreamInfoChanged { [weak self] type, info in
+                    self?.onMediaStreamChanged(type: type, info: info)
+                }
+            } else if !available {
+                if let indexToRemove = self?.auxViews.firstIndex(where: { $0 == stream.renderView }) {
+                    self?.auxViews.remove(at: indexToRemove)
+                    self?.auxCollectionView.reloadData()
+                }
+            }
+        }
+    }
+        
+    func onMediaStreamChanged(type: MediaStreamChangeEventType, info: MediaStreamChangeEventInfo) {
+        if info.stream.streamType == .Stream1 {
+            remoteVideoView.updateView(with: info.stream)
+            return
+        }
+        switch type {
+        case .Size:
+            print("size changes")
+        case .Membership:
+            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
+                if let view = info.stream.renderView {
+                    self.auxViews.remove(at: indexToRemove)
+                    self.auxViews.append(view)
+                    self.auxDictNew[view] = info.stream
+                }
+                DispatchQueue.main.async {
+                    self.auxCollectionView.reloadData()
+                }
+            }
+        case .Video:
+            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
+                if let view = info.stream.renderView {
+                    self.auxViews.remove(at: indexToRemove)
+                    self.auxViews.append(view)
+                    self.auxDictNew[view] = info.stream
+                }
+                DispatchQueue.main.async {
+                    self.auxCollectionView.reloadData()
+                }
+            }
+            print("Video changes")
+        case .Audio:
+            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
+                if let view = info.stream.renderView {
+                    self.auxViews.remove(at: indexToRemove)
+                    self.auxViews.append(view)
+                    self.auxDictNew[view] = info.stream
+                }
+                DispatchQueue.main.async {
+                    self.auxCollectionView.reloadData()
+                }
+            }
+            print("Audio changes")
+        @unknown default:
+            print("unknown")
+        }
+    }
+    
+    fileprivate func registerMultiStreamCallbacks(_ call: Call) {
+        /* set the observer of this call to get multi stream event */
+        call.multiStreamObserver = self
+        
+        // Callback when a new multi stream media being available. Return a MediaRenderView let the SDK open it automatically. Return nil if you want to open it by call the API:openAuxStream(view: MediaRenderView) later.
+        self.onAuxStreamAvailable = { [weak self] in
+            if let strongSelf = self {
+                let view = MediaRenderView()
+                view.translatesAutoresizingMaskIntoConstraints = false
+                view.setSize(width: 80, height: 150)
+                strongSelf.auxViews.append(view)
+                return strongSelf.auxViews[strongSelf.auxViews.count - 1]
+            }
+            return nil
+        }
+        
+        // Callback when an existing multi stream media being unavailable. The SDK will close the last auxiliary stream if you don't return the specified view
+        self.onAuxStreamUnavailable = {
+            return nil
+        }
+        
+        // Callback when an existing multi stream media changed
+        
+        self.onAuxStreamChanged = { [weak self] event in
+            if let strongSelf = self {
+                switch event {
+                    /* Callback for open an auxiliary stream results*/
+                case .auxStreamOpenedEvent(let view, let result):
+                    switch result {
+                    case .success(let auxStream):
+                        strongSelf.openedAuxiliaryUI(view: view, auxStream: auxStream)
+                    case .failure(let error):
+                        strongSelf.closedAuxiliaryUI(view: view)
+                        print("========\(error)=====")
+                    @unknown default:
+                        break
+                    }
+                    /* This might be triggered when the auxiliary stream's speaker has changed.
+                     */
+                case .auxStreamPersonChangedEvent(let auxStream, let old, let new):
+                    strongSelf.updateAuxiliaryUI(auxStream: auxStream)
+                    print("Auxiliary stream has changed: Person from \(String(describing: old?.displayName)) to \(String(describing: new?.displayName))")
+                    /* This might be triggered when the speaker muted or unmuted the video. */
+                case .auxStreamSendingVideoEvent(let auxStream):
+                    strongSelf.updateAuxiliaryUI(auxStream: auxStream)
+                    print("Auxiliary stream has changed: Sendng Video \(auxStream.isSendingVideo)")
+                    /* This might be triggered when the speaker's video rendering view size has changed. */
+                case .auxStreamSizeChangedEvent(let auxStream):
+                    print("Auxiliary stream size changed: Size \(auxStream.auxStreamSize)")
+                    /* Callback for close an auxiliary stream results*/
+                case .auxStreamClosedEvent(let view, let error):
+                    if error == nil {
+                        print("closedAuxiliaryUI: renderView \(view)")
+                        strongSelf.closedAuxiliaryUI(view: view)
+                    } else {
+                        print("=====auxStreamClosedEvent error:\(String(describing: error))")
+                    }
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+    
     func webexCallStatesProcess(call: Call) {
         print("Call Status: \(call.status)")
         
         call.onConnected = { [weak self] in
             guard let self = self else { return }
             self.player.stop()
-            if self.call?.onMediaChanged != nil{
+            if self.call?.onMediaChanged != nil {
                 self.badNetworkIcon.isHidden = false
             }
             self.setMediaQualityInfoChangedCallback()
             DispatchQueue.main.async {
-                call.videoRenderViews = (self.selfVideoView, self.remoteVideoView)
+                call.videoRenderViews = (self.selfVideoView, self.remoteVideoView.mediaRenderView)
                 call.screenShareRenderView = self.screenShareView
                 self.nameLabel.text = call.title
                 self.callingLabel.text = "On Call"
@@ -1107,7 +1273,6 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.updateStates(callInfo: call)
             self.updateUI(isCUCM: call.isCUCMCall)
         }
-        
         
         call.onMediaChanged = { [weak self] mediaEvents in
             print("Call isSpeaker:", call.isSpeaker)
@@ -1132,7 +1297,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                         }
                     }
                     if isSending {
-                        call.videoRenderViews = (self.selfVideoView, self.remoteVideoView)
+                        call.videoRenderViews = (self.selfVideoView, self.remoteVideoView.mediaRenderView)
                     }
                     
                 /* This might be triggered when the local party muted or unmuted the audio. */
@@ -1144,7 +1309,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 case .sendingVideo(let isSending):
                     self.isLocalVideoMuted = !isSending
                     if isSending {
-                        call.videoRenderViews = (self.selfVideoView, self.remoteVideoView)
+                        call.videoRenderViews = (self.selfVideoView, self.remoteVideoView.mediaRenderView)
                         print("wme-camera zoomFactor", call.zoomFactor)
                         print("wme-camera cameraFlashMode", call.cameraFlashMode)
                         print("wme-camera cameraTorchMode", call.cameraTorchMode)
@@ -1214,7 +1379,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     }
                     
                 /* Whether local began to send Screen share */
-                case .sendingScreenShare(let _):
+                case .sendingScreenShare( _):
                     break
                 /* This might be triggered when the remote video's speaker has changed.
                  */
@@ -1321,63 +1486,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
         }
         
-        /* set the observer of this call to get multi stream event */
-        call.multiStreamObserver = self
+        let newMultiStreamApproach = UserDefaults.standard.bool(forKey: "isMultiStreamEnabled")
         
-        /* Callback when a new multi stream media being available. Return a MediaRenderView let the SDK open it automatically. Return nil if you want to open it by call the API:openAuxStream(view: MediaRenderView) later.*/
-        self.onAuxStreamAvailable = { [weak self] in
-            if let strongSelf = self {
-                strongSelf.auxStreams.append(nil)
-                let indexPath = IndexPath(row: strongSelf.auxStreams.count - 1, section: 0)
-                strongSelf.auxCollectionView.insertItems(at: [indexPath])
-                return strongSelf.auxView
-            }
-            return nil
-        }
-        
-        /* Callback when an existing multi stream media being unavailable. The SDK will close the last auxiliary stream if you don't return the specified view*/
-        self.onAuxStreamUnavailable = {
-            return nil
-        }
-        
-        /* Callback when an existing multi stream media changed*/
-        self.onAuxStreamChanged = { [weak self] event in
-            if let strongSelf = self {
-                switch event {
-                /* Callback for open an auxiliary stream results*/
-                case .auxStreamOpenedEvent(let view, let result):
-                    switch result {
-                    case .success(let auxStream):
-                        strongSelf.openedAuxiliaryUI(view: view, auxStream: auxStream)
-                    case .failure(let error):
-                        strongSelf.closedAuxiliaryUI(view: view)
-                        print("========\(error)=====")
-                    @unknown default:
-                        break
-                    }
-                /* This might be triggered when the auxiliary stream's speaker has changed.
-                 */
-                case .auxStreamPersonChangedEvent(let auxStream, let old, let new):
-                    strongSelf.updateAuxiliaryUI(auxStream: auxStream)
-                    print("Auxiliary stream has changed: Person from \(String(describing: old?.displayName)) to \(String(describing: new?.displayName))")
-                /* This might be triggered when the speaker muted or unmuted the video. */
-                case .auxStreamSendingVideoEvent(let auxStream):
-                    print("Auxiliary stream has changed: Sendng Video \(auxStream.isSendingVideo)")
-                /* This might be triggered when the speaker's video rendering view size has changed. */
-                case .auxStreamSizeChangedEvent(let auxStream):
-                    print("Auxiliary stream size changed: Size \(auxStream.auxStreamSize)")
-                /* Callback for close an auxiliary stream results*/
-                case .auxStreamClosedEvent(let view, let error):
-                    if error == nil {
-                        print("closedAuxiliaryUI: renderView \(view)")
-                        strongSelf.closedAuxiliaryUI(view: view)
-                    } else {
-                        print("=====auxStreamClosedEvent error:\(String(describing: error))")
-                    }
-                @unknown default:
-                    break
-                }
-            }
+        if newMultiStreamApproach {
+            registerNewMultiStreamCallBacks(call)
+        } else {
+            registerMultiStreamCallbacks(call)
         }
         
         call.oniOSBroadcastingChanged = { event in
@@ -1437,39 +1551,35 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     private func openedAuxiliaryUI(view: MediaRenderView, auxStream: AuxStream) {
-        if let indexToRemove = self.auxStreams.firstIndex(where: { $0 == nil }) {
-            auxStreams.remove(at: indexToRemove)
-            auxStreams.append(auxStream)
-            auxDict[view] = auxStream
-            DispatchQueue.main.async {
-                self.auxCollectionView.reloadItems(at: [IndexPath(item: indexToRemove, section: 0)])
-            }
+        auxDict[view] = auxStream
+        DispatchQueue.main.async {
+            self.auxCollectionView.reloadData()
         }
     }
     
     private func closedAuxiliaryUI(view: MediaRenderView) {
         let stream = auxDict[view]
-        auxDict.removeValue(forKey: view)
-        if let indexToRemove = self.auxStreams.firstIndex(where: { $0?.renderView == stream?.renderView }) {
-            auxStreams.remove(at: indexToRemove)
+        self.auxDict.removeValue(forKey: view)
+        if let indexToRemove = self.auxViews.firstIndex(where: { $0 == stream?.renderView }) {
+            self.auxViews.remove(at: indexToRemove)
             DispatchQueue.main.async {
-                self.auxCollectionView.deleteItems(at: [IndexPath(item: indexToRemove, section: 0)])
+                self.auxCollectionView.reloadData()
             }
         }
     }
     
     private func updateAuxiliaryUI(auxStream: AuxStream) {
-        if let indexToRemove = self.auxStreams.firstIndex(where: { $0?.renderView == auxStream.renderView }) {
-            auxStreams[indexToRemove] = auxStream
-            DispatchQueue.main.async {
-                self.auxCollectionView.reloadItems(at: [IndexPath(item: indexToRemove, section: 0)])
-            }
+        if let renderView = auxStream.renderView {
+            self.auxDict[renderView] = auxStream
+        }
+        DispatchQueue.main.async {
+            self.auxCollectionView.reloadData()
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if  collectionView == auxCollectionView {
-            return auxStreams.count
+            return auxViews.count
         } else {
             return backgroundItems.count
         }
@@ -1478,9 +1588,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == auxCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCellId, for: indexPath) as? AuxCollectionViewCell else { return UICollectionViewCell() }
-            auxIndexPath = indexPath
-            cell.updateCell(with: auxStreams[indexPath.item])
-            auxView = cell.auxView
+            
+            if UserDefaults.standard.bool(forKey: "isMultiStreamEnabled") {
+                cell.updateCell(with: auxDictNew[auxViews[indexPath.item]])
+            } else {
+                cell.updateCell(with: auxDict[auxViews[indexPath.item]])
+            }
+            
+            auxViews[indexPath.item].frame = cell.streamView.mediaRenderView.frame
+            cell.streamView.setRenderView(view: auxViews[indexPath.item])
+            auxViews[indexPath.item].frame = cell.streamView.mediaRenderView.bounds
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: virtualBackgroundCell, for: indexPath) as? VirtualBackgroundViewCell else { return UICollectionViewCell() }
@@ -1652,5 +1769,43 @@ extension CallViewController: UITableViewDataSource {
         cell.detailTextLabel?.numberOfLines = 0
         cell.detailTextLabel?.text = transcriptionItem.content
         return cell
+    }
+}
+
+extension CallViewController: MultiStreamSettingsViewDelegate {
+    func cancelClicked() {
+        self.multiStreamSettingsView.isHidden = true
+    }
+  
+    func setCategoryAStream(selectedQuality: MediaStreamQuality, duplicate: Bool) {
+        call?.setMediaStreamCategoryA(duplicate: duplicate, quality: selectedQuality)
+        self.multiStreamSettingsView.isHidden = true
+    }
+    
+    func setCategoryBStreams(noOfStreams: Int, selectedQuality: MediaStreamQuality) {
+        call?.setMediaStreamsCategoryB(numStreams: noOfStreams, quality: selectedQuality)
+        self.multiStreamSettingsView.isHidden = true
+    }
+    
+    fileprivate func showMultiStreamOptions() {
+            let alertController = UIAlertController.actionSheetWith(title: "Multi Stream Options", message: nil, sourceView: self.view)
+            alertController.addAction(UIAlertAction(title: "Set Category A Option", style: .default) {  _ in
+                self.multiStreamSettingsView.isHidden = false
+                self.multiStreamSettingsView.setupViewForCategoryA()
+            })
+            alertController.addAction(UIAlertAction(title: "Set Category B Option", style: .default) {  _ in
+                self.multiStreamSettingsView.isHidden = false
+                self.multiStreamSettingsView.setupViewForCategoryB()
+            })
+            alertController.addAction(UIAlertAction(title: "Remove Category A", style: .default) {  _ in
+                self.call?.removeMediaStreamCategoryA()
+            })
+            alertController.addAction(UIAlertAction(title: "Remove Category B", style: .default) {  _ in
+                self.call?.removeMediaStreamsCategoryB()
+            })
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .default) {  _ in
+                alertController.dismiss(animated: true)
+            })
+            self.present(alertController, animated: true, completion: nil)
     }
 }

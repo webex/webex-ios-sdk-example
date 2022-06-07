@@ -11,6 +11,8 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
     private lazy var selectedLoggingMode = webex.logLevel
     private var isComposite = UserDefaults.standard.bool(forKey: "compositeMode")
     private var imagePicker = UIImagePickerController()
+    private var isNewMultiStreamApproach = UserDefaults.standard.bool(forKey: "isMultiStreamEnabled")
+    private var isVideoRes1080p = UserDefaults.standard.bool(forKey: "VideoRes1080p")
 
     // MARK: Views and Constraints
     private lazy var virtualBgcollectionView: UICollectionView = {
@@ -198,6 +200,89 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    // MultiStream Aproach
+    private lazy var multiStreamSwitch: UISwitch = {
+        let toggle = UISwitch(frame: .zero)
+        toggle.isOn = isNewMultiStreamApproach
+        toggle.setHeight(30)
+        toggle.onTintColor = .momentumBlue50
+        toggle.addTarget(self, action: #selector(multiStreamSwitchValueDidChange(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+    
+    private let multiStreamApproachLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "multiStreamStreamModeLabel"
+        label.text = "Old Multi stream Approach"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .preferredFont(forTextStyle: .title3)
+        label.textColor = .black
+        return label
+    }()
+    
+    private lazy var multiStreamApproachStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [multiStreamApproachLabel, multiStreamSwitch])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.spacing = 30
+        stack.distribution = .fill
+        return stack
+    }()
+    
+    @objc func multiStreamSwitchValueDidChange(_ sender: UISwitch) {
+        DispatchQueue.main.async {
+            if sender.isOn == true {
+                UserDefaults.standard.setValue(true, forKey: "isMultiStreamEnabled")
+                self.multiStreamApproachLabel.text = "New Multi stream Approach"
+            } else {
+                UserDefaults.standard.setValue(false, forKey: "isMultiStreamEnabled")
+                self.multiStreamApproachLabel.text = "Old Multi stream Approach"
+            }
+        }
+    }
+    
+    // 1080p Video
+    private lazy var videoResSwitch: UISwitch = {
+        let toggle = UISwitch(frame: .zero)
+        toggle.isOn = isVideoRes1080p
+        toggle.setHeight(30)
+        toggle.onTintColor = .momentumBlue50
+        toggle.addTarget(self, action: #selector(videoResSwitchValueDidChange(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+    
+    private let videoResLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "VideoRes"
+        label.text = "Enable 1080p Video"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .preferredFont(forTextStyle: .title3)
+        label.textColor = .black
+        return label
+    }()
+    
+    private lazy var videoResStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [videoResLabel, videoResSwitch])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.spacing = 30
+        stack.distribution = .fill
+        return stack
+    }()
+    
+    @objc func videoResSwitchValueDidChange(_ sender: UISwitch) {
+        DispatchQueue.main.async {
+            if sender.isOn == true {
+                UserDefaults.standard.setValue(true, forKey: "VideoRes1080p")
+            } else {
+                UserDefaults.standard.setValue(false, forKey: "VideoRes1080p")
+            }
+        }
+    }
     // Video Stream Mode
     private lazy var videoStreamModeSwitch: UISwitch = {
         let toggle = UISwitch(frame: .zero)
@@ -219,7 +304,7 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         label.textColor = .black
         return label
     }()
-    
+        
     private lazy var videoStreamModeStackView: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [videoStreamModeLabel, videoStreamModeSwitch])
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -343,6 +428,7 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         setupConstraints()
         webex.phone.startPreview(view: videoView)
         videoStreamModeLabel.text = isComposite ? "Composite Mode" : "Auxiliary Mode"
+        multiStreamApproachLabel.text = isNewMultiStreamApproach ? "New Multi stream Approach" : "Old Multi stream Approach"
     }
     
     func setupViews() {
@@ -352,6 +438,8 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         view.addSubview(loggingModeStackView)
         view.addSubview(flipCameraStackView)
         view.addSubview(videoStreamModeStackView)
+        view.addSubview(multiStreamApproachStackView)
+        view.addSubview(videoResStackView)
         view.addSubview(callModeStackView)
         view.addSubview(virtualBgcollectionView)
         view.addSubview(virtualBackgroundLimitLabel)
@@ -390,8 +478,16 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         videoStreamModeStackView.topAnchor.constraint(equalTo: flipCameraStackView.topAnchor, constant: -40).activate()
         videoStreamModeStackView.fillWidth(of: view, padded: 32)
         
+        multiStreamApproachStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+        multiStreamApproachStackView.topAnchor.constraint(equalTo: videoStreamModeStackView.topAnchor, constant: -40).activate()
+        multiStreamApproachStackView.fillWidth(of: view, padded: 32)
+        
+        videoResStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+        videoResStackView.topAnchor.constraint(equalTo: multiStreamApproachStackView.topAnchor, constant: -40).activate()
+        videoResStackView.fillWidth(of: view, padded: 32)
+        
         virtualBackgroundLimitStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
-        virtualBackgroundLimitStackView.topAnchor.constraint(equalTo: videoStreamModeStackView.topAnchor, constant: -40).activate()
+        virtualBackgroundLimitStackView.topAnchor.constraint(equalTo: videoResSwitch.topAnchor, constant: -40).activate()
         virtualBackgroundLimitStackView.fillWidth(of: view, padded: 32)
         
         videoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).activate()

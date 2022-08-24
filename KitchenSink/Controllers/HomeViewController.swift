@@ -18,6 +18,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     weak var webexUCLoginDelegate = webex.ucLoginDelegate
     private let kCellId: String = "FeatureCell"
+    private var isUCServicesStarted = false
+    private var isSSOLogin = false
     
     private lazy var features: [Feature] = [
         Feature(title: "UC Login", icon: "sign-in", tileColor: .momentumBlue50, action: { [weak self] in
@@ -78,6 +80,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         webex.ucLoginDelegate = self
+        webex.startUCServices()
+        isUCServicesStarted = true
         webex.messages.onEvent = { messageEvent in
             switch messageEvent {
             case .messageReceived(let message):
@@ -200,7 +204,12 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 // MARK: UC Login
 extension HomeViewController {
     func setPreferencesForUCLogin() {
-        if webex.isUCLoggedIn() {
+        let isUCLoggedIn = webex.isUCLoggedIn()
+        if isUCServicesStarted && isSSOLogin && !isUCLoggedIn
+        {
+            webex.retryUCSSOLogin()
+        }
+        else if isUCLoggedIn {
             let alert = UIAlertController(title: "UC Services", message: "Already logged in", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true )
@@ -268,7 +277,7 @@ extension HomeViewController {
     }
     
     public func showSSOLogin(url: String) {
-        webexUCLoginDelegate?.showUCSSOLoginView(to: url)
+        webexUCLoginDelegate?.loadUCSSOView(to: url)
     }
     
     public func ucServerConnectionSuccess(status: UCLoginServerConnectionStatus, failureReason: PhoneServiceRegistrationFailureReason? = nil ) {
@@ -276,25 +285,45 @@ extension HomeViewController {
         if let failureReason = failureReason, failureReason != .None {
             ucConnectionStatusLabel.textColor = .momentumRed50
             ucConnectionStatusLabel.text = "UC connection status: \(status). \n Reason: \(failureReason)"
+            if failureReason == .RegisteredElsewhere {
+                DispatchQueue.main.async {
+                    self.handleForceRegisterPhoneServicesPopup()
+                }
+            }
         } else {
             ucConnectionStatusLabel.textColor = .momentumGreen50
             ucConnectionStatusLabel.text = "UC connection status: \(status)"
         }
         ucConnectionStatusLabel.isHidden = false
     }
+    
+    func handleForceRegisterPhoneServicesPopup() {
+        let alert = UIAlertController.actionSheetWith(title: "Force Register Phone Services", message: "This will log you out of phone services from your other iOS devices and force register on this device", sourceView: self.view)
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { _ in webex.forceRegisterPhoneServices()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: Webex Delegate
 extension HomeViewController: WebexUCLoginDelegate {
+    func onUCSSOLoginFailed(failureReason: UCSSOFailureReason) {
+        print("UC SSOLoginFailed \(failureReason)")
+        webex.retryUCSSOLogin()
+    }
+    
     func onUCLoginFailed() {
-        successUCLogin(success: false)
+        print("UC login failed")
     }
     
     func onUCServerConnectionStateChanged(status: UCLoginServerConnectionStatus, failureReason: PhoneServiceRegistrationFailureReason) {
         ucServerConnectionSuccess(status: status, failureReason: failureReason)
     }
     
-    func showUCSSOLoginView(to url: String) {
+    func loadUCSSOView(to url: String) {
+        isSSOLogin = true
         webex.getUCSSOLoginView(parentViewController: self, ssoUrl: url, completionHandler: successUCLogin(success:))
     }
     

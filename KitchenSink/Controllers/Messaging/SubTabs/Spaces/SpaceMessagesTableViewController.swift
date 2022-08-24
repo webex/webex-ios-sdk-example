@@ -297,7 +297,7 @@ extension SpaceMessagesTableViewController {
             fileTitles = fileArr.map { $0.displayName ?? "" }
         }
         
-        cell.update(senderName: message.personId, sendDate: message.created?.description, messagebody: message.text?.htmlToAttributedString, filesName: fileTitles, isReply: message.isReply, buttonActionHandler: { index in self.downloadFile(message, contentIndex: index) })
+        cell.update(senderName: message.personDisplayName, sendDate: getLocalDate(serverDate: message.created), messagebody: message.text?.htmlToAttributedString, filesName: fileTitles, isReply: message.isReply, buttonActionHandler: { index in self.downloadFile(message, contentIndex: index) })
         return cell
     }
     
@@ -331,4 +331,16 @@ extension SpaceMessagesTableViewController: SpaceMembershipViewControllerDelegat
             self?.listItems = result.data?.reversed() ?? []
         }
     }
+}
+
+func getLocalDate(serverDate: Date?) -> String {
+    guard let serverDate = serverDate else {
+        return ""
+    }
+    let format = DateFormatter()
+    format.timeZone = .current
+    format.dateStyle = .short
+    format.timeStyle = .short
+    let dateString = format.string(from: serverDate)
+    return dateString
 }

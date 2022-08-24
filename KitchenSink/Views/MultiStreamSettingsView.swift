@@ -5,6 +5,7 @@ protocol MultiStreamSettingsViewDelegate: AnyObject {
     func cancelClicked()
     func setCategoryAStream(selectedQuality: MediaStreamQuality, duplicate: Bool)
     func setCategoryBStreams(noOfStreams: Int, selectedQuality: MediaStreamQuality)
+    func setCategoryCStream(selectedQuality: MediaStreamQuality)
 }
 
 class MultiStreamSettingsView: UIView {
@@ -178,7 +179,9 @@ class MultiStreamSettingsView: UIView {
     }
     
     @objc func saveButtonClicked(_ sender: UIButton) {
-        if noOfStreamsStack.isHidden {
+        if  noOfStreamsStack.isHidden && duplicateSwitchStack.isHidden {
+            delegate?.setCategoryCStream(selectedQuality: selectedQuality)
+        } else if noOfStreamsStack.isHidden {
             delegate?.setCategoryAStream(selectedQuality: selectedQuality, duplicate: isDuplicate)
         } else {
             delegate?.setCategoryBStreams(noOfStreams: Int(Double(noOfStreamsTextField.text ?? "0") ?? 0.0), selectedQuality: selectedQuality)
@@ -247,6 +250,12 @@ class MultiStreamSettingsView: UIView {
         self.noOfStreamsStack.isHidden = false
         self.duplicateSwitchStack.isHidden = true
         self.headerLabel.text = "Set Category B Options"
+    }
+    
+    func setupViewForCategoryC() {
+        self.noOfStreamsStack.isHidden = true
+        self.duplicateSwitchStack.isHidden = true
+        self.headerLabel.text = "Set Category C Options"
     }
 }
 

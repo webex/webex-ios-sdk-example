@@ -85,6 +85,13 @@ class MediaStreamView: UIView {
                     self?.muteButton.backgroundColor = .systemGray2
                 }
             }
+            self.layer.borderWidth = 2
+            if mediaStream.isPinned {
+                self.layer.borderColor = UIColor.red.cgColor
+            } else{
+                self.layer.borderColor = UIColor.green.cgColor
+            }
+        
         } else {
             label.isHidden = true
             mediaRenderView.isHidden = true
@@ -104,9 +111,9 @@ class MediaStreamView: UIView {
         customConstraints.append(mediaRenderView.heightAnchor.constraint(equalToConstant: 130))
         customConstraints.append(mediaRenderView.centerXAnchor.constraint(equalTo: self.centerXAnchor))
         customConstraints.append(mediaRenderView.centerYAnchor.constraint(equalTo: self.centerYAnchor))
-        
-        customConstraints.append(muteButton.topAnchor.constraint(equalTo: mediaRenderView.topAnchor))
-        customConstraints.append(muteButton.rightAnchor.constraint(equalTo: mediaRenderView.rightAnchor))
+                
+        customConstraints.append(muteButton.bottomAnchor.constraint(equalTo: mediaRenderView.bottomAnchor, constant: 4))
+        customConstraints.append(muteButton.leftAnchor.constraint(equalTo: mediaRenderView.leftAnchor))
         
         customConstraints.append(label.topAnchor.constraint(equalTo: mediaRenderView.bottomAnchor, constant: 8))
         customConstraints.append(label.centerXAnchor.constraint(equalTo: mediaRenderView.centerXAnchor))

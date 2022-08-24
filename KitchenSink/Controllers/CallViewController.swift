@@ -44,6 +44,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var canControlWXA = false
     private var isWXAEnabled = false
     private var transcriptionItems: [Transcription] = []
+    private var participantId = ""
+    private var isMultiStreamEnabled = false
     
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
@@ -734,7 +736,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             })
         }
         
-        if UserDefaults.standard.bool(forKey: "isMultiStreamEnabled") {
+        if isMultiStreamEnabled {
             alertController.addAction(UIAlertAction(title: "Multi Stream Options", style: .default) {  _ in
                 self.showMultiStreamOptions()
             })
@@ -1141,46 +1143,28 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             remoteVideoView.updateView(with: info.stream)
             return
         }
+        //removing the changed stream and attaching new stream irrespective of type
+        DispatchQueue.main.async {
+            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
+                if let view = info.stream.renderView {
+                    self.auxViews.remove(at: indexToRemove)
+                    self.auxViews.insert(view, at: indexToRemove)
+                    self.auxDictNew[view] = info.stream
+                    self.auxCollectionView.reloadData()
+                }
+            }
+        }
         switch type {
         case .Size:
             print("size changes")
         case .Membership:
-            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
-                if let view = info.stream.renderView {
-                    self.auxViews.remove(at: indexToRemove)
-                    self.auxViews.append(view)
-                    self.auxDictNew[view] = info.stream
-                }
-                DispatchQueue.main.async {
-                    self.auxCollectionView.reloadData()
-                }
-            }
+            print("Membership changes")
         case .Video:
-            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
-                if let view = info.stream.renderView {
-                    self.auxViews.remove(at: indexToRemove)
-                    self.auxViews.append(view)
-                    self.auxDictNew[view] = info.stream
-                }
-                DispatchQueue.main.async {
-                    self.auxCollectionView.reloadData()
-                }
-            }
             print("Video changes")
         case .Audio:
-            if let indexToRemove = self.auxViews.firstIndex(where: { $0 == info.stream.renderView }) {
-                if let view = info.stream.renderView {
-                    self.auxViews.remove(at: indexToRemove)
-                    self.auxViews.append(view)
-                    self.auxDictNew[view] = info.stream
-                }
-                DispatchQueue.main.async {
-                    self.auxCollectionView.reloadData()
-                }
-            }
             print("Audio changes")
-        @unknown default:
-            print("unknown")
+        case .PinState:
+            print("PinState changes")
         }
     }
     
@@ -1486,9 +1470,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
         }
         
-        let newMultiStreamApproach = UserDefaults.standard.bool(forKey: "isMultiStreamEnabled")
+        isMultiStreamEnabled = UserDefaults.standard.bool(forKey: "isMultiStreamEnabled")
         
-        if newMultiStreamApproach {
+        if isMultiStreamEnabled {
             registerNewMultiStreamCallBacks(call)
         } else {
             registerMultiStreamCallbacks(call)
@@ -1589,8 +1573,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         if collectionView == auxCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: kCellId, for: indexPath) as? AuxCollectionViewCell else { return UICollectionViewCell() }
             
-            if UserDefaults.standard.bool(forKey: "isMultiStreamEnabled") {
+            if isMultiStreamEnabled {
                 cell.updateCell(with: auxDictNew[auxViews[indexPath.item]])
+                cell.moreButton.tag = indexPath.row
+                cell.moreButton.addTarget(self, action: #selector(handleMoreActionOfStream(_:)), for: .touchUpInside)
+                cell.moreButton.isHidden = !(call?.isMediaStreamsPinningSupported ?? false)
             } else {
                 cell.updateCell(with: auxDict[auxViews[indexPath.item]])
             }
@@ -1604,6 +1591,32 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             cell.setupCell(with: backgroundItems[indexPath.item], buttonActionHandler: { [weak self] in self?.deleteItem(item: self?.backgroundItems[indexPath.item]) })
             return cell
         }
+    }
+                                          
+    @objc private func handleMoreActionOfStream(_ sender: UIButton) {
+
+        if isMultiStreamEnabled {
+          participantId = auxDictNew[auxViews[sender.tag]]?.person.personId ?? ""
+        }
+        let alertController = UIAlertController.actionSheetWith(title: "Multi Stream Options", message: nil, sourceView: self.view)
+
+        if auxDictNew[auxViews[sender.tag]]?.isPinned == true {
+
+          alertController.addAction(UIAlertAction(title: "Remove Category C", style: .default) { [weak self]  _ in
+              self?.call?.removeMediaStreamCategoryC(participantId: self?.participantId ?? "")
+          })
+          alertController.addAction(UIAlertAction(title: "Cancel", style: .default) {  _ in
+              alertController.dismiss(animated: true)
+          })
+        } else {
+          alertController.addAction(UIAlertAction(title: "Pin Stream", style: .default) { [weak self] _ in
+              self?.showMultiStreamCategoryCOptions()
+          })
+          alertController.addAction(UIAlertAction(title: "Cancel", style: .default) {  _ in
+              alertController.dismiss(animated: true)
+          })
+        }
+        self.present(alertController, animated: true, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -1785,6 +1798,16 @@ extension CallViewController: MultiStreamSettingsViewDelegate {
     func setCategoryBStreams(noOfStreams: Int, selectedQuality: MediaStreamQuality) {
         call?.setMediaStreamsCategoryB(numStreams: noOfStreams, quality: selectedQuality)
         self.multiStreamSettingsView.isHidden = true
+    }
+    
+    func setCategoryCStream(selectedQuality: MediaStreamQuality) {
+        call?.setMediaStreamCategoryC(participantId: participantId, quality: selectedQuality)
+        self.multiStreamSettingsView.isHidden = true
+    }
+    
+    fileprivate func showMultiStreamCategoryCOptions() {
+        self.multiStreamSettingsView.isHidden = false
+        self.multiStreamSettingsView.setupViewForCategoryC()
     }
     
     fileprivate func showMultiStreamOptions() {

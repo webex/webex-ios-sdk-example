@@ -4,7 +4,7 @@ import WebexSDK
 class HistoryCallViewController: UIViewController, UITableViewDataSource {
     // MARK: Properties
     private let kCellId = "Cell"
-    private var items: [Space] = []
+    private var items: [CallHistoryRecord] = []
     
     // MARK: Views
     private lazy var tableView: UITableView = {
@@ -20,7 +20,7 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
     
     private var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = "No Spaces"
+        label.text = "Your History is empty"
         label.textColor = .grayColor
         label.textAlignment = .center
         label.font = .preferredFont(forTextStyle: .title2)
@@ -53,14 +53,15 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: kCellId, for: indexPath) as? ContactTableViewCell else {
             return UITableViewCell()
         }
-        let space = items[indexPath.row]
-        cell.setupCell(name: space.title ?? "", buttonActionHandler: { [weak self] in self?.callSpace(space) })
+        let callHistoryRecord = items[indexPath.row]
+        
+        cell.setupCell(name: callHistoryRecord.displayName, buttonActionHandler: { [weak self] in self?.redialCallHistoryRecord(callHistoryRecord) })
         return cell
     }
     
     // MARK: Methods
-    private func callSpace(_ space: Space) {
-        present(CallViewController(space: space), animated: true)
+    private func redialCallHistoryRecord(_ callHistoryRecord: CallHistoryRecord) {
+        present(CallViewController(callInviteAddress: callHistoryRecord.callbackAddress), animated: true)
     }
     
     private func setupViews() {

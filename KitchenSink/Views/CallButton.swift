@@ -2,7 +2,7 @@ import UIKit
 
 class CallButton: UIButton {
     enum ActionType {
-        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more, qualityIndicator
+        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more, qualityIndicator, pin
 
         var imageName: String {
             switch self {
@@ -20,6 +20,7 @@ class CallButton: UIButton {
             case .screenShare: return "screen-share"
             case .more: return "more"
             case .qualityIndicator: return "quality-Indicator"
+            case .pin: return "pin"
             }
         }
         
@@ -39,6 +40,7 @@ class CallButton: UIButton {
             case .screenShare: return .systemGray2
             case .more: return .systemGray2
             case .qualityIndicator: return .systemGreen
+            case .pin: return .systemRed
             }
         }
     }

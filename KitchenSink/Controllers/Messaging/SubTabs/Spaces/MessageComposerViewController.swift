@@ -1,6 +1,6 @@
 import UIKit
 import WebexSDK
-
+import AVKit
 enum SendMessageType {
     case personId
     case personEmail
@@ -331,6 +331,7 @@ class MessageComposerViewController: UIViewController {
     @objc func handleAttachments(_ sender: UIButton) {
         if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum) {
             imagePicker.sourceType = .photoLibrary
+            imagePicker.mediaTypes = ["public.movie", "public.image"]
             imagePicker.allowsEditing = false
             present(imagePicker, animated: true, completion: nil)
         }
@@ -389,47 +390,91 @@ class MessageComposerViewController: UIViewController {
         }
     }
 }
+func thumbnailForVideo(url: URL) -> UIImage? {
+    let asset = AVAsset(url: url)
+    let assetImageGenerator = AVAssetImageGenerator(asset: asset)
+    assetImageGenerator.appliesPreferredTrackTransform = true
+
+    var time = asset.duration
+    time.value = min(time.value, 2)
+
+    do {
+        let imageRef = try assetImageGenerator.copyCGImage(at: time, actualTime: nil)
+        return UIImage(cgImage: imageRef)
+    } catch {
+        print("failed to create thumbnail")
+        return nil
+    }
+}
 
 extension MessageComposerViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let image = info[.originalImage] as? UIImage else {
-            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
-        }
-        var fileName = ""
-        var fileType = ""
-        if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
-            fileName = url.lastPathComponent
-            fileType = url.pathExtension
-        }
-        attachmentCollectionView.isHidden = false
-        guard let data = image.pngData() else { return }
-        let path = writeToFile(data: data, fileName: fileName)
         
-        guard let filePath = path?.absoluteString.replacingOccurrences(of: "file://", with: "") else { return }
-        
-        let thumbnail = LocalFile.Thumbnail(path: filePath, mime: fileType, width: Int(image.size.width), height: Int(image.size.height))
-        
-        let duplicate = localFiles.contains { // checking if already attached
-            let url1 = URL(fileURLWithPath: $0.path)
-            let url2 = URL(fileURLWithPath: filePath)
-            
-            if let data1 = try? Data(contentsOf: url1), let data2 = try? Data(contentsOf: url2) {
-                return data1 == data2
-            } else {
-                return false
+        var thumbnailImage: UIImage?
+        var fileURL: URL?
+        if info[.mediaType] as? String ?? "" == "public.movie" {
+            if let url = info[.mediaURL] as? URL {
+                fileURL = url
+                thumbnailImage = thumbnailForVideo(url: url)
+            }
+        } else {
+            thumbnailImage = info[.originalImage] as? UIImage
+            if let url = info[UIImagePickerController.InfoKey.imageURL] as? URL {
+                fileURL = url
             }
         }
+       
+        guard let image = thumbnailImage else {
+            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+        }
+            
+        attachmentCollectionView.isHidden = false
         
-        picker.dismiss(animated: true, completion: nil)
-        
-        if duplicate { // if already attached returning
+        guard let url = fileURL else {
             return
         }
         
-        guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { return }
+        let fileName = url.lastPathComponent
+        let fileType = url.pathExtension
         
-        localFiles.append(localFile)
-        reloadattachmentCollectionView()
+        do {
+            let data = try Data(contentsOf: url)
+            let path = writeToFile(data: data, fileName: fileName)
+            guard let filePath = path?.absoluteString.replacingOccurrences(of: "file://", with: "") else { return }
+            
+            guard let thumbnailData = image.pngData() else { return }
+            let thumbnailPath = writeToFile(data: thumbnailData, fileName: "thumnail"+fileName)
+            
+            guard let thumbnailFilePath = thumbnailPath?.absoluteString.replacingOccurrences(of: "file://", with: "") else { return }
+            
+            let thumbnail = LocalFile.Thumbnail(path: thumbnailFilePath, mime: fileType, width: Int(image.size.width), height: Int(image.size.height))
+            
+            let duplicate = localFiles.contains { // checking if already attached
+                let url1 = URL(fileURLWithPath: $0.path)
+                let url2 = URL(fileURLWithPath: filePath)
+                
+                if let data1 = try? Data(contentsOf: url1), let data2 = try? Data(contentsOf: url2) {
+                    return data1 == data2
+                } else {
+                    return false
+                }
+            }
+            
+            picker.dismiss(animated: true, completion: nil)
+            
+            if duplicate { // if already attached returning
+                return
+            }
+            
+            guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { return }
+            
+            localFiles.append(localFile)
+            reloadattachmentCollectionView()
+        }
+        catch let error {
+            print(error.localizedDescription)
+            return
+        }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -475,7 +520,7 @@ extension MessageComposerViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: attachmentCell, for: indexPath)
         let imageview = UIImageView(frame: CGRect(x: 0, y: 0, width: 120, height: 120))
         imageview.contentMode = .scaleToFill
-        let img = UIImage(contentsOfFile: localFiles[indexPath.row].path)
+        let img = UIImage(contentsOfFile: localFiles[indexPath.row].thumbnail?.path ?? localFiles[indexPath.row].path)
         imageview.image = img
         cell.contentView.addSubview(imageview)
         let deleteButton = UIButton(type: .system)

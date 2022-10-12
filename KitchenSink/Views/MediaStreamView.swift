@@ -91,7 +91,7 @@ class MediaStreamView: UIView {
             } else{
                 self.layer.borderColor = UIColor.green.cgColor
             }
-        
+          
         } else {
             label.isHidden = true
             mediaRenderView.isHidden = true

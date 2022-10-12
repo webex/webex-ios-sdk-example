@@ -69,6 +69,17 @@ extension PeopleViewController {
         }
     }
     
+    private func editPerson(person: Person) {
+        let personVC = PersonFormViewController()
+        personVC.person = person
+        
+        navigationController?.pushViewController(personVC, animated: true)
+    }
+    
+    @objc private func addPeopleTapped() {
+        navigationController?.pushViewController(PersonFormViewController(), animated: true)
+    }
+    
     private func postMessageByPersonId(byId id: String) {
         present(MessageComposerViewController(id: id, type: .personId), animated: true, completion: nil)
     }
@@ -106,6 +117,15 @@ extension PeopleViewController {
                 self?.fetchPerson(byId: personId)
             })
             
+            alertController.addAction(UIAlertAction(title: "Edit Person", style: .default) { [weak self] _ in
+                guard let person = self?.listItems[indexPath.row]
+                else {
+                    print("Edit Person: error getting person")
+                    return
+                }
+                self?.editPerson(person: person)
+            })
+            
             alertController.addAction(UIAlertAction(title: "Post Message by PersonId", style: .default) { [weak self] _ in
                 self?.postMessageByPersonId(byId: personId)
             })
@@ -131,7 +151,7 @@ extension PeopleViewController: UISearchBarDelegate {
 extension PeopleViewController: NavigationItemSetupProtocol {
     // MARK: NavigationItemSetupProtocol functions
     var rightBarButtonItems: [UIBarButtonItem]? {
-        return []
+        return [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPeopleTapped))]
     }
 }
 

@@ -40,6 +40,8 @@
 		4F2593A9284F8FC9001A777E /* MediaStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2593A7284F8FC9001A777E /* MediaStreamView.swift */; };
 		4F2593AA284F8FC9001A777E /* MultiStreamSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2593A8284F8FC9001A777E /* MultiStreamSettingsView.swift */; };
 		4F2593AC284F8FD2001A777E /* UIView+Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2593AB284F8FD2001A777E /* UIView+Extenstion.swift */; };
+		4F326C8928EB073100EA57D9 /* PasswordCaptchaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F326C8828EB073100EA57D9 /* PasswordCaptchaView.swift */; };
+		4F326C8B28EB073F00EA57D9 /* PersonFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F326C8A28EB073F00EA57D9 /* PersonFormViewController.swift */; };
 		592BABD224D3378C0071B85B /* MessagingReadStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */; };
 		84BB78D7316E71528EEE714D /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */; };
 		90301A2A24BE594C00DDD9DB /* MessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90301A2924BE594C00DDD9DB /* MessagingTests.swift */; };
@@ -183,6 +185,8 @@
 		4F2593A7284F8FC9001A777E /* MediaStreamView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaStreamView.swift; sourceTree = "<group>"; };
 		4F2593A8284F8FC9001A777E /* MultiStreamSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiStreamSettingsView.swift; sourceTree = "<group>"; };
 		4F2593AB284F8FD2001A777E /* UIView+Extenstion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extenstion.swift"; sourceTree = "<group>"; };
+		4F326C8828EB073100EA57D9 /* PasswordCaptchaView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordCaptchaView.swift; sourceTree = "<group>"; };
+		4F326C8A28EB073F00EA57D9 /* PersonFormViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFormViewController.swift; sourceTree = "<group>"; };
 		592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingReadStatusUITests.swift; sourceTree = "<group>"; };
 		5AE595443E5E7BAA9EE1DACC /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		71CD1C4163EDAD74F9E7F7C3 /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
@@ -383,6 +387,7 @@
 		2EB6BD7124B799FC00DC3B7D /* SubTabs */ = {
 			isa = PBXGroup;
 			children = (
+				4F326C8A28EB073F00EA57D9 /* PersonFormViewController.swift */,
 				2E9FA34B24D9964C00C914D4 /* Spaces */,
 				904F183E24F71BB700FA043A /* Teams */,
 				9C3E5A0324DC3FDD0030855E /* PeopleViewController.swift */,
@@ -587,6 +592,7 @@
 		9DDC82C524AA36A300F06E31 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				4F326C8828EB073100EA57D9 /* PasswordCaptchaView.swift */,
 				4F2593A7284F8FC9001A777E /* MediaStreamView.swift */,
 				4F2593A8284F8FC9001A777E /* MultiStreamSettingsView.swift */,
 				9D8236932726EA330099D44D /* CalendarMeetingTableViewCell.swift */,
@@ -883,6 +889,7 @@
 				9DDC82DA24AA36A300F06E31 /* DialButton.swift in Sources */,
 				9DB243E3260CC458006B18C5 /* Dropdown.swift in Sources */,
 				9DDC82DB24AA36A300F06E31 /* FeatureCollectionViewCell.swift in Sources */,
+				4F326C8B28EB073F00EA57D9 /* PersonFormViewController.swift in Sources */,
 				9DB243CF260CC3EC006B18C5 /* ScheduledMeetingTableViewCell.swift in Sources */,
 				9CB90C0924E72685009D9D75 /* FilterSpacesViewController.swift in Sources */,
 				9DB243CE260CC3EC006B18C5 /* IncomingCallViewCell.swift in Sources */,
@@ -948,6 +955,7 @@
 				9CB90C0824E72685009D9D75 /* (null) in Sources */,
 				9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */,
 				9D3701A924ABDD43004E480E /* ImageExtension.swift in Sources */,
+				4F326C8928EB073100EA57D9 /* PasswordCaptchaView.swift in Sources */,
 				9DDC82D024AA36A300F06E31 /* CallingSpacesListViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1253,7 +1261,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1270,7 +1278,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
@@ -1304,7 +1312,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1318,7 +1326,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1354,7 +1362,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1376,7 +1384,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1412,7 +1420,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1431,7 +1439,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.6.0;
+				MARKETING_VERSION = 3.7.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -491,6 +491,7 @@ extension HomeViewController {
 extension HomeViewController {  // waiting call related code
     func setIncomingCallListener() {
         webex.phone.onIncoming = { call in
+            print("onIncoming Call object : " + (call.callId ?? "") + " , " + " correlationId : " + (call.correlationId ?? ""))
             CallObjectStorage.self.shared.addCallObject(call: call)
             call.onScheduleChanged = { c in
                 self.getUpdatedSchedule(call: c)

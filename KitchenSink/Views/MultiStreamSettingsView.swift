@@ -96,7 +96,7 @@ class MultiStreamSettingsView: UIView {
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.spacing = 30
-        stack.distribution = .fill
+        stack.distribution = .fillProportionally
         return stack
     }()
     

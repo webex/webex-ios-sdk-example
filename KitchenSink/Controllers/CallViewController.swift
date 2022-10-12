@@ -37,6 +37,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var auxDictNew: [MediaRenderView: MediaStream] = [:]
     var isModerator = false
     var pinOrPassword = ""
+    var captcha: Phone.Captcha?
+    var captchaVerifyCode: String = ""
     var isCUCMCall = false
     private let virtualBackgroundCell = "VirtualBackgroundCell"
     private var backgroundItems: [Phone.VirtualBackground] = []
@@ -46,6 +48,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var transcriptionItems: [Transcription] = []
     private var participantId = ""
     private var isMultiStreamEnabled = false
+    private var breakout: Call.Breakout?
+    private var sessions: [Call.BreakoutSession] = []
+    private var breakoutJoined = false
+    private var duration = 0
+    private var timer = Timer()
     
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
@@ -91,6 +98,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         let view = MediaRenderView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    private var durationLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.accessibilityIdentifier = "durationLabel"
+        label.textColor = .momentumOrange50
+        label.isHidden = true
+        return label
     }()
     
     private var callingLabel: UILabel = {
@@ -461,7 +478,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
-        let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword)
+        let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword, captchaId: captcha?.id ?? "", captchaVerifyCode: captchaVerifyCode)
         webex.phone.dial(joinAddress, option: mediaOption, completionHandler: { result in
             switch result {
             case .success(let call):
@@ -473,36 +490,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.isCUCMCall = call.isCUCMCall
                 CallObjectStorage.self.shared.addCallObject(call: call)
             case .failure(let error):
-                if let err = error as? WebexError, case .requireHostPinOrMeetingPassword = err {
-                    DispatchQueue.main.async {
-                        var hostKeyTextField: UITextField?
-                        var passwordTextField: UITextField?
-                        let alert = UIAlertController(title: "Are you the host?", message: "If you are the host, please enter host key. Otherwise, enter the meeting password.", preferredStyle: .alert)
-                        alert.addTextField { textFiled in
-                            textFiled.placeholder = "Host Key"
-                            hostKeyTextField = textFiled
-                        }
-                        alert.addTextField { textFiled in
-                            textFiled.placeholder = "Meeting Password"
-                            passwordTextField = textFiled
-                        }
-                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-                            self.isModerator = false
-                            self.pinOrPassword = passwordTextField?.text ?? ""
-                            if let hostKey = hostKeyTextField?.text, !hostKey.isEmpty {
-                                self.isModerator = true
-                                self.pinOrPassword = hostKey
-                            }
-                            self.connectCall()
-                        }))
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
-                            alert.dismiss(animated: true, completion: {
-                                self.dismiss(animated: true, completion: nil)
-                            })
-                        }))
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                } else {
+                guard let err = error as? WebexError else {
                     let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
                         self.dismiss(animated: true)
@@ -510,9 +498,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     DispatchQueue.main.async {
                         self.present(alert, animated: true)
                     }
+                    return
                 }
-            @unknown default:
-                break
+                self.showPasswordCaptchaAlert(error: err)
             }
         })
     }
@@ -533,7 +521,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         })
     }
     
-    func getMediaOption(isModerator: Bool, pin: String?) -> MediaOption {
+    func getMediaOption(isModerator: Bool, pin: String?, captchaId: String = "", captchaVerifyCode: String = "") -> MediaOption {
         var mediaOption = MediaOption.audioOnly()
         let hasVideo = UserDefaults.standard.bool(forKey: "hasVideo")
         if hasVideo {
@@ -541,6 +529,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         mediaOption.moderator = isModerator
         mediaOption.pin = pin
+        mediaOption.captchaId = captchaId
+        mediaOption.captchaVerifyCode = captchaVerifyCode
         return mediaOption
     }
     
@@ -675,6 +665,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleMoreAction(_ sender: UIButton) {
+        
         self.torchMode = call?.cameraTorchMode ?? .off
         self.flashMode = call?.cameraFlashMode ?? .off
         self.cameraTargetBias = call?.exposureTargetBias
@@ -788,6 +779,23 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
             
             alertController.addAction(wxaToggleAction)
+        }
+        
+        // BreakoutSession
+        if let breakout = breakout {
+            if (breakout.allowJoinLater) {
+                for session in sessions {
+                    alertController.addAction(UIAlertAction(title: "Join Breakout Session \(session.name)", style: .default) {  _ in
+                        self.call?.joinBreakoutSession(breakoutSession: session)
+                    })
+                }
+            }
+            
+            if (breakout.allowReturnToMainSession && breakoutJoined) {
+                alertController.addAction(UIAlertAction(title: "Return To Main Session", style: .default) {  _ in
+                    self.call?.returnToMainSession()
+                })
+            }
         }
         
         alertController.addAction(UIAlertAction(title: "Video Torch Mode - \(String(describing: self.torchMode))", style: .default) {  _ in
@@ -989,6 +997,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(screenShareView)
         view.addSubview(remoteVideoView)
         view.addSubview(auxCollectionView)
+        view.addSubview(durationLabel)
         view.addSubview(callingLabel)
         view.addSubview(badNetworkIcon)
         view.addSubview(nameLabel)
@@ -1003,8 +1012,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     private func setupConstraints() {
+        durationLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+        durationLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).activate()
+        
         callingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
-        callingLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30).activate()
+        callingLabel.topAnchor.constraint(equalTo: durationLabel.bottomAnchor, constant: 10).activate()
         
         nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         nameLabel.topAnchor.constraint(equalTo: callingLabel.topAnchor, constant: 44).activate()
@@ -1532,6 +1544,95 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.present(showAlert, animated: true, completion: nil)
             }
         }
+
+        call.onSessionEnabled = {
+            print("BreakoutSession: Session Enabled")
+            self.slideInStateView(slideInMsg: "Breakout Session: Enabled")
+        }
+        
+        call.onSessionStarted = { [weak self] breakout in
+            self?.breakout = breakout
+            if let _duration = breakout.duration {
+                self?.duration = Int(_duration)
+                self?.durationLabel.isHidden = false
+                self?.runTimer()
+            }
+            print("BreakoutSession: Session Started \(breakout)")
+            self?.slideInStateView(slideInMsg: "Breakout Session: Started")
+        }
+        
+        call.onBreakoutUpdated = { [weak self] breakout in
+            self?.breakout = breakout
+            if breakout.duration == nil {
+                self?.durationLabel.isHidden = true
+            }
+            print("BreakoutSession: Breakout Updated \(breakout)")
+            self?.slideInStateView(slideInMsg: "Breakout Session: Breakout Updated")
+        }
+        
+        call.onSessionJoined = { [weak self] session in
+            self?.breakoutJoined = true
+            print("BreakoutSession: Session Joined \(session)")
+            self?.slideInStateView(slideInMsg: "Breakout Session: \(session.name) Joined")
+            self?.nameLabel.text = session.name
+        }
+        
+        call.onJoinableSessionListUpdated = { [weak self] sessions in
+            print("BreakoutSession: Joinable Session List Updated \(sessions)")
+            self?.sessions = sessions
+        }
+        
+        call.onHostAskingReturnToMainSession = { [weak self] in
+            print("BreakoutSession: Host Asking Return To Main Session")
+            self?.slideInStateView(slideInMsg: "Host Asking Return To Main Session")
+        }
+        
+        call.onBroadcastMessageReceivedFromHost = { [weak self] message in
+            print("BreakoutSession: Broadcast Message Received From Host \(message)")
+            self?.slideInStateView(slideInMsg: "Message Received From Host \n \(message)")
+        }
+        
+        call.onJoinedSessionUpdated = { [weak self] session in
+            print("BreakoutSession: Session Updated \(session)")
+            self?.slideInStateView(slideInMsg: "Breakout Session: \(session.name) Updated")
+            self?.nameLabel.text = session.name
+        }
+        
+        call.onSessionClosing = { [weak self] in
+            print("BreakoutSession: Session Closing")
+            if let delay = self?.breakout?.delay {
+                self?.slideInStateView(slideInMsg: "Breakout Session: Closing in \(Int(delay)) seconds")
+            }
+        }
+        
+        call.onReturnedToMainSession = { [weak self] in
+            self?.breakoutJoined = false
+            self?.durationLabel.isHidden = true
+            print("BreakoutSession: Returned To Main Session")
+            self?.slideInStateView(slideInMsg: "Returned To Main Session")
+            self?.nameLabel.text = call.title
+        }
+        
+        call.onBreakoutErrorHappened = { [weak self] error in
+            print("BreakoutSession: Breakout Error Happened")
+            self?.slideInStateView(slideInMsg: "Breakout Error: \(error.rawValue)")
+        }
+    }
+    
+    private func runTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(self.updateTimer)), userInfo: nil, repeats: true)
+   }
+    
+    @objc private func updateTimer() {
+        duration -= 1
+        durationLabel.text = "Breakout session duration \(timeString(time: TimeInterval(duration)))"
+    }
+    
+    private func timeString(time: TimeInterval) -> String {
+        let hours = Int(time) / 3600
+        let minutes = Int(time) / 60 % 60
+        let seconds = Int(time) % 60
+        return String(format:"%02i:%02i:%02i", hours, minutes, seconds)
     }
     
     private func openedAuxiliaryUI(view: MediaRenderView, auxStream: AuxStream) {
@@ -1830,5 +1931,74 @@ extension CallViewController: MultiStreamSettingsViewDelegate {
                 alertController.dismiss(animated: true)
             })
             self.present(alertController, animated: true, completion: nil)
+    }
+}
+
+
+extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
+    
+    func refreshCaptcha(captcha: Phone.Captcha?) {
+        self.captcha = captcha
+    }
+    
+    func showPasswordCaptchaAlert(error: WebexError) {
+        
+        DispatchQueue.main.async {
+            let captchaView  = PasswordCaptchaView(frame: CGRect(x: 0, y: 120, width: 270, height: 220))
+            captchaView.delegate = self
+            var title = ""
+            var message = ""
+            switch error {
+            case .requireHostPinOrMeetingPassword(reason: let reason):
+                self.captcha = nil
+                title = reason
+                message = "If you are the host, please enter host key. Otherwise, enter the meeting password."
+                captchaView.setupViewForPassword()
+            case .invalidPassword(reason: let reason):
+                self.captcha = nil
+                title = reason
+                message = "If you are the host, please enter correct host key. Otherwise, enter the correct meeting password."
+                captchaView.setupViewForPassword()
+            case .captchaRequired(captcha: let captchaObject):
+                self.captcha = captchaObject
+                title = "captcha Required"
+                message = "Please enter the captcha shown in image or by playing audio"
+                captchaView.setupViewForPasswordAndCaptcha()
+            case .invalidPasswordWithCaptcha(captcha: let captchaObject):
+                self.captcha = captchaObject
+                title = "Invalid Password With Captcha"
+                message = "Please enter the captcha shown in image or by playing audio"
+                captchaView.setupViewForPasswordAndCaptcha()
+            default:
+                self.captcha = nil
+                return
+            }
+        
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+
+            alert.view.addSubview(captchaView)
+            let height = NSLayoutConstraint(item: alert.view as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 380)
+            let width = NSLayoutConstraint(item: alert.view as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 250)
+            alert.view.addConstraint(height)
+            alert.view.addConstraint(width)
+        
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                self.isModerator = false
+                self.pinOrPassword = captchaView.passwordTextField.text ?? ""
+                self.captchaVerifyCode =  captchaView.captchaTextField.text ?? ""
+                if let hostKey = captchaView.hostKeyTextField.text, !hostKey.isEmpty {
+                    self.isModerator = true
+                    self.pinOrPassword = hostKey
+                }
+                self.connectCall()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                alert.dismiss(animated: true, completion: {
+                    self.dismiss(animated: true, completion: nil)
+                })
+            }))
+            self.present(alert, animated: true, completion: nil)
+            captchaView.updateCaptcha(captcha: self.captcha)
+        }
     }
 }

@@ -174,7 +174,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.setHeight(70)
         button.accessibilityIdentifier = "mergeCallButton"
         button.isHidden = true
-        button.backgroundColor = .systemGray2
+        if #available(iOS 13.0, *) {
+            button.backgroundColor = .systemGray2
+        } else {
+            button.backgroundColor = .systemGray
+        }
         button.addTarget(self, action: #selector(handleMergeCallAction(_:)), for: .touchUpInside)
         return button
     }()
@@ -217,7 +221,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.accessibilityIdentifier = "transferCallButton"
         button.addTarget(self, action: #selector(handletransferCallAction(_:)), for: .touchUpInside)
         button.isHidden = true
-        button.backgroundColor = .systemGray2
+        if #available(iOS 13.0, *) {
+            button.backgroundColor = .systemGray2
+        } else {
+            button.backgroundColor = .systemGray
+        }
         return button
     }()
     
@@ -461,12 +469,20 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         if self.isLocalAudioMuted {
             DispatchQueue.main.async {
                 self.muteButton.setImage(UIImage(named: "microphone-muted"), for: .normal)
-                self.muteButton.backgroundColor = .systemGray6
+                if #available(iOS 13.0, *) {
+                    self.muteButton.backgroundColor = .systemGray6
+                } else {
+                    self.muteButton.backgroundColor = .systemGray
+                }
             }
         } else {
             DispatchQueue.main.async {
                 self.muteButton.setImage(UIImage(named: "microphone"), for: .normal)
-                self.muteButton.backgroundColor = .systemGray2
+                if #available(iOS 13.0, *) {
+                    self.muteButton.backgroundColor = .systemGray2
+                } else {
+                    self.muteButton.backgroundColor = .systemGray
+                }
             }
         }
     }
@@ -563,7 +579,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         onHold = call.isOnHold
         DispatchQueue.main.async {
-            self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+            if #available(iOS 13.0, *) {
+                self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+            } else {
+                self.holdButton.backgroundColor = self.onHold ? .systemGray : .white
+            }
         }
     }
     
@@ -655,11 +675,25 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleScreenShareAction(_ sender: UIButton) {
-        let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-        broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
-        for subview in broadcastPicker.subviews {
-            if let button = subview as? UIButton {
-                button.sendActions(for: .allTouchEvents)
+        if #available(iOS 12.0, *) {
+            let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+            broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.KitchenSinkBroadcastExtension"
+            for subview in broadcastPicker.subviews {
+                if let button = subview as? UIButton {
+                    button.sendActions(for: .allTouchEvents)
+                }
+            }
+        } else {
+            if isLocalScreenSharing {
+                self.call?.stopSharing() {
+                    error in
+                        print("ERROR: \(String(describing: error))")
+                }
+            } else {
+                self.call?.startSharing() {
+                    error in
+                        print("ERROR: \(String(describing: error))")
+                }
             }
         }
     }
@@ -1478,7 +1512,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.selfVideoView.isHidden = self.onHold
                 self.remoteVideoView.isHidden = self.onHold
                 self.screenShareView.isHidden = self.onHold
-                self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+                if #available(iOS 13.0, *) {
+                    self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+                } else {
+                    self.holdButton.backgroundColor = self.onHold ? .systemGray : .white
+                }
             }
         }
         

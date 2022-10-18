@@ -122,7 +122,11 @@ class CalendarMeetingDetailViewController: UIViewController {
     // MARK: overrides
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
         title = "Meeting details"
         self.navigationItem.setRightBarButton(attendeesButton, animated: true)
         setupViews()

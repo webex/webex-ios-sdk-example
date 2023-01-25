@@ -27,18 +27,18 @@ class CallButton: UIButton {
         var color: UIColor {
             switch self {
             case .connectCall: return .momentumGreen40
+            case .mutedCall: if #available(iOS 13.0, *) {
+                return .systemGray6
+            } else {
+                return .systemGray
+            }
+            case .muteCall, .holdCall, .addCall, .mergeCall, .transferCall, .audioRoute, .showParticipants,  .toggleVideo, .screenShare, .more:
+                if #available(iOS 13.0, *) {
+                    return .systemGray2
+                } else {
+                    return .systemGray
+                }
             case .endCall: return .systemRed
-            case .muteCall: return .systemGray2
-            case .mutedCall: return .systemGray6
-            case .holdCall: return .systemGray2
-            case .addCall: return .systemGray2
-            case .mergeCall: return .systemGray2
-            case .transferCall: return .systemGray2
-            case .audioRoute: return .systemGray2
-            case .showParticipants: return .systemGray2
-            case .toggleVideo: return .systemGray2
-            case .screenShare: return .systemGray2
-            case .more: return .systemGray2
             case .qualityIndicator: return .systemGreen
             case .pin: return .systemRed
             }

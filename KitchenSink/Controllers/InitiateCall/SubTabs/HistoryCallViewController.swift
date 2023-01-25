@@ -10,7 +10,7 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero)
         table.dataSource = self
-        table.register(ContactTableViewCell.self, forCellReuseIdentifier: self.kCellId)
+        table.register(CallHistoryRecordTableViewCell.self, forCellReuseIdentifier: self.kCellId)
         table.tableFooterView = UIView()
         table.allowsSelection = false
         table.rowHeight = 64
@@ -50,12 +50,12 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: kCellId, for: indexPath) as? ContactTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: kCellId, for: indexPath) as? CallHistoryRecordTableViewCell else {
             return UITableViewCell()
         }
         let callHistoryRecord = items[indexPath.row]
-        
-        cell.setupCell(name: callHistoryRecord.displayName, buttonActionHandler: { [weak self] in self?.redialCallHistoryRecord(callHistoryRecord) })
+        cell.setupCell(callHistoryRecord: callHistoryRecord, buttonActionHandler: { [weak self] in
+            self?.redialCallHistoryRecord(callHistoryRecord) })
         return cell
     }
     

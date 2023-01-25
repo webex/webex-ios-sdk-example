@@ -74,7 +74,10 @@ class PasswordCaptchaView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.accessibilityIdentifier = "audioButton"
-        let image = UIImage(systemName: "speaker.wave.2")
+        var image = UIImage()
+        if #available(iOS 13.0, *) {
+            image = UIImage(systemName: "speaker.wave.2") ?? UIImage()
+        }
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(self.handleAudioButtonAction(_:)), for: .touchUpInside)
         return button
@@ -84,8 +87,10 @@ class PasswordCaptchaView: UIView {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.accessibilityIdentifier = "refreshButton"
-        
-        let image = UIImage(systemName: "arrow.clockwise")
+        var image = UIImage()
+        if #available(iOS 13.0, *) {
+            image = UIImage(systemName: "arrow.clockwise") ?? UIImage()
+        }
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(self.handleRefreshButtonAction(_:)), for: .touchUpInside)
         return button

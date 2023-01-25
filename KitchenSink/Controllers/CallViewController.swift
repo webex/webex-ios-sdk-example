@@ -39,7 +39,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var pinOrPassword = ""
     var captcha: Phone.Captcha?
     var captchaVerifyCode: String = ""
-    var isCUCMCall = false
+    var isCUCMOrWxcCall = false
     private let virtualBackgroundCell = "VirtualBackgroundCell"
     private var backgroundItems: [Phone.VirtualBackground] = []
     private var imagePicker = UIImagePickerController()
@@ -174,7 +174,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.setHeight(70)
         button.accessibilityIdentifier = "mergeCallButton"
         button.isHidden = true
-        button.backgroundColor = .systemGray2
+        if #available(iOS 13.0, *) {
+            button.backgroundColor = .systemGray2
+        } else {
+            button.backgroundColor = .systemGray
+        }
         button.addTarget(self, action: #selector(handleMergeCallAction(_:)), for: .touchUpInside)
         return button
     }()
@@ -217,7 +221,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.accessibilityIdentifier = "transferCallButton"
         button.addTarget(self, action: #selector(handletransferCallAction(_:)), for: .touchUpInside)
         button.isHidden = true
-        button.backgroundColor = .systemGray2
+        if #available(iOS 13.0, *) {
+            button.backgroundColor = .systemGray2
+        } else {
+            button.backgroundColor = .systemGray
+        }
         return button
     }()
     
@@ -363,12 +371,15 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         updatePhoneSettings()
         imagePicker.delegate = self
         if !addedCall && !incomingCall {
+            callingLabel.text = "calling..."
             connectCall()
         } else if incomingCall {
             answerCall()
+            callingLabel.text = "connecting..."
         } else if addedCall {
             guard let call = call else { print("Call is empty"); return }
-            self.isCUCMCall = call.isCUCMCall
+            callingLabel.text = "connecting..."
+            self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
             DispatchQueue.main.async {
                 self.webexCallStatesProcess(call: call)
             }
@@ -379,7 +390,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         remoteVideoView.addGestureRecognizer(tap)
         self.view.addGestureRecognizer(tap)
         tap.cancelsTouchesInView = false
-        if !isCUCMCall {
+        if !isCUCMOrWxcCall {
             DispatchQueue.main.async {
                 self.auxCollectionView.reloadData()
             }
@@ -389,6 +400,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        AppDelegate.shared.callKitManager?.delegate = self
         updateVirtualBackgrounds()
     }
     
@@ -441,8 +453,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         webex.phone.advancedSettings = advancedSettings
     }
     
-    private func updateUI(isCUCM: Bool) {
-        if isCUCM {
+    private func updateUI(isCUCMOrWxcCall: Bool) {
+        if isCUCMOrWxcCall {
             DispatchQueue.main.async {
                 self.bottomStackView.addArrangedSubview(self.addCallButton)
                 self.bottomStackView.addArrangedSubview(self.mergeCallButton)
@@ -461,12 +473,20 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         if self.isLocalAudioMuted {
             DispatchQueue.main.async {
                 self.muteButton.setImage(UIImage(named: "microphone-muted"), for: .normal)
-                self.muteButton.backgroundColor = .systemGray6
+                if #available(iOS 13.0, *) {
+                    self.muteButton.backgroundColor = .systemGray6
+                } else {
+                    self.muteButton.backgroundColor = .systemGray
+                }
             }
         } else {
             DispatchQueue.main.async {
                 self.muteButton.setImage(UIImage(named: "microphone"), for: .normal)
-                self.muteButton.backgroundColor = .systemGray2
+                if #available(iOS 13.0, *) {
+                    self.muteButton.backgroundColor = .systemGray2
+                } else {
+                    self.muteButton.backgroundColor = .systemGray
+                }
             }
         }
     }
@@ -487,7 +507,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     self.webexCallStatesProcess(call: call)
                 }
                 self.call = call
-                self.isCUCMCall = call.isCUCMCall
+                self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
                 CallObjectStorage.self.shared.addCallObject(call: call)
             case .failure(let error):
                 guard let err = error as? WebexError else {
@@ -512,6 +532,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
+        self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
         let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword)
         self.webexCallStatesProcess(call: call)
         call.answer(option: mediaOption, completionHandler: { error in
@@ -563,23 +584,28 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         onHold = call.isOnHold
         DispatchQueue.main.async {
-            self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+            if #available(iOS 13.0, *) {
+                self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+            } else {
+                self.holdButton.backgroundColor = self.onHold ? .systemGray : .white
+            }
         }
     }
     
-    // MARK: Actions
-    @objc private func handleEndCallAction(_ sender: UIButton) {
+    fileprivate func endCall() {
         if let call = self.call {
             call.hangup(completionHandler: { error in
                 if error == nil {
-                    self.dismiss(animated: true)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.dismiss(animated: true)
+                    }
                 } else {
                     let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
-                        self.dismiss(animated: true)
+                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { [weak self] _ in
+                        self?.dismiss(animated: true)
                     }))
-                    DispatchQueue.main.async {
-                        self.present(alert, animated: true)
+                    DispatchQueue.main.async {  [weak self] in
+                        self?.present(alert, animated: true)
                     }
                 }
             })
@@ -587,6 +613,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             webex.phone.cancel()
             self.dismiss(animated: true)
         }
+    }
+    
+    func toggleMuteButton() {
+        isLocalAudioMuted.toggle()
+        self.call?.sendingAudio = !isLocalAudioMuted
+    }
+    
+    // MARK: Actions
+    @objc private func handleEndCallAction(_ sender: UIButton) {
+        endCall()
+        AppDelegate.shared.callKitManager?.endCall()
     }
     
     @objc private func showAudioRouteSelector(_ sender: UIButton) {
@@ -618,8 +655,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleMuteCallAction(_ sender: UIButton) {
-        isLocalAudioMuted.toggle()
-        self.call?.sendingAudio = !isLocalAudioMuted
+        toggleMuteButton()
     }
     
     @objc private func handleHoldCallAction(_ sender: UIButton) {
@@ -655,11 +691,25 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleScreenShareAction(_ sender: UIButton) {
-        let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-        broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
-        for subview in broadcastPicker.subviews {
-            if let button = subview as? UIButton {
-                button.sendActions(for: .allTouchEvents)
+        if #available(iOS 12.0, *) {
+            let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+            broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
+            for subview in broadcastPicker.subviews {
+                if let button = subview as? UIButton {
+                    button.sendActions(for: .allTouchEvents)
+                }
+            }
+        } else {
+            if isLocalScreenSharing {
+                self.call?.stopSharing() {
+                    error in
+                        print("ERROR: \(String(describing: error))")
+                }
+            } else {
+                self.call?.startSharing() {
+                    error in
+                        print("ERROR: \(String(describing: error))")
+                }
             }
         }
     }
@@ -705,6 +755,33 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.setRenderMode(mode: renderModes[index])
         })
         
+        // DTMF Keyboard only supported for CUCM or WxC call
+        alertController.addAction(UIAlertAction(title: "Enter authorisation code", style: .default) {  _ in
+            let alertController = UIAlertController(title: "Authorisation Code", message: "", preferredStyle: .alert)
+            
+            alertController.addTextField { (textField: UITextField!) -> Void in
+                textField.placeholder = "Enter Authorisation Code"
+            }
+            
+            let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                let firstTextField = alertController.textFields![0] as UITextField
+                if let dtmf = firstTextField.text {
+                    self.call?.send(dtmf: dtmf, completionHandler: { res in
+                        if let res = res {
+                            print("Send DTMF error: \(res)")
+                        }
+                    })
+                }
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        })
+
         alertController.addAction(UIAlertAction(title: "Receiving Video - \(isReceivingVideo)", style: .default) {  _ in
             self.setReceivingVideo(isReceiving: (!self.isReceivingVideo))
         })
@@ -733,6 +810,38 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             })
         }
         
+        if (call?.isWebexCallingOrWebexForBroadworks ?? false) {
+            alertController.addAction(UIAlertAction(title: "Direct Transfer Call", style: .default) {  _ in
+                let alertController = UIAlertController(title: "Enter phone number to direct transfer", message: "", preferredStyle: .alert)
+                
+                alertController.addTextField { (textField: UITextField!) -> Void in
+                    textField.placeholder = "Phone number"
+                }
+                
+                let saveAction = UIAlertAction(title: "Ok", style: .default, handler: { alert -> Void in
+                    let firstTextField = alertController.textFields![0] as UITextField
+                    if let phoneNumber = firstTextField.text {
+                        self.call?.directTransferCall(toPhoneNumber: phoneNumber, completionHandler: { err in
+                            if err == nil {
+                                print("Blind Transfer success")
+                            }
+                            else
+                            {
+                                self.slideInStateView(slideInMsg: "Blind Transfer error \(err.debugDescription)")
+                            }
+                        })
+                    }
+                })
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil )
+                
+                alertController.addAction(saveAction)
+                alertController.addAction(cancelAction)
+                
+                self.present(alertController, animated: true, completion: nil)
+            })
+        }
+        
         // Media Quality Indicator
         alertController.addAction(UIAlertAction(title: "receive MediaQualityInfoChangedCallback- \(self.call?.onMediaQualityInfoChanged != nil)", style: .default) {  _ in
             if self.call?.onMediaQualityInfoChanged == nil {
@@ -743,6 +852,50 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.call?.onMediaQualityInfoChanged = nil
             }
         })
+        
+        // Webex Calling escalate to Audio / Video call
+        
+        if let call = call {
+            if call.isWebexCallingOrWebexForBroadworks {
+                
+                if call.isAudioOnly {
+                    alertController.addAction(UIAlertAction(title: "Switch to Video call", style: .default) { [self] _ in
+                        call.switchToVideoCall { result in
+                            switch result {
+                            case .success:
+                                print("Switched to Video Call")
+                                self.slideInStateView(slideInMsg: "Switched to Video Call")
+                            case .failure:
+                                print("Error switching to Video: \(result.error.debugDescription)")
+                                self.slideInStateView(slideInMsg: "Error switching to Video call: \(result.error.debugDescription)")
+                            @unknown default:
+                                fatalError()
+                            }
+                            
+                        }
+                    })
+                    
+                } else {
+                    alertController.addAction(UIAlertAction(title: "Switch to Audio only call", style: .default) { [self] _ in
+                        
+                        call.switchToAudioCall { result in
+                            switch result {
+                            case .success:
+                                print("Switched to Audio Call")
+                                self.slideInStateView(slideInMsg: "Switched to audio-only Call")
+                            case .failure:
+                                print("Error switching to audio-only: \(result.error.debugDescription)")
+                                self.slideInStateView(slideInMsg: "Error switching to audio-only: \(result.error.debugDescription)")
+                            @unknown default:
+                                fatalError()
+                            }
+                        }
+                    })
+                }
+                
+            }
+        }
+        
         // Transcriptions
         if let call = call {
             if call.wxa.isEnabled {
@@ -1267,7 +1420,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 }
             }
             self.updateStates(callInfo: call)
-            self.updateUI(isCUCM: call.isCUCMCall)
+            self.updateUI(isCUCMOrWxcCall: self.isCUCMOrWxcCall)
         }
         
         call.onMediaChanged = { [weak self] mediaEvents in
@@ -1402,11 +1555,14 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         
         call.onDisconnected = { reason in
             self.player.stop()
+            // We will need to report call ended to CallKit when we are disconnected from a CallKit call
+            AppDelegate.shared.callKitManager?.reportEndCall()
+            
             switch reason {
             case .callEnded:
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true)
+                DispatchQueue.main.async { [weak self] in
+                    self?.dismiss(animated: true)
                 }
             case .localLeft:
                 print(reason)
@@ -1478,7 +1634,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.selfVideoView.isHidden = self.onHold
                 self.remoteVideoView.isHidden = self.onHold
                 self.screenShareView.isHidden = self.onHold
-                self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+                if #available(iOS 13.0, *) {
+                    self.holdButton.backgroundColor = self.onHold ? .systemGray6 : .systemGray2
+                } else {
+                    self.holdButton.backgroundColor = self.onHold ? .systemGray : .white
+                }
             }
         }
         
@@ -1964,7 +2124,7 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
                 title = "captcha Required"
                 message = "Please enter the captcha shown in image or by playing audio"
                 captchaView.setupViewForPasswordAndCaptcha()
-            case .invalidPasswordWithCaptcha(captcha: let captchaObject):
+            case .invalidPasswordOrHostKeyWithCaptcha(captcha: let captchaObject):
                 self.captcha = captchaObject
                 title = "Invalid Password With Captcha"
                 message = "Please enter the captcha shown in image or by playing audio"
@@ -2001,4 +2161,32 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
             captchaView.updateCaptcha(captcha: self.captcha)
         }
     }
+}
+
+extension CallViewController: CallKitManagerDelegate {
+    
+    func muteButtonToggle() {
+        toggleMuteButton()
+    }
+    
+    func callDidEnd() {
+        endCall()
+    }
+    
+    func callDidHold(isOnHold: Bool) {
+        guard let call = call else {
+            let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
+            alert.addAction(.dismissAction(withTitle: "Ok"))
+            self.present(alert, animated: true)
+            return
+        }
+        onHold.toggle()
+        call.holdCall(putOnHold: onHold)
+    }
+    
+    func callDidFail() {
+        print("call failed")
+    }
+    
+    
 }

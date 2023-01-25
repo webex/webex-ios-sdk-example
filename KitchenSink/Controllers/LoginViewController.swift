@@ -98,31 +98,44 @@ class LoginViewController: UIViewController {
         }
     }
     
-    func initializeWebex() {
+    func initializeWebex(showLoading: Bool = false) {
+        if showLoading {
+            showLoadingIndicator()
+        }
         webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
         webex.logLevel = .verbose
 
         // Always call webex.initialize before invoking any other method on the webex instance
-        webex.initialize { [weak self] isLoggedIn in
-            guard let self = self else { return }
-            
-            if let authenticator = webex.authenticator {
-                print("Value of webex.authenticator.authorized: " + (authenticator.authorized.stringValue))
-            }
-            
-            if isLoggedIn {
-                self.switchRootController()
-                self.handleNotificationRoutingIfNeeded()
-            } else {
-                self.loginButton.isHidden = false
+        DispatchQueue.main.async {
+            webex.initialize { [weak self] isLoggedIn in
+                guard let self = self else { return }
+                
+                if let authenticator = webex.authenticator {
+                    print("Value of webex.authenticator.authorized: " + (authenticator.authorized.stringValue))
+                }
+                
+                if isLoggedIn {
+                    self.switchRootController()
+                    self.handleNotificationRoutingIfNeeded()
+                } else {
+                    self.dismissLoadingIndicator()
+                    self.loginButton.isHidden = false
+                }
             }
         }
+        
     }
     
     func switchRootController() {
-        guard let window = keyWindow else { return }
-        window.rootViewController = UINavigationController(rootViewController: HomeViewController())
-        window.makeKeyAndVisible()
+        showLoadingIndicator("syncing spaces")
+        webex.onInitialSpacesSyncCompleted = {
+            self.dismissLoadingIndicator()
+            DispatchQueue.main.async {
+                guard let window = self.keyWindow else { return }
+                window.rootViewController = UINavigationController(rootViewController: HomeViewController())
+                window.makeKeyAndVisible()
+            }
+        }
     }
     
     private func handleNotificationRoutingIfNeeded() {
@@ -154,7 +167,7 @@ class LoginViewController: UIViewController {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
             let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)
-            self.initializeWebex()
+            self.initializeWebex(showLoading: true)
             completion?(true)
             return
         }
@@ -199,25 +212,31 @@ class LoginViewController: UIViewController {
     }
     
     @objc private func handleLoginAction() {
-        initWebexUsingOauth { [self] success in
+        
+        initWebexUsingOauth { [weak self] success in
             guard success else {
                 print("Failed to init webex")
                 return
             }
             if let authenticator = webex.authenticator as? OAuthAuthenticator {
-                loginButton.alpha = 0.7
-                loginButton.setTitle("Loading...", for: .normal)
-                loginButton.isEnabled = false
-                authenticator.authorize(parentViewController: self) { result in
-                    guard result == .success else {
-                        self.loginButton.setTitle("Login", for: .normal)
-                        self.loginButton.isEnabled = true
-                        print("Login failed!")
-                        UserDefaults.standard.removeObject(forKey: "userEmail")
+                self?.loginButton.alpha = 0.7
+                self?.loginButton.setTitle("Loading...", for: .normal)
+                self?.loginButton.isEnabled = false
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {
                         return
                     }
-                    UserDefaults.standard.setValue("auth", forKey: "loginType")
-                    self.switchRootController()
+                    authenticator.authorize(parentViewController: self) { [weak self] result in
+                        guard result == .success else {
+                            self?.loginButton.setTitle("Login", for: .normal)
+                            self?.loginButton.isEnabled = true
+                            print("Login failed!")
+                            UserDefaults.standard.removeObject(forKey: "userEmail")
+                            return
+                        }
+                        UserDefaults.standard.setValue("auth", forKey: "loginType")
+                        self?.switchRootController()
+                    }
                 }
             } else {
                 print("Authenticator is nil")

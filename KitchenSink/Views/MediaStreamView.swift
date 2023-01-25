@@ -77,12 +77,20 @@ class MediaStreamView: UIView {
             if mediaStream.person.sendingAudio {
                 DispatchQueue.main.async { [weak self] in
                     self?.muteButton.setImage(UIImage(named: "microphone-unmuted"), for: .normal)
-                    self?.muteButton.backgroundColor = .systemGray2
+                    if #available(iOS 13.0, *) {
+                        self?.muteButton.backgroundColor = .systemGray2
+                    } else {
+                        self?.muteButton.backgroundColor = .systemGray
+                    }
                 }
             } else {
                 DispatchQueue.main.async { [weak self] in
                     self?.muteButton.setImage(UIImage(named: "microphone-muted"), for: .normal)
-                    self?.muteButton.backgroundColor = .systemGray2
+                    if #available(iOS 13.0, *) {
+                        self?.muteButton.backgroundColor = .systemGray2
+                    } else {
+                        self?.muteButton.backgroundColor = .systemGray
+                    }
                 }
             }
             self.layer.borderWidth = 2

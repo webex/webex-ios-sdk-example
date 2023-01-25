@@ -29,15 +29,20 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
     // MARK: Views
     private lazy var keyboardToggleButton: UIButton = {
         let button = UIButton(frame: .zero)
-        switch traitCollection.userInterfaceStyle {
-        case .light, .unspecified:
+        if #available(iOS 12.0, *) {
+            switch traitCollection.userInterfaceStyle {
+            case .light, .unspecified:
+                button.setImage(UIImage(named: "keyboard"), for: .normal)
+                button.setImage(UIImage(named: "dialpad"), for: .selected)
+            case .dark:
+                button.setImage(UIImage(named: "keyboard-white"), for: .normal)
+                button.setImage(UIImage(named: "dialpad-white"), for: .selected)
+            @unknown default:
+                fatalError()
+            }
+        } else {
             button.setImage(UIImage(named: "keyboard"), for: .normal)
             button.setImage(UIImage(named: "dialpad"), for: .selected)
-        case .dark:
-            button.setImage(UIImage(named: "keyboard-white"), for: .normal)
-            button.setImage(UIImage(named: "dialpad-white"), for: .selected)
-        @unknown default:
-            fatalError()
         }
 
         button.setSize(width: 44, height: 44)

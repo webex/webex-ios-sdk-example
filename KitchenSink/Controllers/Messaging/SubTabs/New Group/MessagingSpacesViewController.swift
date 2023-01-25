@@ -9,6 +9,7 @@ final class MessagingSpacesViewController: BasicTableViewController<MessagingSpa
         super.init(placeholderText: "No Spaces")
         registerSpaceCallBack()
         registerSpaceCallBackWithPayload()
+        registerSyncingSpacesStatusChanged()
         getActiveCalls()
     }
     
@@ -262,6 +263,23 @@ extension MessagingSpacesViewController {
                 break
             }
         }
+    }
+    
+    func registerSyncingSpacesStatusChanged() {
+        if !webex.spaces.isSpacesSyncCompleted {
+            print("isSpacesSyncCompleted \(false)")
+            self.showLoadingIndicator("syncing spaces")
+        }
+        
+        webex.spaces.onSyncingSpacesStatusChanged = { isSpacesSyncInProgress in
+            print("Syncing Spaces: \(isSpacesSyncInProgress)")
+            if isSpacesSyncInProgress {
+                self.showLoadingIndicator("syncing spaces")
+            } else {
+                self.dismissLoadingIndicator()
+            }
+        }
+
     }
     
     private func spaceCallOnGoing(_ spaceId: String, isStarted: Bool) {

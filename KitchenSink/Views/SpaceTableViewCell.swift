@@ -53,7 +53,11 @@ class SpaceTableViewCell: UITableViewCell, ReusableCell {
             titleLabel.text?.append(" (On Call)")
         } else {
             titleLabel.text = name
-            titleLabel.textColor = .label
+            if #available(iOS 13.0, *) {
+                titleLabel.textColor = .label
+            } else {
+                titleLabel.textColor = .black
+            }
         }
         self.messageButtonHandler = messageButtonHandler
     }

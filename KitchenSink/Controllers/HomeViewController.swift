@@ -69,6 +69,11 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             addCustomBackground()
         }
         setIncomingCallListener()
+        
+        if webex.phone.getCallingType() == .WebexCalling || webex.phone.getCallingType() == .WebexForBroadworks {
+            connectWxCButton.isHidden = false
+            disconnectWxCButton.isHidden = false
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -164,6 +169,32 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         return button
     }()
     
+    private lazy var connectWxCButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.setTitleColor(.lightText, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.setTitle("Connect", for: .normal)
+        button.backgroundColor = .momentumBlue50
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.cornerRadius = 10
+        button.isHidden = true
+        button.addTarget(self, action: #selector(connectPhoneService), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var disconnectWxCButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.setTitleColor(.lightText, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16)
+        button.setTitle("Disconnect", for: .normal)
+        button.backgroundColor = .momentumRed50
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.cornerRadius = 10
+        button.isHidden = true
+        button.addTarget(self, action: #selector(disconnectPhoneService), for: .touchUpInside)
+        return button
+    }()
+    
     private lazy var ucConnectionStatusLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.text = ""
@@ -179,6 +210,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         view.addSubview(ucConnectionStatusLabel)
         view.addSubview(collectionView)
         view.addSubview(currentUserButton)
+        view.addSubview(connectWxCButton)
+        view.addSubview(disconnectWxCButton)
     }
     
     func setupConstraints() {
@@ -194,6 +227,16 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             currentUserButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(UIScreen.main.bounds.height / 7)),
             currentUserButton.widthAnchor.constraint(equalToConstant: userButtonWidth),
             currentUserButton.heightAnchor.constraint(equalToConstant: userButtonWidth),
+            
+            connectWxCButton.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor, constant: 20),
+            connectWxCButton.centerYAnchor.constraint(equalTo: currentUserButton.centerYAnchor),
+            connectWxCButton.widthAnchor.constraint(equalToConstant: 100),
+            connectWxCButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            disconnectWxCButton.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor, constant: -20),
+            disconnectWxCButton.centerYAnchor.constraint(equalTo: currentUserButton.centerYAnchor),
+            disconnectWxCButton.widthAnchor.constraint(equalToConstant: 100),
+            disconnectWxCButton.heightAnchor.constraint(equalToConstant: 40),
             
             ucConnectionStatusLabel.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
             ucConnectionStatusLabel.topAnchor.constraint(equalTo: currentUserButton.bottomAnchor, constant: 20)
@@ -260,7 +303,7 @@ extension HomeViewController {
                 alert.title = "Invalid credentials. Try again"
                 return
             }
-            webex.setCUCMCredential(username: username, password: password)
+            webex.setCallServiceCredential(username: username, password: password)
         }))
         self.present(alert, animated: true)
     }
@@ -284,7 +327,7 @@ extension HomeViewController {
         ucConnectionStatusLabel.isHidden = true
         if let failureReason = failureReason, failureReason != .None {
             ucConnectionStatusLabel.textColor = .momentumRed50
-            ucConnectionStatusLabel.text = "UC connection status: \(status). \n Reason: \(failureReason)"
+            ucConnectionStatusLabel.text = "Phone Services: \(status). \n Reason: \(failureReason)"
             if failureReason == .RegisteredElsewhere {
                 DispatchQueue.main.async {
                     self.handleForceRegisterPhoneServicesPopup()
@@ -292,7 +335,7 @@ extension HomeViewController {
             }
         } else {
             ucConnectionStatusLabel.textColor = .momentumGreen50
-            ucConnectionStatusLabel.text = "UC connection status: \(status)"
+            ucConnectionStatusLabel.text = "Phone Services: \(status)"
         }
         ucConnectionStatusLabel.isHidden = false
     }
@@ -314,8 +357,8 @@ extension HomeViewController: WebexUCLoginDelegate {
         webex.retryUCSSOLogin()
     }
     
-    func onUCLoginFailed() {
-        print("UC login failed")
+    func onUCLoginFailed(failureReason: UCLoginFailureReason) {
+        print("UC login failed \(failureReason)")
     }
     
     func onUCServerConnectionStateChanged(status: UCLoginServerConnectionStatus, failureReason: PhoneServiceRegistrationFailureReason) {
@@ -339,6 +382,28 @@ extension HomeViewController: WebexUCLoginDelegate {
         
     func onUcSSONavigate(to url: String) {
         print("on uc sso navigate to")
+    }
+    
+    @objc func connectPhoneService() {
+        webex.phone.connectPhoneServices(completionHandler: { result in
+            switch result {
+                case .success:
+                    print("Request completed successfully")
+                case .failure:
+                print("Error connecting \(result.error.debugDescription)")
+            }
+        })
+    }
+    
+    @objc func disconnectPhoneService() {
+        webex.phone.disconnectPhoneServices(completionHandler: { result in
+            switch result {
+                case .success:
+                    print("Request completed successfully")
+                case .failure:
+                print("Error disconnecting \(result.error.debugDescription)")
+            }
+        })
     }
 }
 
@@ -441,6 +506,9 @@ extension HomeViewController {
                 "email": emailId,
                 "personId": personId
             ]
+            
+            webex.phone.setPushTokens(bundleId: "com.webex.sdk.KitchenSinkv3.0", deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
+
             var request = URLRequest(url: serviceUrl)
             request.httpMethod = "POST"
             request.setValue("Application/json", forHTTPHeaderField: "Content-Type")

@@ -10,6 +10,20 @@ class CallingSpacesListViewController: UIViewController, UITableViewDataSource {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
+        if !webex.spaces.isSpacesSyncCompleted {
+            print("isSpacesSyncCompleted \(false)")
+            self.showLoadingIndicator("syncing spaces")
+        }
+        
+        webex.spaces.onSyncingSpacesStatusChanged = { isSpacesSyncInProgress in
+            print("Syncing Spaces: \(isSpacesSyncInProgress)")
+            if isSpacesSyncInProgress {
+                self.showLoadingIndicator("syncing spaces")
+            } else {
+                self.dismissLoadingIndicator()
+            }
+        }
+        
         webex.spaces.list(teamId: nil, max: nil, type: nil, sortBy: .byLastActivity, queue: nil) { [weak self] in
             guard let self = self else { return }
             switch $0 {

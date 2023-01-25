@@ -30,12 +30,17 @@ var incomingCallData: [Meeting] = []  // have to keep this in centralised place 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-
+    var callKitManager: CallKitManager?
+    class var shared: AppDelegate {
+      return UIApplication.shared.delegate as! AppDelegate
+    }
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow()
         navigateToLoginViewController()
         window?.makeKeyAndVisible()
-
+        if (callKitManager == nil) {
+            callKitManager = CallKitManager()
+        }
         UNUserNotificationCenter.current().requestAuthorization(options: [.sound, .alert, .badge]) { granted, error in
             if granted {
               print("Approval granted to send notifications")
@@ -46,7 +51,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.registerForRemoteNotifications()
         self.voipRegistration()
         UNUserNotificationCenter.current().delegate = self
-        
         return true
     }
     
@@ -60,22 +64,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func navigateToLoginViewController() {
-        window?.rootViewController = LoginViewController()
+        if !(UIApplication.shared.topViewController() is CallViewController) {
+            window?.rootViewController = LoginViewController()
+        }
     }
     
     // Register for VoIP notifications
     func voipRegistration() {
         // Create a push registry object
-        let mainQueue = DispatchQueue.main
-        let voipRegistry = PKPushRegistry(queue: mainQueue)
-        voipRegistry.delegate = self
-        voipRegistry.desiredPushTypes = [PKPushType.voIP]
+        let voipRegistry = PKPushRegistry(queue: .main)
+            voipRegistry.delegate = self
+            voipRegistry.desiredPushTypes = [PKPushType.voIP]
     }
 }
-
+    
 extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler(.alert)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
+        if authType == "jwt" {
+            initWebexUsingJWT()
+        } else if authType == "token" {
+            initWebexUsingToken()
+        } else {
+            initWebexUsingOauth()
+        }
+        DispatchQueue.main.async {
+            webex.initialize { success in
+                if success {
+                    do {
+                        let data = try JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted)
+                        let string = String(data: data, encoding: .utf8) ?? ""
+                        print("Received push: string")
+                        print(string)
+                        webex.phone.processPushNotification(message: string) { error in
+                            if let error = error {
+                                print("processPushNotification error" + error.localizedDescription)
+                            }
+                        }
+                    }
+                    catch (let error){
+                        print(error.localizedDescription)
+                    }
+                    
+                }
+            }
+        }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -135,4 +172,85 @@ extension AppDelegate: PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
         print("pushRegistry:didInvalidatePushTokenForType:\(type)")
     }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        debugPrint("Received push: voIP")
+        debugPrint(payload.dictionaryPayload)
+
+        if type == .voIP {
+                 // Report the call to CallKit, and let it display the call UI.
+            guard let bsft = payload.dictionaryPayload["bsft"] as? [String: Any], let sender = bsft["sender"] as? String else {
+                print("payload not valid")
+              return
+            }
+            
+            callKitManager?.reportIncomingCallFor(uuid: UUID(), sender: sender) {
+                completion()
+                self.establishConnection(payload: payload)
+            }
+        }
+    }
+    
+        func establishConnection(payload: PKPushPayload) {
+            guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
+            if authType == "jwt" {
+                initWebexUsingJWT()
+            } else if authType == "token" {
+                initWebexUsingToken()
+            } else {
+                initWebexUsingOauth()
+            }
+            DispatchQueue.main.async {
+                webex.initialize { [weak self] success in
+                    if success {
+                        webex.phone.onIncoming = { [weak self] call in
+                            self?.callKitManager?.updateCall(call: call)
+                        }
+                        do {
+                            let data = try JSONSerialization.data(withJSONObject: payload.dictionaryPayload, options: .prettyPrinted)
+                            let string = String(data: data, encoding: .utf8) ?? ""
+                            print("Received push: string")
+                            print(string)
+                            webex.phone.processPushNotification(message: string) { error in
+                                if let error = error {
+                                    print("processPushNotification error" + error.localizedDescription)
+                                }
+                            }
+                        }
+                        catch (let error){
+                            print(error.localizedDescription)
+                        }
+                        
+                    } else {
+                        print("Failed to initialise WebexSDK on receiving incoming call push notification")
+                    }
+                }
+            }
+        }
+    
+    func initWebexUsingOauth() {
+        guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
+        guard let keys = NSDictionary(contentsOfFile: path) else { return }
+        let clientId = keys["clientId"] as? String ?? ""
+        let clientSecret = keys["clientSecret"] as? String ?? ""
+        let redirectUri = keys["redirectUri"] as? String ?? ""
+        let scopes = "spark:all" // spark:all is always mandatory
+        
+        // See if we already have an email stored in UserDefaults else get it from user and do new Login
+        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
+            // The scope parameter can be a space separated list of scopes that you want your access token to possess
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
+            webex = Webex(authenticator: authenticator)
+            return
+        }
+    }
+    
+    func initWebexUsingJWT() {
+        webex = Webex(authenticator: JWTAuthenticator())
+    }
+    
+    func initWebexUsingToken() {
+        webex = Webex(authenticator: TokenAuthenticator())
+    }
 }
+

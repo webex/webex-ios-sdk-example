@@ -1,96 +1,50 @@
-# Cisco Webex iOS SDK Example
+# Cisco Webex iOS SDK
 
-This *Kitchen Sink* demo employs Cisco Webex service through [Webex iOS SDK](https://github.com/webex/webex-ios-sdk).  It provides a developer friendly sample implementation of Webex client SDK and showcases all SDK features. It focuses on how to call and use *Webex-SDK* APIs. Developers could directly cut, paste, and use the code from this sample.
+[![CocoaPods](https://img.shields.io/cocoapods/v/WebexSDK.svg)](https://cocoapods.org/pods/WebexSDK)
+[![license](https://img.shields.io/github/license/webex/webex-ios-sdk.svg)](https://github.com/webex/webex-ios-sdk/blob/master/LICENSE)
 
-This demo supports iOS device with **iOS 13** or later
+The Cisco Webex iOS SDK makes it easy to integrate and secure messaging, meeting and calling features in your iOS apps.
 
-## Table of Contents
+## NOTE: This is meant to be an evaluation-only build and stability of this build is not guaranteed. Please get in touch with Cisco support for any build specific issues.
 
-- [Download App](#download-app)
-- [Setup](#setup)
-- [Usage](#usage)
-- [API Reference](#api-reference)
+ ## Guide for integrating alpha/beta/hotfix versions of WebexSDK and WebexBroadcastextensionKit pods into your projects
+ 1. Download and extract `WebexSDK.zip` and `WebexBroadcastExtensionKit.zip` from the alpha/beta/hotfix branch
+ 2. After extraction, the pods should be inside two folders: `WebexSDK` and `WebexBroadcastExtensionKit`
+ 3. Modify your project `Podfile` as the following example:
 
+    ```ruby
+    target 'KitchenSink' do
+    use_frameworks!
 
-## Screenshots 
-<ul>
-<img src="images/Picture1.png" width="22%" height="23%">
-<img src="images/Picture2.png" width="22%" height="20%">
-<img src="images/Picture3.png" width="22%" height="23%">
-<img src="images/Picture4.png" width="22%" height="23%">
-<img src="images/Picture5.png" width="22%" height="23%">
-<img src="images/Picture6.png" width="22%" height="23%">
-<img src="images/Picture7.png" width="22%" height="23%">
-<img src="images/Picture8.png" width="22%" height="23%">
-</ul>
+    # Pods for KitchenSink
+        pod 'WebexSDK', :path => '/path/to/WebexSDK'
 
-1. ScreenShot-1: Main page of Application, listing main functions of this demo.
-1. ScreenShot-2: Initiate call page.
-1. ScreenShot-3: Show call controls when call is connected.
-1. ScreenShot-4: Video calling screen 
-1. ScreenShot-5: Teams listing screen
-1. ScreenShot-6: Space listing screen
-1. ScreenShot-7: Space related option screen
-1. ScreenShot-8: Send Message screen
+    target 'KitchenSinkUITests' do
+        # Pods for testing
+    end
 
-## Download App
-You can download our Demo App from TestFlight.
-1. Download TestFlight from App Stroe.
-1. Open the public url(https://testflight.apple.com/join/obJ7Inof) from your iPhone browser.
-1. Start Testing and install Ktichen Sink App from TestFlight.
+    end
 
-## Setup
+    target 'KitchenSinkBroadcastExtension' do
+    use_frameworks!
 
-Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org):
-
-1. Install CocoaPods:
-    ```bash
-    gem install cocoapods
+    # Pods for KitchenSinkBroadcastExtension 
+    pod 'WebexBroadcastExtensionKit',:path => '/path/to/WebexBroadcastExtensionKit'
+    end
     ```
 
-1. Setup Cocoapods:
-    ```bash
-    pod setup
-    ```
+## Documentation
+- [Requirements & Feature List](https://developer.webex.com/docs/sdks/ios)
+- [Guides](https://github.com/webex/webex-ios-sdk/wiki)
+- [API Reference](https://webex.github.io/webex-ios-sdk/)
+- [Kitchen Sink Sample App](https://github.com/webex/webex-ios-sdk-example)
 
-1. Install WebexSDK and other dependencies from your project directory:
+## Support
+- [Webex Developer Support ](https://developer.webex.com/support)
+- Email: devsupport@webex.com
 
-    ```bash
-    pod install
-    ```
+## License
 
-1. To the app’s `Info.plist`, please add an entry `GroupIdentifier` with the value as your app's GroupIdentifier. This is required so that we can get a path to store the local data warehouse. Note: You'll need to claim your own GroupIdentifier from Apple developer site.
+&copy; 2016-2022 Cisco Systems, Inc. and/or its affiliates. All Rights Reserved.
 
-1. If you'll be using [WebexBroadcastExtensionKit](https://cocoapods.org/pods/WebexBroadcastExtensionKit), You also need to add an entry `GroupIdentifier` with the value as your app's GroupIdentifier to your Broadcast Extension target. This is required so that we that we can communicate with the main app for screen sharing.
-
-1. Modify the `Signing & Capabilities` section in your xcode project as follows 
-<img src="https://github.com/webex/webex-ios-sdk-example/blob/master/images/signing_and_capabilities.png" width="80%" height="80%">
-
-## Usage
-
-1. Add **Secrets.plist** file in your project and add following fields:
-    ```
-    clientId
-    clientSecret
-    redirectUri
-   ```
-   <img src="images/secrets.png" width="80%" height="80%">
-
-1. Enabling and using screen share on your iPhone
-
-    - Add screen recording to control center:
-
-      1. Open Settings -> Control Center -> Customize Controls
-
-      1. Tap '+' on Screen Recording
-
-    - To share your screen in KitchenSink:
-
-      1. Swipe up to open Control Center
-
-      1. Long press on recording button
-
-      1. select the KitchenSinkBroadcastExtension, tap Start Broadcast button
-
-## API Reference
-For complete API Reference, see [documentation](https://webex.github.io/webex-ios-sdk/)
+See [LICENSE](https://github.com/webex/webex-ios-sdk/blob/master/LICENSE) for details.

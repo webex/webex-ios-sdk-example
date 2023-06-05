@@ -26,6 +26,7 @@ var webex: Webex!
 var token: String?
 var voipToken: String?
 var incomingCallData: [Meeting] = []  // have to keep this in centralised place to update it realtime
+var voipUUID: UUID?
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -178,15 +179,18 @@ extension AppDelegate: PKPushRegistryDelegate {
         debugPrint(payload.dictionaryPayload)
 
         if type == .voIP {
-                 // Report the call to CallKit, and let it display the call UI.
+            // Report the call to CallKit, and let it display the call UI.
             guard let bsft = payload.dictionaryPayload["bsft"] as? [String: Any], let sender = bsft["sender"] as? String else {
                 print("payload not valid")
-              return
+                return
             }
-            
-            callKitManager?.reportIncomingCallFor(uuid: UUID(), sender: sender) {
-                completion()
+            voipUUID = UUID()
+            print("payload voip: \(bsft)")
+            print("didReceiveIncomingPushWith uuid \(String(describing: voipUUID!))")
+            self.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: sender) {
                 self.establishConnection(payload: payload)
+                completion()
+                return
             }
         }
     }
@@ -204,7 +208,10 @@ extension AppDelegate: PKPushRegistryDelegate {
                 webex.initialize { [weak self] success in
                     if success {
                         webex.phone.onIncoming = { [weak self] call in
-                            self?.callKitManager?.updateCall(call: call)
+                            if call.isWebexCallingOrWebexForBroadworks {
+                                print("webex.phone.onIncoming calll \(String(describing: call.callId))")
+                                self?.callKitManager?.updateCall(call: call)
+                            }
                         }
                         do {
                             let data = try JSONSerialization.data(withJSONObject: payload.dictionaryPayload, options: .prettyPrinted)

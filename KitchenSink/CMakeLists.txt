@@ -16,19 +16,21 @@ endif()
 BuildModule(
     NAME KitchenSink
     BUNDLE_IOS
-    BUNDLE_IDENTIFIER_IOS "com.webex.sdk.KitchenSinkv3"
+    BUNDLE_IDENTIFIER_IOS "com.webex.sdk.KitchenSinkv3.0.dev"
     PLIST_FILE_IOS "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
     XCODE_ATTRIBUTES
         XCODE_ATTRIBUTE_VALIDATE_WORKSPACE YES
         XCODE_ATTRIBUTE_APPLICATION_EXTENSION_API_ONLY NO
         XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "$<TARGET_FILE_DIR:WebexSDK>/.. ${WME_FRAMEWORK_SEARCH_PATH}"
         XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+        XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "9X38D433RE"
     EMBED_FRAMEWORKS_CODE_SIGN_ON_COPY YES
     EMBED_APP_EXTENSIONS_CODE_SIGN_ON_COPY YES
     EMBED_PLUGINS_CODE_SIGN_ON_COPY YES
     BUILD_WITH_INSTALL_RPATH YES
     INSTALL_RPATH "@executable_path/Frameworks"
     EMBED_FRAMEWORKS
+        UCFBridge
         WebexSDK
         WebexBroadcastExtensionKit
         "${WME_FRAMEWORK_SEARCH_PATH}/mediastores_ios.framework"
@@ -44,6 +46,22 @@ BuildModule(
         Base.lproj/LaunchScreen.storyboard
         Sound/call_1_1_ringback.wav
         Sound/call_1_1_ringtone.wav
+        Sound/BusyTone.wav
+        Sound/CallWaiting.wav
+        Sound/FastBusy.mp3
+        Sound/Reconnect.wav
+        Sound/dtmf-0.caf
+        Sound/dtmf-1.caf
+        Sound/dtmf-2.caf
+        Sound/dtmf-3.caf
+        Sound/dtmf-4.caf
+        Sound/dtmf-5.caf
+        Sound/dtmf-6.caf
+        Sound/dtmf-7.caf
+        Sound/dtmf-8.caf
+        Sound/dtmf-9.caf
+        Sound/dtmf-pound.caf
+        Sound/dtmf-star.caf
         "${SECRET_PLIST_FILE_NAME}"
     FILES
         AppDelegate.swift
@@ -86,6 +104,7 @@ BuildModule(
         Controllers/WaitingCall/ScheduledMeetingTableViewCell.swift
         Controllers/Webhook/NewWebhookFormViewController.swift
         Controllers/Webhook/WebhooksViewController.swift
+        Controllers/LoadingViewController.swift
         KitchenSink-Bridging-Header.h
         Models/Feature.swift
         ThirdPary/SwCrypt.swift
@@ -104,12 +123,15 @@ BuildModule(
         Utils/DateUtils.swift
         Extensions/UIAlertController+Extension.swift
         Extensions/UIView+Extenstion.swift
+        Extensions/UIApplication+Extenstion.swift
+        Extensions/UIViewController+Extenstion.swift
         Views/MultiStreamSettingsView.swift
         Views/PasswordCaptchaView.swift
         Views/MediaStreamView.swift
         Views/AuxCollectionViewCell.swift
         Views/CallButton.swift
         Views/ContactTableViewCell.swift
+        Views/CallHistoryRecordTableViewCell.swift
         Views/DialButton.swift
         Views/DialPadView.swift
         Views/Dropdown.swift
@@ -120,6 +142,9 @@ BuildModule(
         Views/WebhookTableViewCell.swift
         Views/VirtualBackgroundViewCell.swift
         Views/CalendarMeetingTableViewCell.swift
+        Views/AttachmentCollectionViewCell.swift
+        Views/ScreenShareConfigView.swift
+        Utils/CallKitManager.swift
     DEPENDS_ON
         WebexSDK
         WebexBroadcastExtensionKit

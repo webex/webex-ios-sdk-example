@@ -53,7 +53,7 @@ final class MessageTableViewCell: UITableViewCell, ReusableCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(senderName: String?, sendDate: String?, messagebody: NSAttributedString?, filesName: [String] = [], isReply: Bool, buttonActionHandler handler: @escaping ButtonActionHandler) {
+    func update(senderName: String?, sendDate: String?, messagebody: String?, isPlain: Bool, filesName: [String] = [], isReply: Bool, buttonActionHandler handler: @escaping ButtonActionHandler) {
         if isReply {
             messageConstraints?.deactivate()
             replyConstraints = NSLayoutConstraint(item: replyImage, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 30)
@@ -65,7 +65,11 @@ final class MessageTableViewCell: UITableViewCell, ReusableCell {
         replyImage.isHidden = !isReply
         senderIdLabel.text = "Sender: \(senderName.valueOrEmpty)"
         dateLabel.text = sendDate
-        messageBodyLabel.attributedText = messagebody
+        if isPlain {
+            messageBodyLabel.text = messagebody
+        } else {
+            messageBodyLabel.attributedText = messagebody?.htmlToAttributedString
+        }
         let removedSubviews = stackView.arrangedSubviews.reduce([]) { allSubviews, subview -> [UIView] in
             self.stackView.removeArrangedSubview(subview)
             return allSubviews + [subview]

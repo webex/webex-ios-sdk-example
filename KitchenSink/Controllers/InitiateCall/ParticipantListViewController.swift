@@ -81,7 +81,7 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
         default:
             participant = inMeeting[indexPath.row]
         }
-        cell.setupCell(name: participant.displayName ?? "", isAudioMuted: !participant.sendingAudio)
+        cell.setupCell(name: "\(participant.displayName ?? "ParticipantX"): \(participant.deviceType ?? .unknown)" , isAudioMuted: !participant.sendingAudio)
         return cell
     }
     
@@ -92,7 +92,26 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
                 alert.addAction(.dismissAction(withTitle: "Ok"))
                 self.present(alert, animated: true)
             } else {
-                muteParticipant(inMeeting[indexPath.row])
+                if (inMeeting[indexPath.row].pairedMemberships.count > 0)
+                {
+                    var paired = ""
+                    for i in inMeeting[indexPath.row].pairedMemberships {
+                        paired += "\(i.displayName ?? "ParticipantX"),"
+                    }
+                    paired.removeLast()
+                    
+                    let alert = UIAlertController(title: "Mute all paired memberships", message: "This will mute \(paired)", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Mute", style: .default, handler: { [weak self] _ in
+                        guard let participant = self?.inMeeting[indexPath.row] else { return }
+                        self?.muteParticipant(participant)
+                    }))
+                    alert.addAction(.dismissAction(withTitle: "Cancel"))
+                    self.present(alert, animated: true)
+                }
+                else
+                {
+                    muteParticipant(inMeeting[indexPath.row])
+                }
             }
         }
     }

@@ -296,8 +296,16 @@ extension SpaceMessagesTableViewController {
         if let fileArr = message.files {
             fileTitles = fileArr.map { $0.displayName ?? "" }
         }
-        
-        cell.update(senderName: message.personDisplayName, sendDate: getLocalDate(serverDate: message.created), messagebody: message.text?.htmlToAttributedString, filesName: fileTitles, isReply: message.isReply, buttonActionHandler: { index in self.downloadFile(message, contentIndex: index) })
+
+        var isPlainText = false
+
+        if let messageTextObj = message.textAsObject {
+            if messageTextObj.plain != nil {
+                isPlainText = true
+            }
+        }
+
+        cell.update(senderName: message.personDisplayName, sendDate: getLocalDate(serverDate: message.created), messagebody:  message.text, isPlain: isPlainText, filesName: fileTitles, isReply: message.isReply, buttonActionHandler: { index in self.downloadFile(message, contentIndex: index) })
         return cell
     }
     

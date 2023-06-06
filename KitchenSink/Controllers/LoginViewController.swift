@@ -5,7 +5,8 @@ class LoginViewController: UIViewController {
     private var launchMessageInfo: (messageId: String, spaceId: String)?
     private var launchWebexCallId: String?
     private var launchCUCMCallId: String?
-    
+    private var isFedRAMPMode: Bool = false
+
     private var ciscoLogoView: UIImageView = {
         let ciscoLogo = UIImageView(frame: .zero)
         ciscoLogo.translatesAutoresizingMaskIntoConstraints = false
@@ -35,6 +36,57 @@ class LoginViewController: UIViewController {
         view.layer.masksToBounds = true
         return view
     }()
+
+    private lazy var fedrampSwitch: UISwitch = {
+        let toggle = UISwitch(frame: .zero)
+        toggle.isOn = UserDefaults.standard.bool(forKey: "isFedRAMP")
+        toggle.setHeight(30)
+        toggle.onTintColor = .momentumBlue50
+        toggle.addTarget(self, action: #selector(fedrampSwitchValueDidChange(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+
+    private let fedrampLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "fedrampLabel"
+        label.text = "Fedramp Mode"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textColor = .white
+        return label
+    }()
+
+    private lazy var fedrampStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [fedrampLabel, fedrampSwitch])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.distribution = .fillEqually
+        stack.alignment = .center
+        return stack
+    }()
+
+    private let versionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "versionLabel"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textColor = .white
+        return label
+    }()
+
+    @objc func fedrampSwitchValueDidChange(_ sender: UISwitch) {
+        DispatchQueue.main.async {
+            if sender.isOn == true {
+                self.isFedRAMPMode = true
+            } else {
+                self.isFedRAMPMode = false
+            }
+        }
+    }
     
     private var keyWindow: UIWindow? {
         return UIApplication.shared.windows.first { $0.isKeyWindow }
@@ -88,6 +140,8 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .backgroundColor
+        let bundleVersion = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+        versionLabel.text = "v\(Webex.version) (\(bundleVersion))"
         guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
         if authType == "jwt" {
             initWebexUsingJWT()
@@ -115,6 +169,7 @@ class LoginViewController: UIViewController {
                 }
                 
                 if isLoggedIn {
+                    UserDefaults.standard.setValue(self.isFedRAMPMode, forKey: "isFedRAMP")
                     self.switchRootController()
                     self.handleNotificationRoutingIfNeeded()
                 } else {
@@ -127,15 +182,15 @@ class LoginViewController: UIViewController {
     }
     
     func switchRootController() {
-        showLoadingIndicator("syncing spaces")
-        webex.onInitialSpacesSyncCompleted = {
-            self.dismissLoadingIndicator()
+       // showLoadingIndicator("syncing spaces")
+       // webex.onInitialSpacesSyncCompleted = {
+        //    self.dismissLoadingIndicator()
             DispatchQueue.main.async {
                 guard let window = self.keyWindow else { return }
                 window.rootViewController = UINavigationController(rootViewController: HomeViewController())
                 window.makeKeyAndVisible()
             }
-        }
+       // }
     }
     
     private func handleNotificationRoutingIfNeeded() {
@@ -157,15 +212,15 @@ class LoginViewController: UIViewController {
     func initWebexUsingOauth(completion: ((_ success: Bool) -> Void)?) {
         guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
         guard let keys = NSDictionary(contentsOfFile: path) else { return }
-        let clientId = keys["clientId"] as? String ?? ""
-        let clientSecret = keys["clientSecret"] as? String ?? ""
-        let redirectUri = keys["redirectUri"] as? String ?? ""
+        let clientId = isFedRAMPMode ? keys["fedClientId"] as? String ?? "" : keys["clientId"] as? String ?? ""
+        let clientSecret = isFedRAMPMode ? keys["fedClientSecret"] as? String ?? "" : keys["clientSecret"] as? String ?? ""
+        let redirectUri = isFedRAMPMode ? keys["fedRedirectUri"] as? String ?? "" : keys["redirectUri"] as? String ?? ""
         let scopes = "spark:all" // spark:all is always mandatory
         
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
         if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString(), isFedRAMPEnvironment: isFedRAMPMode)
             webex = Webex(authenticator: authenticator)
             self.initializeWebex(showLoading: true)
             completion?(true)
@@ -192,7 +247,7 @@ class LoginViewController: UIViewController {
             UserDefaults.standard.setValue(email.toString(), forKey: "userEmail")
 
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
+            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString(), isFedRAMPEnvironment: self.isFedRAMPMode)
             webex = Webex(authenticator: authenticator)
             self.initializeWebex()
             completion?(true)
@@ -207,7 +262,7 @@ class LoginViewController: UIViewController {
     }
     
     func initWebexUsingToken() {
-        webex = Webex(authenticator: TokenAuthenticator())
+        webex = Webex(authenticator: TokenAuthenticator(isFedRAMPEnvironment: self.isFedRAMPMode))
         initializeWebex()
     }
     
@@ -336,18 +391,20 @@ class LoginViewController: UIViewController {
     }
     
     func setupViews() {
+        view.addSubview(fedrampStackView)
         view.addSubview(webexLogoView)
         view.addSubview(loginButton)
         view.addSubview(loginWithJWTButton)
         view.addSubview(loginWithAccessTokenButton)
         view.addSubview(ciscoLogoView)
+        view.addSubview(versionLabel)
     }
     
     func setupConstraints() {
         webexLogoView.setSize(width: 150, height: 150)
         webexLogoView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         webexLogoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50).activate()
-        
+
         loginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         loginButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -20).activate()
         loginButton.fillWidth(of: view, padded: 64)
@@ -359,10 +416,17 @@ class LoginViewController: UIViewController {
         loginWithAccessTokenButton.topAnchor.constraint(equalTo: loginWithJWTButton.bottomAnchor, constant: 20).activate()
         loginWithAccessTokenButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         loginWithAccessTokenButton.fillWidth(of: view, padded: 64)
-        
+
+        fedrampStackView.setSize(width: 100, height: 50)
+        fedrampStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).activate()
+        fedrampStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).activate()
+
         ciscoLogoView.setSize(width: 100, height: 100)
-        ciscoLogoView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12).activate()
-        ciscoLogoView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+        ciscoLogoView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).activate()
+        ciscoLogoView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).activate()
+
+        versionLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).activate()
+        versionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
     }
 }
 

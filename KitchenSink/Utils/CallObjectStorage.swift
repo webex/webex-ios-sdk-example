@@ -33,6 +33,23 @@ final class CallObjectStorage {
         }
         return nil
     }
+
+    func getCallObject(uuid: UUID) -> Call? {
+        var callObj: Call?
+        serialQueue.sync {
+            for call in self.callObjects where call.uuid == uuid {
+                callObj = call
+            }
+        }
+        if let callObj = callObj {
+            return callObj
+        }
+        return nil
+    }
+
+    func getAllActiveCalls() -> [Call] {
+        return callObjects
+    }
     
     func getCallsSize() -> Int {
         var count = 0

@@ -19,6 +19,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var addedCall = false
     var incomingCall = false
     var player = AVAudioPlayer()
+    var playingRingerType: Call.RingerType = .undefined
     var isReceivingAudio = false
     var isReceivingVideo = false
     var isReceivingScreenshare = false
@@ -40,6 +41,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var captcha: Phone.Captcha?
     var captchaVerifyCode: String = ""
     var isCUCMOrWxcCall = false
+    private var isNoiseDetectedAlertShown = false
     private let virtualBackgroundCell = "VirtualBackgroundCell"
     private var backgroundItems: [Phone.VirtualBackground] = []
     private var imagePicker = UIImagePickerController()
@@ -53,6 +55,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var breakoutJoined = false
     private var duration = 0
     private var timer = Timer()
+    private var shareConfig: ShareConfig? // to store share config locally and send when screen-share extension connected
     
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
@@ -128,6 +131,18 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         label.text = space?.title ?? call?.title ?? "Ongoing Call"
         label.accessibilityIdentifier = "nameLabel"
         return label
+    }()
+
+    private lazy var swapCallButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setHeight(50)
+        button.accessibilityIdentifier = "swapCallButton"
+        button.addTarget(self, action: #selector(handleSwapCallAction(_:)), for: .touchUpInside)
+        button.setTitle("Another Caller", for: .normal)
+        button.backgroundColor = .momentumGreen40
+        button.isHidden = true
+        return button
     }()
     
     private lazy var endCallButton: CallButton = {
@@ -340,7 +355,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         button.setHeight(50)
         button.isHidden = true
         button.accessibilityIdentifier = "badNetworkIcon"
-        button.addTarget(self, action: #selector(handleMuteCallAction(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var noiseRemovalButton: CallButton = {
+        var button = CallButton(style: .outlined, size: .large, type: .noiseRemoval)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setWidth(50)
+        button.setHeight(50)
+        button.isHidden = true
+        button.accessibilityIdentifier = "noiseRemovalButton"
+        button.addTarget(self, action: #selector(handleNoiseRemovalAction(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -369,6 +394,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         setupConstraints()
         checkIsOnHold()
         updatePhoneSettings()
+        checkOtherActiveWxcCall()
         imagePicker.delegate = self
         if !addedCall && !incomingCall {
             callingLabel.text = "calling..."
@@ -426,6 +452,20 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.isWXAEnabled = callInfo.wxa.isEnabled
         self.showVideo()
         self.updateMuteState()
+        self.checkOtherActiveWxcCall()
+    }
+    private func updateNoiseRemovalState() {
+        var imageName = "noise-none-filled"
+        self.noiseRemovalButton.isHidden = false
+        if call?.receivingNoiseInfo?.isNoiseDetected == true {
+            imageName = "noise-detected-filled"
+            if call?.receivingNoiseInfo?.isNoiseRemovalEnabled == true {
+                imageName = "noise-detected-cancelled-filled"
+            }
+        }
+        DispatchQueue.main.async {
+            self.noiseRemovalButton.setImage(UIImage(named: imageName), for: .normal)
+        }
     }
     
     private func updatePhoneSettings() {
@@ -506,6 +546,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 DispatchQueue.main.async {
                     self.webexCallStatesProcess(call: call)
                 }
+                if call.isWebexCallingOrWebexForBroadworks {
+                    AppDelegate.shared.callKitManager?.startCall(call: call)
+                }
                 self.call = call
                 self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
                 CallObjectStorage.self.shared.addCallObject(call: call)
@@ -513,6 +556,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 guard let err = error as? WebexError else {
                     let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                        print("CallVC dismiss connectCall")
                         self.dismiss(animated: true)
                     }))
                     DispatchQueue.main.async {
@@ -574,6 +618,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             })
         }
     }
+
+    func checkOtherActiveWxcCall() {
+        let otherCall = getOtherActiveWxcCall()
+        if let otherCall = otherCall {
+            swapCallButton.setTitle(otherCall.title, for: .normal)
+            swapCallButton.isHidden = false
+        } else {
+            swapCallButton.isHidden = true
+        }
+    }
     
     private func checkIsOnHold() {
         guard let call = call else {
@@ -592,38 +646,78 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
     }
     
-    fileprivate func endCall() {
-        if let call = self.call {
-            call.hangup(completionHandler: { error in
-                if error == nil {
-                    DispatchQueue.main.async { [weak self] in
-                        self?.dismiss(animated: true)
-                    }
-                } else {
-                    let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { [weak self] _ in
-                        self?.dismiss(animated: true)
-                    }))
-                    DispatchQueue.main.async {  [weak self] in
-                        self?.present(alert, animated: true)
-                    }
+    fileprivate func endCall(call: Call, endAndAccept: Bool = false) {
+        call.hangup(completionHandler: { error in
+            if error == nil {
+                if endAndAccept {
+                    CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                    return
                 }
-            })
-        } else {
-            webex.phone.cancel()
-            self.dismiss(animated: true)
-        }
+                let otherCall = self.getOtherActiveWxcCall()
+                if let otherCall = otherCall {
+                    return
+                }
+                DispatchQueue.main.async { [weak self] in
+                    print("CallVC dismiss endCall")
+                    self?.dismiss(animated: true)
+                }
+            } else {
+                let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { [weak self] _ in
+                    print("CallVC dismiss endCall error \(error)")
+                    self?.dismiss(animated: true)
+                }))
+                DispatchQueue.main.async {  [weak self] in
+                    self?.present(alert, animated: true)
+                }
+            }
+        })
     }
     
-    func toggleMuteButton() {
-        isLocalAudioMuted.toggle()
-        self.call?.sendingAudio = !isLocalAudioMuted
+    func toggleMuteButton(call: Call) {
+        if call.callId == currentCallId {
+            isLocalAudioMuted.toggle()
+        }
+        call.sendingAudio = !call.sendingAudio
     }
     
     // MARK: Actions
+
+    @objc private func handleSwapCallAction(_ sender: UIButton) {
+        guard let otherCall = getOtherActiveWxcCall() else { return }
+        self.call?.holdCall(putOnHold: true)
+        self.currentCallId = otherCall.callId
+        self.call = otherCall
+        self.call?.holdCall(putOnHold: false)
+        self.webexCallStatesProcess(call: otherCall)
+    }
+
     @objc private func handleEndCallAction(_ sender: UIButton) {
-        endCall()
-        AppDelegate.shared.callKitManager?.endCall()
+        guard let call = call else {
+            webex.phone.cancel()
+            print("CallVC dismiss handleEndCallAction")
+            self.dismiss(animated: true)
+            return
+        }
+        endCall(call: call)
+        AppDelegate.shared.callKitManager?.endCall(call: call)
+    }
+    
+    @objc private func handleNoiseRemovalAction(_ sender: UIButton) {
+        guard let call = call, let receivingNoiseInfo = call.receivingNoiseInfo else {
+            return
+        }
+        
+        call.enableReceivingNoiseRemoval(shouldEnable: !receivingNoiseInfo.isNoiseRemovalEnabled) { result in
+            switch result {
+            case .NoError:
+                print("enable/disable ReceivingNoiseRemoval success")
+            case .NotSupported:
+                print("NotSupported")
+            case .InternalError:
+                print("InternalError")
+            }
+        }
     }
     
     @objc private func showAudioRouteSelector(_ sender: UIButton) {
@@ -655,7 +749,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleMuteCallAction(_ sender: UIButton) {
-        toggleMuteButton()
+        guard let call = call else {
+            let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
+            alert.addAction(.dismissAction(withTitle: "Ok"))
+            self.present(alert, animated: true)
+            return
+        }
+        toggleMuteButton(call: call)
     }
     
     @objc private func handleHoldCallAction(_ sender: UIButton) {
@@ -667,6 +767,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         onHold.toggle()
         call.holdCall(putOnHold: onHold)
+        AppDelegate.shared.callKitManager?.holdCall(hold: onHold, call: call)
     }
     
     @objc private func handletransferCallAction(_ sender: UIButton) {
@@ -691,27 +792,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handleScreenShareAction(_ sender: UIButton) {
-        if #available(iOS 12.0, *) {
-            let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
-            broadcastPicker.preferredExtension = "com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension"
-            for subview in broadcastPicker.subviews {
-                if let button = subview as? UIButton {
-                    button.sendActions(for: .allTouchEvents)
-                }
-            }
-        } else {
-            if isLocalScreenSharing {
-                self.call?.stopSharing() {
-                    error in
-                        print("ERROR: \(String(describing: error))")
-                }
-            } else {
-                self.call?.startSharing() {
-                    error in
-                        print("ERROR: \(String(describing: error))")
-                }
-            }
-        }
+        showScreenShareConfig()
     }
     
     @objc private func handleMoreAction(_ sender: UIButton) {
@@ -1153,6 +1234,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(durationLabel)
         view.addSubview(callingLabel)
         view.addSubview(badNetworkIcon)
+        view.addSubview(noiseRemovalButton)
         view.addSubview(nameLabel)
         view.addSubview(multiStreamSettingsView)
         view.addSubview(stackView)
@@ -1162,11 +1244,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(selfVideoView)
         view.addSubview(swapCameraButton)
         view.addSubview(endCallButton)
+        view.addSubview(swapCallButton)
     }
     
     private func setupConstraints() {
         durationLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
-        durationLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10).activate()
+        durationLabel.topAnchor.constraint(equalTo: swapCallButton.bottomAnchor, constant: 10).activate()
         
         callingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         callingLabel.topAnchor.constraint(equalTo: durationLabel.bottomAnchor, constant: 10).activate()
@@ -1175,10 +1258,17 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         nameLabel.topAnchor.constraint(equalTo: callingLabel.topAnchor, constant: 44).activate()
         
         badNetworkIcon.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).activate()
-        badNetworkIcon.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30).activate()
+        badNetworkIcon.topAnchor.constraint(equalTo: swapCallButton.bottomAnchor, constant: 30).activate()
+        
+        noiseRemovalButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30).activate()
+        noiseRemovalButton.topAnchor.constraint(equalTo: badNetworkIcon.bottomAnchor, constant: 30).activate()
 
         endCallButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         endCallButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -140).activate()
+
+        swapCallButton.leftAnchor.constraint(equalTo: view.leftAnchor).activate()
+        swapCallButton.rightAnchor.constraint(equalTo: view.rightAnchor).activate()
+        swapCallButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).activate()
         
         stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
         stackView.bottomAnchor.constraint(equalTo: bottomStackView.topAnchor, constant: -50).activate()
@@ -1189,20 +1279,20 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         swapCameraButton.centerXAnchor.constraint(equalTo: selfVideoView.centerXAnchor).activate()
         swapCameraButton.centerYAnchor.constraint(equalTo: selfVideoView.centerYAnchor).activate()
         
-        screenShareView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).activate()
+        screenShareView.topAnchor.constraint(equalTo: swapCallButton.bottomAnchor).activate()
         screenShareView.bottomAnchor.constraint(equalTo: auxCollectionView.topAnchor).activate()
         screenShareView.widthAnchor.constraint(equalToConstant: view.bounds.width / 2).activate()
         screenShareView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         screenShareView.trailingAnchor.constraint(equalTo: remoteVideoView.leadingAnchor).activate()
         
-        remoteVideoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).activate()
+        remoteVideoView.topAnchor.constraint(equalTo: swapCallButton.bottomAnchor).activate()
         remoteVideoView.bottomAnchor.constraint(equalTo: auxCollectionView.topAnchor).activate()
         remoteVideoView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
         
         selfVideoView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).activate()
         selfVideoView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -50).activate()
         
-        auxCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: (view.bounds.height / 2) - 50).activate()
+        auxCollectionView.topAnchor.constraint(equalTo: swapCallButton.bottomAnchor, constant: (view.bounds.height / 2) - 50).activate()
         auxCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
         auxCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         auxCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
@@ -1419,8 +1509,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     self.transferCallButton.isHidden = false
                 }
             }
+            print("isVideoEnabled: \(call.isVideoEnabled)")
             self.updateStates(callInfo: call)
             self.updateUI(isCUCMOrWxcCall: self.isCUCMOrWxcCall)
+            call.updateAudioSession()
         }
         
         call.onMediaChanged = { [weak self] mediaEvents in
@@ -1544,10 +1636,21 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.onFailed = { reason in
             print("Call Failed!")
             self.player.stop()
+            let otherCall = self.getOtherActiveWxcCall()
+            if let otherCall = otherCall {
+                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                otherCall.holdCall(putOnHold: false)
+                self.swapCallButton.isHidden = true
+                self.call = otherCall
+                self.currentCallId = otherCall.callId
+                self.webexCallStatesProcess(call: otherCall)
+                return
+            }
             let alert = UIAlertController(title: "Call Failed", message: reason, preferredStyle: .alert)
             alert.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async {
                 self.present(alert, animated: true, completion: {
+                    print("CallVC dismiss onFailed")
                     self.dismiss(animated: true)
                 })
             }
@@ -1556,38 +1659,27 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.onDisconnected = { reason in
             self.player.stop()
             // We will need to report call ended to CallKit when we are disconnected from a CallKit call
-            AppDelegate.shared.callKitManager?.reportEndCall()
-            
+            AppDelegate.shared.callKitManager?.reportEndCall(uuid: call.uuid)
+
+            // check if other call is active, then resume it
+            let otherCall = self.getOtherActiveWxcCall()
+            if let otherCall = otherCall {
+                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                otherCall.holdCall(putOnHold: false)
+                self.swapCallButton.isHidden = true
+                self.call = otherCall
+                self.currentCallId = otherCall.callId
+                self.webexCallStatesProcess(call: otherCall)
+                return
+            }
             switch reason {
-            case .callEnded:
+            case .callEnded, .localLeft, .localDecline, .localCancel, .remoteLeft, .remoteDecline, .remoteCancel, .otherConnected, .otherDeclined:
+                print("Call Disconnected: \(reason)")
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
                 DispatchQueue.main.async { [weak self] in
+                    print("CallVC dismiss onDisconnected")
                     self?.dismiss(animated: true)
                 }
-            case .localLeft:
-                print(reason)
-                
-            case .localDecline:
-                print(reason)
-                
-            case .localCancel:
-                print(reason)
-                
-            case .remoteLeft:
-                print(reason)
-                
-            case .remoteDecline:
-                print(reason)
-                
-            case .remoteCancel:
-                print(reason)
-                
-            case .otherConnected:
-                print(reason)
-                
-            case .otherDeclined:
-                print(reason)
-                
             case .error(let error):
                 print(error)
             @unknown default:
@@ -1599,16 +1691,81 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             print(reason)
         }
         
-        call.onRinging = { [weak self] in
+        call.onStartRinger = { [weak self] ringerType in
             guard let self = self else { return }
-            guard let path = Bundle.main.path(forResource: "call_1_1_ringback", ofType: "wav") else { return }
+            
+            print("[Ringer] Playing tone for RingerType: \(ringerType)")
+            
+            let path: String?
+            
+            switch ringerType {
+            case .outgoing:
+                path = Bundle.main.path(forResource: "call_1_1_ringback", ofType: "wav")
+            case .busyTone:
+                path = Bundle.main.path(forResource: "BusyTone", ofType: "wav")
+            case .incoming:
+                path = Bundle.main.path(forResource: "call_1_1_ringtone", ofType: "wav")
+            case .reconnect:
+                path = Bundle.main.path(forResource: "Reconnect", ofType: "wav")
+            case .notFound:
+                path = Bundle.main.path(forResource: "FastBusy", ofType: "mp3")
+            case .DTMF_0:
+                path = Bundle.main.path(forResource: "dtmf-0", ofType: "caf")
+            case .DTMF_1:
+                path = Bundle.main.path(forResource: "dtmf-1", ofType: "caf")
+            case .DTMF_2:
+                path = Bundle.main.path(forResource: "dtmf-2", ofType: "caf")
+            case .DTMF_3:
+                path = Bundle.main.path(forResource: "dtmf-3", ofType: "caf")
+            case .DTMF_4:
+                path = Bundle.main.path(forResource: "dtmf-4", ofType: "caf")
+            case .DTMF_5:
+                path = Bundle.main.path(forResource: "dtmf-5", ofType: "caf")
+            case .DTMF_6:
+                path = Bundle.main.path(forResource: "dtmf-6", ofType: "caf")
+            case .DTMF_7:
+                path = Bundle.main.path(forResource: "dtmf-7", ofType: "caf")
+            case .DTMF_8:
+                path = Bundle.main.path(forResource: "dtmf-8", ofType: "caf")
+            case .DTMF_9:
+                path = Bundle.main.path(forResource: "dtmf-9", ofType: "caf")
+            case .DTMF_STAR:
+                path = Bundle.main.path(forResource: "dtmf-star", ofType: "caf")
+            case .DTMF_POUND:
+                path = Bundle.main.path(forResource: "dtmf-pound", ofType: "caf")
+            case .callWaiting:
+                path = Bundle.main.path(forResource: "CallWaiting", ofType: "wav")
+            @unknown default:
+                path = nil
+                print("[Ringer] Unhandled RingerType: \(ringerType)")
+                break
+            }
+            guard let path = path else {
+                print("[Ringer] There was an issue finding the specified ringtone in the bundle")
+                return
+            }
+            
             let url = URL(fileURLWithPath: path)
             do {
+                if self.player.isPlaying {
+                    self.player.stop()
+                }
                 self.player = try AVAudioPlayer(contentsOf: url)
                 self.player.numberOfLoops = -1
+                self.playingRingerType = ringerType
                 self.player.play()
             } catch {
-                print("There is an issue with ringtone")
+                print("[Ringer] There is an issue with ringtone")
+            }
+        }
+        
+        call.onStopRinger = { [weak self] ringerType in
+            guard let self = self else { return }
+            
+            print("[Ringer] Stopping tone for RingerType: \(ringerType)")
+            
+            if self.player.isPlaying && self.playingRingerType == ringerType {
+                self.player.stop()
             }
         }
         
@@ -1653,7 +1810,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.oniOSBroadcastingChanged = { event in
             switch event {
             case .extensionConnected:
-                call.startSharing(completionHandler: { error in
+                call.startSharing(shareConfig: self.shareConfig, completionHandler: { error in
                     if error != nil {
                         print("share screen error:\(String(describing: error))")
                     }
@@ -1676,6 +1833,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             alert.addAction(.dismissAction(withTitle: "Ok"))
             DispatchQueue.main.async {
                 self.present(alert, animated: true, completion: {
+                    print("CallVC dismiss onCpuHitThreshold")
                     self.dismiss(animated: true)
                 })
             }
@@ -1776,6 +1934,31 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.onBreakoutErrorHappened = { [weak self] error in
             print("BreakoutSession: Breakout Error Happened")
             self?.slideInStateView(slideInMsg: "Breakout Error: \(error.rawValue)")
+        }
+        call.onReceivingNoiseInfoChanged = { [weak self] info in
+            guard let strongSelf = self else {return}
+            if info.isNoiseDetected && !info.isNoiseRemovalEnabled && !strongSelf.isNoiseDetectedAlertShown {
+                let showAlert = UIAlertController(title: "Noise Detected, You want to remove?", message: nil, preferredStyle: .alert)
+                showAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                    call.enableReceivingNoiseRemoval(shouldEnable: true) { result in
+                        print("noise removed")
+                    }
+                }))
+                
+                showAlert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { _ in
+                    
+                }))
+                strongSelf.isNoiseDetectedAlertShown = true
+                DispatchQueue.main.async {
+                    strongSelf.present(showAlert, animated: true, completion: nil)
+                }
+                
+                let seconds = 30.0
+                DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { // this timer and boolean  isNoiseDetectedAlertShown are used here to avoid repeated alerts
+                    strongSelf.isNoiseDetectedAlertShown = false
+                }
+                strongSelf.updateNoiseRemovalState()
+            }
         }
     }
     
@@ -2164,29 +2347,110 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
 }
 
 extension CallViewController: CallKitManagerDelegate {
-    
-    func muteButtonToggle() {
-        toggleMuteButton()
+    func oldCallEnded() {
+        swapCallButton.isHidden = true
+    }
+
+    func callDidEnd(call: Call) {
+        endCall(call: call, endAndAccept: true)
     }
     
-    func callDidEnd() {
-        endCall()
+    func muteButtonToggle(call: Call) {
+        toggleMuteButton(call: call)
     }
     
-    func callDidHold(isOnHold: Bool) {
-        guard let call = call else {
-            let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
-            alert.addAction(.dismissAction(withTitle: "Ok"))
-            self.present(alert, animated: true)
-            return
-        }
-        onHold.toggle()
-        call.holdCall(putOnHold: onHold)
+    func callDidHold(call: Call, isOnHold: Bool) {
+        call.holdCall(putOnHold: isOnHold)
     }
     
     func callDidFail() {
-        print("call failed")
+        print("Call Failed!")
+        self.player.stop()
+        let alert = UIAlertController(title: "Call Failed", message: nil, preferredStyle: .alert)
+        alert.addAction(.dismissAction(withTitle: "Ok"))
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: {
+                self.dismiss(animated: true)
+                print("CallVC dismiss callDidFail")
+            })
+        }
+    }
+
+    func getOtherActiveWxcCall() -> Call? {
+        var otherCall: Call?
+        let activeCalls = CallObjectStorage.self.shared.getAllActiveCalls()
+        for call in activeCalls {
+            if call.isWebexCallingOrWebexForBroadworks && call.callId != self.call?.callId {
+                otherCall = call
+                break
+            }
+        }
+        return otherCall
+    }
+}
+
+extension CallViewController {
+    fileprivate func startScreenShareExtension() {
+        if #available(iOS 12.0, *) {
+            guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
+            guard let keys = NSDictionary(contentsOfFile: path) else { return }
+            let broadcastBundleId = keys["broadcastBundleId"] as? String ?? ""
+            let broadcastPicker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+            broadcastPicker.preferredExtension = broadcastBundleId
+            for subview in broadcastPicker.subviews {
+               if let button = subview as? UIButton {
+                   button.sendActions(for: .allTouchEvents)
+               }
+            }
+        } else {
+            if isLocalScreenSharing {
+               self.call?.stopSharing() {
+                   error in
+                       print("ERROR: \(String(describing: error))")
+               }
+            } else {
+               self.call?.startSharing() {
+                   error in
+                       print("ERROR: \(String(describing: error))")
+               }
+            }
+        }
     }
     
-    
+    func showScreenShareConfig() {
+        DispatchQueue.main.async {
+            let configView  = ScreenShareConfigView(frame: CGRect(x: 0, y: 20, width: 300, height: 300))
+            
+            let alert = UIAlertController(title: "ScreenShare Config", message: "", preferredStyle: .alert)
+
+            alert.view.addSubview(configView)
+            let height = NSLayoutConstraint(item: alert.view as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 350)
+            let width = NSLayoutConstraint(item: alert.view as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 300)
+            alert.view.addConstraint(height)
+            alert.view.addConstraint(width)
+        
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                self.shareConfig = configView.getSelectedConfig()
+                
+                let path = Bundle.main.path(forResource: "Info", ofType: "plist")
+                let keys = NSDictionary(contentsOfFile: path ?? "")
+                guard let groupId = keys?["GroupIdentifier"] as? String, !groupId.isEmpty else { fatalError("KitchenSink: Expected your Broadcast Extension's Info.plist to contain a valid group identifier. Please add a key `GroupIdentifier` with the value as your App's Group Identifier to your App's Info.plist. This is required for ScreenSharing") }
+                                
+                if let defaults = UserDefaults(suiteName: groupId)
+                {
+                    switch self.shareConfig?.shareType {
+                    case .OptimizeVideo:
+                        defaults.setValue(true, forKey: "optimizeForVideo")
+                    default:
+                        defaults.setValue(false, forKey: "optimizeForVideo")
+                    }
+                }
+                self.startScreenShareExtension()
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+                alert.dismiss(animated: true)
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
 }

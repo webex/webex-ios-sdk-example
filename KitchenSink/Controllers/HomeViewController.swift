@@ -47,11 +47,22 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
                     self?.navigationController?.dismiss(animated: true)
                     UserDefaults.standard.removeObject(forKey: "loginType")
                     UserDefaults.standard.removeObject(forKey: "userEmail")
+                    UserDefaults.standard.removeObject(forKey: "isFedRAMP")
                     appDelegate.navigateToLoginViewController()
                 }
             })
         })
     ]
+
+    private let versionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "versionLabel"
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textColor = .white
+        return label
+    }()
     
     // MARK: Lifecycle Methods
     override func viewDidLoad() {
@@ -60,6 +71,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
 
         title = "Kitchen Sink"
         navigationController?.navigationBar.prefersLargeTitles = true
+        let bundleVersion = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+        versionLabel.text = "v\(Webex.version) (\(bundleVersion))"
         setupViews()
         setupConstraints()
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
@@ -212,6 +225,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         view.addSubview(currentUserButton)
         view.addSubview(connectWxCButton)
         view.addSubview(disconnectWxCButton)
+        view.addSubview(versionLabel)
     }
     
     func setupConstraints() {
@@ -239,7 +253,10 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             disconnectWxCButton.heightAnchor.constraint(equalToConstant: 40),
             
             ucConnectionStatusLabel.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
-            ucConnectionStatusLabel.topAnchor.constraint(equalTo: currentUserButton.bottomAnchor, constant: 20)
+            ucConnectionStatusLabel.topAnchor.constraint(equalTo: currentUserButton.bottomAnchor, constant: 20),
+
+            versionLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+            versionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
 }
@@ -506,8 +523,11 @@ extension HomeViewController {
                 "email": emailId,
                 "personId": personId
             ]
-            
-            webex.phone.setPushTokens(bundleId: "com.webex.sdk.KitchenSinkv3.0", deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
+            guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
+            guard let keys = NSDictionary(contentsOfFile: path) else { return }
+            let bundleId = keys["bundleId"] as? String ?? ""
+
+            webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
 
             var request = URLRequest(url: serviceUrl)
             request.httpMethod = "POST"
@@ -640,9 +660,6 @@ extension HomeViewController {  // waiting call related code
             switch reason {
             case .callEnded:
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true)
-                }
             case .localLeft:
                 print(reason)
                 

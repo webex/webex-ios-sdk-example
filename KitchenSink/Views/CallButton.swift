@@ -2,7 +2,7 @@ import UIKit
 
 class CallButton: UIButton {
     enum ActionType {
-        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more, qualityIndicator, pin
+        case connectCall, endCall, muteCall, mutedCall, holdCall, addCall, transferCall, audioRoute, showParticipants, toggleVideo, mergeCall, screenShare, more, qualityIndicator, pin, noiseRemoval
 
         var imageName: String {
             switch self {
@@ -21,6 +21,7 @@ class CallButton: UIButton {
             case .more: return "more"
             case .qualityIndicator: return "quality-Indicator"
             case .pin: return "pin"
+            case .noiseRemoval: return "noise-detected-filled"
             }
         }
         
@@ -32,7 +33,7 @@ class CallButton: UIButton {
             } else {
                 return .systemGray
             }
-            case .muteCall, .holdCall, .addCall, .mergeCall, .transferCall, .audioRoute, .showParticipants,  .toggleVideo, .screenShare, .more:
+            case .muteCall, .holdCall, .addCall, .mergeCall, .transferCall, .audioRoute, .showParticipants,  .toggleVideo, .screenShare, .more, .noiseRemoval:
                 if #available(iOS 13.0, *) {
                     return .systemGray2
                 } else {

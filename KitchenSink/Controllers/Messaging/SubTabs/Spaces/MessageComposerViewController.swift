@@ -128,7 +128,7 @@ class MessageComposerViewController: UIViewController {
         view.setHeight(125)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.dataSource = self
-        view.register(UICollectionViewCell.self, forCellWithReuseIdentifier: attachmentCell)
+        view.register(AttachmentCollectionViewCell.self, forCellWithReuseIdentifier: attachmentCell)
         view.isScrollEnabled = true
         view.isHidden = true
         return view
@@ -466,7 +466,15 @@ extension MessageComposerViewController: UINavigationControllerDelegate, UIImage
                 return
             }
             
-            guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail) else { return }
+            guard let localFile = LocalFile(path: filePath, name: fileName, mime: fileType, thumbnail: thumbnail, progressHandler: { [weak self] progress in
+                DispatchQueue.main.async { [weak self] in
+                    guard let strongSelf = self else { return}
+                    for case let cell as AttachmentCollectionViewCell in strongSelf.attachmentCollectionView.visibleCells where cell.id == filePath + fileName {
+                        cell.configureUploadProgress(progress: Float(progress/100))
+                    }
+                }
+                print("localFiles progress \(fileName) \(progress)")
+            }) else { return }
             
             localFiles.append(localFile)
             reloadattachmentCollectionView()
@@ -518,26 +526,15 @@ extension MessageComposerViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: attachmentCell, for: indexPath)
-        let imageview = UIImageView(frame: CGRect(x: 0, y: 0, width: 120, height: 120))
-        imageview.contentMode = .scaleToFill
-        let img = UIImage(contentsOfFile: localFiles[indexPath.row].thumbnail?.path ?? localFiles[indexPath.row].path)
-        imageview.image = img
-        cell.contentView.addSubview(imageview)
-        let deleteButton = UIButton(type: .system)
-        deleteButton.frame = CGRect(x: 100, y: 0, width: 20, height: 20)
-        deleteButton.translatesAutoresizingMaskIntoConstraints = false
-        deleteButton.setBackgroundImage(UIImage(named: "delete"), for: .normal)
-        deleteButton.backgroundColor = .momentumRed50
-        deleteButton.layer.cornerRadius = 10
-        deleteButton.addTarget(self, action: #selector(deleteAttachment(_:)), for: .touchUpInside)
-        deleteButton.tag = indexPath.row
-        cell.contentView.addSubview(deleteButton)
+        if let customCell = cell as? AttachmentCollectionViewCell {
+            let img = UIImage(contentsOfFile: localFiles[indexPath.row].thumbnail?.path ?? localFiles[indexPath.row].path) ??  UIImage()
+            customCell.configure(id: (localFiles[indexPath.row].path ) + localFiles[indexPath.row].name, image: img) {
+                self.localFiles.remove(at: indexPath.row)
+                self.reloadattachmentCollectionView()
+            }
+            return customCell
+        }
         return cell
-    }
-    
-    @objc func deleteAttachment(_ sender: UIButton) {
-        localFiles.remove(at: sender.tag)
-        reloadattachmentCollectionView()
     }
     
     func reloadattachmentCollectionView() {

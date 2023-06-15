@@ -182,15 +182,11 @@ class LoginViewController: UIViewController {
     }
     
     func switchRootController() {
-       // showLoadingIndicator("syncing spaces")
-       // webex.onInitialSpacesSyncCompleted = {
-        //    self.dismissLoadingIndicator()
-            DispatchQueue.main.async {
-                guard let window = self.keyWindow else { return }
-                window.rootViewController = UINavigationController(rootViewController: HomeViewController())
-                window.makeKeyAndVisible()
-            }
-       // }
+        DispatchQueue.main.async {
+            guard let window = self.keyWindow else { return }
+            window.rootViewController = UINavigationController(rootViewController: HomeViewController())
+            window.makeKeyAndVisible()
+        }
     }
     
     private func handleNotificationRoutingIfNeeded() {
@@ -222,7 +218,7 @@ class LoginViewController: UIViewController {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
             let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString(), isFedRAMPEnvironment: isFedRAMPMode)
             webex = Webex(authenticator: authenticator)
-            self.initializeWebex(showLoading: true)
+            self.initializeWebex()
             completion?(true)
             return
         }

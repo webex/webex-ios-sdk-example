@@ -161,9 +161,17 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
                     }
                     CallObjectStorage.self.shared.addCallObject(call: call)
                     
-                    let callVC = CallViewController(space: space, addedCall: true, currentCallId: call.callId ?? "", oldCallId: oldCallId, call: call)
+                    // CallViewController is already open
                     DispatchQueue.main.async {
-                        self?.present(callVC, animated: true)
+                        if let callVC = self?.presentingViewController as? CallViewController {
+                            print("Associated calll old: \(oldCallId), new: \(String(describing: call.callId))")
+                            callVC.currentCallId = call.callId
+                            callVC.addedCall = true
+                            callVC.oldCallId = oldCallId
+                            callVC.call = call
+                            callVC.viewDidLoad()
+                            self?.dismiss(animated: true)
+                        }
                     }
                 case .failure(let error):
                     let alert = UIAlertController(title: "Error", message: "\(error)", preferredStyle: .alert)

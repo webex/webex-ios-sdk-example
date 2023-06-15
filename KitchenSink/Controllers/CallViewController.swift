@@ -41,6 +41,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var captcha: Phone.Captcha?
     var captchaVerifyCode: String = ""
     var isCUCMOrWxcCall = false
+    var mergedCall = false
     private var isNoiseDetectedAlertShown = false
     private let virtualBackgroundCell = "VirtualBackgroundCell"
     private var backgroundItems: [Phone.VirtualBackground] = []
@@ -410,7 +411,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 self.webexCallStatesProcess(call: call)
             }
         }
-        
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
         self.remoteVideoView.isUserInteractionEnabled = true
         remoteVideoView.addGestureRecognizer(tap)
@@ -620,6 +621,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
 
     func checkOtherActiveWxcCall() {
+        if mergedCall {
+            swapCallButton.isHidden = true
+            return
+        }
         let otherCall = getOtherActiveWxcCall()
         if let otherCall = otherCall {
             swapCallButton.setTitle(otherCall.title, for: .normal)
@@ -708,7 +713,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         
-        call.enableReceivingNoiseRemoval(shouldEnable: !receivingNoiseInfo.isNoiseRemovalEnabled) { result in
+        call.enableReceivingNoiseRemoval(shouldEnable: !receivingNoiseInfo.isNoiseRemovalEnabled) { [weak self] result in
             switch result {
             case .NoError:
                 print("enable/disable ReceivingNoiseRemoval success")
@@ -717,6 +722,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             case .InternalError:
                 print("InternalError")
             }
+            self?.updateNoiseRemovalState()
         }
     }
     
@@ -744,8 +750,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
-        call.mergeCall(targetCallId: currentCallId ?? "")
-        self.navigationController?.popToRootViewController(animated: true)
+        print("Merge call old: \(oldCallId), new: \(currentCallId)")
+        mergedCall = true
+        self.call?.mergeCall(targetCallId: oldCallId)
     }
     
     @objc private func handleMuteCallAction(_ sender: UIButton) {
@@ -777,8 +784,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
+        print("Transfer call old: \(oldCallId), new: \(currentCallId)")
         call.transferCall(toCallId: currentCallId ?? "")
-        self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc private func handleToggleVideoCallAction(_ sender: UIButton) {
@@ -1492,6 +1500,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         
         call.onConnected = { [weak self] in
             guard let self = self else { return }
+            print("onConnected Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
             self.player.stop()
             if self.call?.onMediaChanged != nil {
                 self.badNetworkIcon.isHidden = false
@@ -1507,6 +1516,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     self.toggleVideoButton.isHidden = true
                     self.mergeCallButton.isHidden = false
                     self.transferCallButton.isHidden = false
+                }
+                if self.mergedCall {
+                    self.addCallButton.isHidden = false
+                    self.toggleVideoButton.isHidden = false
+                    self.mergeCallButton.isHidden = true
+                    self.transferCallButton.isHidden = true
                 }
             }
             print("isVideoEnabled: \(call.isVideoEnabled)")
@@ -1634,7 +1649,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         
         call.onFailed = { reason in
-            print("Call Failed!")
+            print("Call Failed! \(reason)")
             self.player.stop()
             let otherCall = self.getOtherActiveWxcCall()
             if let otherCall = otherCall {
@@ -1942,6 +1957,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 showAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
                     call.enableReceivingNoiseRemoval(shouldEnable: true) { result in
                         print("noise removed")
+                        strongSelf.updateNoiseRemovalState()
                     }
                 }))
                 

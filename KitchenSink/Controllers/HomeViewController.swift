@@ -508,43 +508,49 @@ extension WebexSDK.Person {
 }
 
 extension HomeViewController {
-    func deviceRegistration() {
-        webex.people.getMe(completionHandler: { result in
-            guard let person = result.data, let personId = person.id, let emails = person.emails, let emailId = emails.first?.toString() else {
-                print("Unable to register User for Push notifications with webhook handling server because of missing emailId or person details")
-                return
-            }
-            
-            let Url = String(format: "https://fierce-forest-67615.herokuapp.com/register")
-            guard let serviceUrl = URL(string: Url), let token = token, let voipToken = voipToken else { return }
-            let parameters: [String: Any] = [
-                "voipToken": voipToken,
-                "msgToken": token,
-                "email": emailId,
-                "personId": personId
-            ]
-            guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
-            guard let keys = NSDictionary(contentsOfFile: path) else { return }
-            let bundleId = keys["bundleId"] as? String ?? ""
+      func deviceRegistration() {
+           webex.people.getMe(completionHandler: { result in
+               guard let person = result.data, let personId = person.encodedId else {
+                   print("Unable to register User for Push notifications with webhook handling server because of missing emailId or person details")
+                   return
+               }
+               guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
+               guard let keys = NSDictionary(contentsOfFile: path) else { return }
+               guard let token = token, let voipToken = voipToken else { return }
 
-            webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
+               if let urlString = keys["registerationUrl"] as? String  {
+                   guard let serviceUrl = URL(string: urlString) else { print("Invalid URL"); return }
 
-            var request = URLRequest(url: serviceUrl)
-            request.httpMethod = "POST"
-            request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
-            guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {
-                return
-            }
-            request.httpBody = httpBody
-            request.timeoutInterval = 20
-            let session = URLSession.shared
-            session.dataTask(with: request) { (data, response, error) in
-                if let response = response {
-                    print("DEVICE REGISTRATION: \(response)")
-                }
-            }.resume()
-        })
-    }
+                   let parameters: [String: Any] = [
+                       "voipToken": voipToken,
+                       "deviceToken": token,
+                       "pushProvider": "APNS",
+                       "userId": personId,
+                       "prod": false
+                   ]
+                   var request = URLRequest(url: serviceUrl)
+                   request.httpMethod = "POST"
+                   request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+                   guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {
+                       return
+                   }
+                   request.httpBody = httpBody
+                   request.timeoutInterval = 20
+                   let session = URLSession.shared
+                   session.dataTask(with: request) { (data, response, error) in
+                       if let response = response {
+                           print("DEVICE REGISTRATION: \(response)")
+                       }
+                   }.resume()
+               }
+               else {
+                   let bundleId = keys["bundleId"] as? String ?? ""
+
+                   webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
+                   return
+               }
+           })
+       }
     
     func addCustomBackground() {
         let  fileName = "Background"
@@ -579,7 +585,7 @@ extension HomeViewController {
 extension HomeViewController {  // waiting call related code
     func setIncomingCallListener() {
         webex.phone.onIncoming = { call in
-            print("onIncoming Call object : " + (call.callId ?? "") + " , " + " correlationId : " + (call.correlationId ?? ""))
+            print("onIncoming Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
             CallObjectStorage.self.shared.addCallObject(call: call)
             call.onScheduleChanged = { c in
                 self.getUpdatedSchedule(call: c)

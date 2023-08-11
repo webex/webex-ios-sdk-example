@@ -980,7 +980,7 @@
 				9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */,
 				1FDC6E2B298159B10054EC1B /* UIApplication+Extenstion.swift in Sources */,
 				90F9B00B24B79FB200447A9D /* TeamsViewController.swift in Sources */,
-				9CB90C0824E72685009D9D75 /* BuildFile in Sources */,
+				9CB90C0824E72685009D9D75 /* (null) in Sources */,
 				9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */,
 				9D3701A924ABDD43004E480E /* ImageExtension.swift in Sources */,
 				4F326C8928EB073100EA57D9 /* PasswordCaptchaView.swift in Sources */,
@@ -1289,7 +1289,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3910;
+				CURRENT_PROJECT_VERSION = 3920;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1310,7 +1310,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.9.1;
+				MARKETING_VERSION = 3.9.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
@@ -1344,7 +1344,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3910;
+				CURRENT_PROJECT_VERSION = 3920;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1362,7 +1362,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.9.1;
+				MARKETING_VERSION = 3.9.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1398,7 +1398,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3910;
+				CURRENT_PROJECT_VERSION = 3920;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1420,7 +1420,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.9.1;
+				MARKETING_VERSION = 3.9.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1456,7 +1456,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3910;
+				CURRENT_PROJECT_VERSION = 3920;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1475,7 +1475,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.9.1;
+				MARKETING_VERSION = 3.9.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

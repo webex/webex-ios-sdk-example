@@ -60,7 +60,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         label.accessibilityIdentifier = "versionLabel"
         label.adjustsFontSizeToFitWidth = true
         label.font = .boldSystemFont(ofSize: 20)
-        label.textColor = .white
+        label.textColor = .labelColor
         return label
     }()
     

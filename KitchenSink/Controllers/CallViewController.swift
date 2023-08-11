@@ -57,14 +57,15 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var duration = 0
     private var timer = Timer()
     private var shareConfig: ShareConfig? // to store share config locally and send when screen-share extension connected
-    
+    private var isPhoneNumber =  false
     // MARK: Initializers
-    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil) {
+    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false) {
         self.space = space
         self.addedCall = addedCall
         self.currentCallId = currentCallId
         self.oldCallId = oldCallId
         self.incomingCall = incomingCall
+        self.isPhoneNumber = isPhoneNumber
         if incomingCall || addedCall {
             self.call = call
         }
@@ -73,11 +74,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         modalTransitionStyle = .crossDissolve
     }
     
-    init(callInviteAddress: String) {
+    init(callInviteAddress: String, isPhoneNumber: Bool = false) {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         modalTransitionStyle = .crossDissolve
         self.callInviteAddress = callInviteAddress
+        self.isPhoneNumber = isPhoneNumber
     }
     
     required init?(coder: NSCoder) {
@@ -532,6 +534,35 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
     }
     
+    fileprivate func handleDialResult(_ result: Result<Call>) {
+        switch result {
+        case .success(let call):
+            self.currentCallId = call.callId
+            DispatchQueue.main.async {
+                self.webexCallStatesProcess(call: call)
+            }
+            if call.isWebexCallingOrWebexForBroadworks {
+                AppDelegate.shared.callKitManager?.startCall(call: call)
+            }
+            self.call = call
+            self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
+            CallObjectStorage.self.shared.addCallObject(call: call)
+        case .failure(let error):
+            guard let err = error as? WebexError else {
+                let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                    print("CallVC dismiss connectCall")
+                    self.dismiss(animated: true)
+                }))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+                return
+            }
+            self.showErrorAlert(error: err)
+        }
+    }
+    
     private func connectCall() {
         guard let joinAddress = callInviteAddress ?? space?.id else {
             let alert = UIAlertController(title: "Error", message: "Calling address is null", preferredStyle: .alert)
@@ -540,34 +571,18 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword, captchaId: captcha?.id ?? "", captchaVerifyCode: captchaVerifyCode)
-        webex.phone.dial(joinAddress, option: mediaOption, completionHandler: { result in
-            switch result {
-            case .success(let call):
-                self.currentCallId = call.callId
-                DispatchQueue.main.async {
-                    self.webexCallStatesProcess(call: call)
-                }
-                if call.isWebexCallingOrWebexForBroadworks {
-                    AppDelegate.shared.callKitManager?.startCall(call: call)
-                }
-                self.call = call
-                self.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
-                CallObjectStorage.self.shared.addCallObject(call: call)
-            case .failure(let error):
-                guard let err = error as? WebexError else {
-                    let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
-                        print("CallVC dismiss connectCall")
-                        self.dismiss(animated: true)
-                    }))
-                    DispatchQueue.main.async {
-                        self.present(alert, animated: true)
-                    }
-                    return
-                }
-                self.showPasswordCaptchaAlert(error: err)
-            }
-        })
+       
+        if self.isPhoneNumber
+        {
+            webex.phone.dialPhoneNumber(joinAddress, option: mediaOption, completionHandler: { result in
+                self.handleDialResult(result)
+            })
+            
+        } else {
+            webex.phone.dial(joinAddress, option: mediaOption, completionHandler: { result in
+                self.handleDialResult(result)
+            })
+        }
     }
     
     private func answerCall() {
@@ -2300,7 +2315,7 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
         self.captcha = captcha
     }
     
-    func showPasswordCaptchaAlert(error: WebexError) {
+    func showErrorAlert(error: WebexError) {
         
         DispatchQueue.main.async {
             let captchaView  = PasswordCaptchaView(frame: CGRect(x: 0, y: 120, width: 270, height: 220))
@@ -2328,6 +2343,26 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
                 title = "Invalid Password With Captcha"
                 message = "Please enter the captcha shown in image or by playing audio"
                 captchaView.setupViewForPasswordAndCaptcha()
+            case .requireH264:
+                let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                    print("CallVC dismiss connectCall")
+                    self.dismiss(animated: true)
+                }))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+                return
+            case .failed(reason: let reason):
+                let alert = UIAlertController(title: "Call Failed", message: "\(reason)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                    print("CallVC dismiss connectCall")
+                    self.dismiss(animated: true)
+                }))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+                return
             default:
                 self.captcha = nil
                 return

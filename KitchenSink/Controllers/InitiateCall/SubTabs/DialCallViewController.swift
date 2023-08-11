@@ -5,6 +5,7 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
     var addedCall: Bool
     var oldCallId: String?
     var call: Call?
+    var isPhoneNumber = false
     private var callButtonDialpadBottomConstraint: NSLayoutConstraint?
     private var callButtonTextFieldBottomConstraint: NSLayoutConstraint?
     
@@ -74,6 +75,27 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         return textField
     }()
     
+    private lazy var dialPhoneNumberSwitch: UISwitch = {
+        let toggle = UISwitch(frame: .zero)
+        toggle.isOn = false
+        toggle.setHeight(30)
+        toggle.onTintColor = .momentumBlue50
+        toggle.addTarget(self, action: #selector(dialPhoneNumberValueDidChanged(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+    
+    private lazy var dialPhoneNumberLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .preferredFont(forTextStyle: .title1)
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.text = "Dial Phone number ?"
+        label.accessibilityIdentifier = "dialPhoneNumberLabel"
+        return label
+    }()
+    
     private lazy var callButton: CallButton = {
         let button = CallButton(style: .cta, size: .medium, type: .connectCall)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -81,6 +103,10 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         button.accessibilityIdentifier = "dialButton"
         return button
     }()
+    
+    @objc func dialPhoneNumberValueDidChanged(_ sender: UISwitch) {
+        self.isPhoneNumber = sender.isOn
+    }
     
     // MARK: DialPad Delegates
     func dialPadView(_ dialPadView: DialPadView, didSelect key: String) {
@@ -115,9 +141,17 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         view.addSubview(keyboardToggleButton)
         view.addSubview(dialPad)
         view.addSubview(callButton)
+        view.addSubview(dialPhoneNumberSwitch)
+        view.addSubview(dialPhoneNumberLabel)
     }
     
     private func setupConstraints() {
+        dialPhoneNumberLabel.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor, constant: 24).activate()
+        dialPhoneNumberLabel.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -8).activate()
+
+        dialPhoneNumberSwitch.leadingAnchor.constraint(equalTo: dialPhoneNumberLabel.trailingAnchor, constant: 16).activate()
+        dialPhoneNumberSwitch.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -8).activate()
+        
         textField.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor, constant: 24).activate()
         textField.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor, constant: -64).activate()
         textField.bottomAnchor.constraint(equalTo: dialPad.topAnchor, constant: -68).activate()
@@ -180,7 +214,7 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
                 }
             })
         } else {
-            present(CallViewController(space: space, addedCall: addedCall), animated: true)
+            present(CallViewController(space: space, addedCall: addedCall, isPhoneNumber: isPhoneNumber), animated: true)
         }
     }
 }

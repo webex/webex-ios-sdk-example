@@ -61,7 +61,7 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
     
     // MARK: Methods
     private func redialCallHistoryRecord(_ callHistoryRecord: CallHistoryRecord) {
-        present(CallViewController(callInviteAddress: callHistoryRecord.callbackAddress), animated: true)
+        present(CallViewController(callInviteAddress: callHistoryRecord.callbackAddress, isPhoneNumber: callHistoryRecord.isPhoneNumber), animated: true)
     }
     
     private func setupViews() {

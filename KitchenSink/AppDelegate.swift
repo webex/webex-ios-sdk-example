@@ -85,35 +85,24 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
-        if authType == "jwt" {
-            initWebexUsingJWT()
-        } else if authType == "token" {
-            initWebexUsingToken()
-        } else {
-            initWebexUsingOauth()
-        }
-        DispatchQueue.main.async {
-            webex.initialize { success in
-                if success {
-                    do {
-                        let data = try JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted)
-                        let string = String(data: data, encoding: .utf8) ?? ""
-                        print("Received push: string")
-                        print(string)
-                        webex.phone.processPushNotification(message: string) { error in
-                            if let error = error {
-                                print("processPushNotification error" + error.localizedDescription)
-                            }
-                        }
+        print("enter didReceiveRemoteNotification")
+        if let webex = webex, webex.authenticator?.authorized == true {
+            do {
+                let data = try JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted)
+                let string = String(data: data, encoding: .utf8) ?? ""
+                print("Received push: string")
+                print(string)
+                webex.phone.processPushNotification(message: string) { error in
+                    print("didReceiveRemoteNotification processPushNotification")
+                    if let error = error {
+                        print("didReceiveRemoteNotification processPushNotification error" + error.localizedDescription)
                     }
-                    catch (let error){
-                        print(error.localizedDescription)
-                    }
-                    
                 }
             }
-        }
+            catch (let error){
+                print("didReceiveRemoteNotification processPushNotification exception" + error.localizedDescription)
+            }
+                    }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -177,17 +166,23 @@ extension AppDelegate: PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         debugPrint("Received push: voIP")
         debugPrint(payload.dictionaryPayload)
+        print("enter voip didReceiveIncomingPushWith")
 
         if type == .voIP {
             // Report the call to CallKit, and let it display the call UI.
-            guard let bsft = payload.dictionaryPayload["bsft"] as? [String: Any], let sender = bsft["sender"] as? String else {
-                print("payload not valid")
+            guard let callerInfo = webex.parseVoIPPayload(payload: payload) else {
+                print("error parsing VoIP payload")
+                return
+            }
+            print("callerInfo: \(String(describing: callerInfo))")
+            if CallObjectStorage.shared.getAllActiveCalls().count > 0 // ignore if there is already active call, it will be handled in  webex.phone.onIncoming
+            {
                 return
             }
             voipUUID = UUID()
-            print("payload voip: \(bsft)")
+            print("voipUUID: \(voipUUID)")
             print("didReceiveIncomingPushWith uuid \(String(describing: voipUUID!))")
-            self.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: sender) {
+            self.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: callerInfo.name) {
                 self.establishConnection(payload: payload)
                 completion()
                 return
@@ -195,45 +190,72 @@ extension AppDelegate: PKPushRegistryDelegate {
         }
     }
     
-        func establishConnection(payload: PKPushPayload) {
-            guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
-            if authType == "jwt" {
-                initWebexUsingJWT()
-            } else if authType == "token" {
-                initWebexUsingToken()
-            } else {
-                initWebexUsingOauth()
-            }
-            DispatchQueue.main.async {
-                webex.initialize { [weak self] success in
-                    if success {
-                        webex.phone.onIncoming = { [weak self] call in
-                            if call.isWebexCallingOrWebexForBroadworks {
-                                print("webex.phone.onIncoming calll \(String(describing: call.callId))")
-                                self?.callKitManager?.updateCall(call: call)
-                            }
-                        }
-                        do {
-                            let data = try JSONSerialization.data(withJSONObject: payload.dictionaryPayload, options: .prettyPrinted)
-                            let string = String(data: data, encoding: .utf8) ?? ""
-                            print("Received push: string")
-                            print(string)
-                            webex.phone.processPushNotification(message: string) { error in
-                                if let error = error {
-                                    print("processPushNotification error" + error.localizedDescription)
-                                }
-                            }
-                        }
-                        catch (let error){
-                            print(error.localizedDescription)
-                        }
-                        
-                    } else {
-                        print("Failed to initialise WebexSDK on receiving incoming call push notification")
+    fileprivate func processVoipPush(payload: PKPushPayload) {
+        print("enter processVoipPush")
+
+        webex.phone.onIncoming = { [weak self] call in
+            print("processVoipPush onIncoming")
+
+            if call.isWebexCallingOrWebexForBroadworks {
+                if CallObjectStorage.shared.getAllActiveCalls().count > 0
+                {
+                    voipUUID = UUID()
+                    print("voipUUID: \(voipUUID)")
+                    self?.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: call.title ?? "") {
+                        self?.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
+                        return
                     }
+                }
+                print("webex.phone.onIncoming: incoming call arrived callID: \(String(describing: call.callId))")
+                self?.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
+            }
+        }
+        do {
+            let data = try JSONSerialization.data(withJSONObject: payload.dictionaryPayload, options: .prettyPrinted)
+            let string = String(data: data, encoding: .utf8) ?? ""
+            print("Received push: string")
+            print(string)
+            webex.phone.processPushNotification(message: string) { error in
+                print("processVoipPush processPushNotification")
+
+                if let error = error {
+                    print("processVoipPush processPushNotification error" + error.localizedDescription)
                 }
             }
         }
+        catch (let error){
+            print("processVoipPush processPushNotification exception" + error.localizedDescription)
+        }
+    }
+    
+    func establishConnection(payload: PKPushPayload) {
+        if let webex = webex, webex.authenticator?.authorized == true {
+            processVoipPush(payload: payload)
+            return
+        }
+        
+        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
+        if authType == "jwt" {
+            initWebexUsingJWT()
+        } else if authType == "token" {
+            initWebexUsingToken()
+        } else {
+            initWebexUsingOauth()
+        }
+        print("processVoipPush before  webex.initialize")
+
+        DispatchQueue.main.async {
+            webex.initialize { [weak self] success in
+                print("processVoipPush after  webex.initialize" + "\(success)")
+
+                if success {
+                    self?.processVoipPush(payload: payload)
+                } else {
+                    print("Failed to initialise WebexSDK on receiving incoming call push notification")
+                }
+            }
+        }
+    }
     
     func initWebexUsingOauth() {
         guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }

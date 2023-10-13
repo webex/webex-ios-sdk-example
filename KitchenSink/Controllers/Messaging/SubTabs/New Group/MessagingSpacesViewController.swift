@@ -4,7 +4,12 @@ import WebexSDK
 final class MessagingSpacesViewController: BasicTableViewController<MessagingSpacesViewController.SpaceItem, SpaceTableViewCell> {
     private var spaceValue = SpaceValue.space
     fileprivate var onGoingSpaceCalls = [String: Bool]()
-    
+    var directSpaceIds : [String] = []
+    var spaceIdPresenceDict: [String: Presence] = [:]
+    var selfPersonId: String?
+    var spaceIdPersonIdDict: [String : String] = [:]
+    var handles: [PresenceHandle] = []
+
     init() {
         super.init(placeholderText: "No Spaces")
         registerSpaceCallBack()
@@ -29,7 +34,10 @@ final class MessagingSpacesViewController: BasicTableViewController<MessagingSpa
                         self?.present(alert, animated: true)
                     }
                 case .success(let listspaces):
-                    self?.listItems = (listspaces ?? []).map { .space($0) }
+                    let directSpaces = listspaces.filter( {$0.type == .direct} )
+                    self?.directSpaceIds = directSpaces.map { $0.id ?? "" }
+                    self?.listItems = (listspaces).map { .space($0) }
+                    self?.getPresenceStatus()
                 }
             }
         case .readStatus:
@@ -296,7 +304,11 @@ extension MessagingSpacesViewController {
                 let spaceItem = listItems[i]
                 switch spaceItem {
                 case .space(let space):
-                    cell?.setupCell(name: space.title, description: space.displayValue, isOnCall: isStarted) { [weak self] in
+                    var presence : Presence?
+                    if let presenceOfSpaceId = spaceIdPresenceDict[spaceId] {
+                        presence = presenceOfSpaceId
+                    }
+                    cell?.setupCell(name: space.title, description: space.displayValue, isOnCall: isStarted, presence: presence) { [weak self] in
                         guard let self = self, let spaceId = space.id else { return }
                         self.sendMessageToSpace(spaceId: spaceId)
                     }
@@ -346,12 +358,16 @@ extension MessagingSpacesViewController {
             if self.onGoingSpaceCalls[spaceId] != nil {
                 onCall = true
             }
-            cell.setupCell(name: space.title, description: space.displayValue, isOnCall: onCall) { [weak self] in
+            var presence: Presence?
+            if let spaceId = space.id, let presenceForSpaceId = spaceIdPresenceDict[spaceId] {
+                presence = presenceForSpaceId
+            }
+            cell.setupCell(name: space.title, description: space.displayValue, isOnCall: onCall, presence: presence) { [weak self] in
                 guard let self = self, let spaceId = space.id else { return }
                 self.sendMessageToSpace(spaceId: spaceId)
             }
         case .readStatus(let readStatus):
-            cell.setupCell(name: "Space Read Status", description: readStatus.displayValue, isOnCall: false)
+            cell.setupCell(name: "Space Read Status", description: readStatus.displayValue, isOnCall: false, presence: nil)
         }
         
         return cell
@@ -380,10 +396,9 @@ extension MessagingSpacesViewController {
             
             alertController.addAction(UIAlertAction(title: "Show Messages in Space", style: .default) { [weak self] _ in
                 webex.people.getMe { result in
-                    var selfPersonId: String?
                     switch result {
                     case .success(let person):
-                        selfPersonId = person.id
+                        self?.selfPersonId = person.id
                     case .failure:
                         break
                     @unknown default:
@@ -391,7 +406,7 @@ extension MessagingSpacesViewController {
                     }
                     
                     let spaceMessagesTableVC = SpaceMessagesTableViewController(spaceId: spaceId)
-                    spaceMessagesTableVC.selfPersonId = selfPersonId
+                    spaceMessagesTableVC.selfPersonId = self?.selfPersonId
                     
                     self?.navigationController?.pushViewController(spaceMessagesTableVC, animated: true)
                 }
@@ -449,6 +464,8 @@ extension MessagingSpacesViewController: FilterSpacesDelegate {
                     }
                 case .success(let spaces):
                     self?.listItems = (spaces ?? []).map { .space($0) }
+                    let directSpaces = spaces.filter( {$0.type == .direct} )
+                    self?.directSpaceIds = directSpaces.map { $0.id ?? "" }
                 }
             }
             
@@ -486,3 +503,52 @@ extension SpaceReadStatus {
         "Space Id: \(id ?? "--"),\nSpace Type: \(type?.rawValue ?? "--"),\nLast Activity: \(lastActivityDate?.description ?? "--"), \nLast Seen Activity: \(lastSeenActivityDate?.description ?? "--")"
     }
 }
+
+extension MessagingSpacesViewController {
+    func getPresenceStatus() {
+        let selfId = UserDefaults.standard.string(forKey: "selfId")
+        for spaceId in directSpaceIds {
+            webex.memberships.list(spaceId: spaceId, completionHandler: { result in
+                switch result {
+                case .success(let memberships):
+                    var personId = ""
+                    for membership in memberships {
+                        if membership.personId != selfId {
+                            personId = membership.personId ?? ""
+                            self.spaceIdPersonIdDict[personId] = spaceId
+                        }
+                    }
+                    self.handles = webex.people.startWatchingPresences(contactIds: [personId], completionHandler: { presence in
+                        let spaceId = self.spaceIdPersonIdDict[personId]
+                        if let spacceId = spaceId, self.spaceIdPresenceDict[spacceId]?.status != presence.status {
+                            self.spaceIdPresenceDict[spacceId] = presence
+                            for i in 0..<self.listItems.count {
+                                switch self.listItems[i] {
+                                case .space(let space):
+                                    if space.id == spaceId {
+                                        DispatchQueue.main.async {
+                                            self.tableView.reloadRows(at: [IndexPath(row: i, section: 0)], with: .none)
+                                        }
+                                    }
+                                case .readStatus(_):
+                                    continue
+                                }
+                            }
+                        }
+                    })
+                case .failure(_):
+                    return
+                @unknown default:
+                    return
+                }
+            })
+        }
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        webex.people.stopWatchingPresences(presenceHandles: self.handles)
+    }
+}
+
+

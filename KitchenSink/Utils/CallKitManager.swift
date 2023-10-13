@@ -57,10 +57,14 @@ class CallKitManager: NSObject, CXProviderDelegate {
         provider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
     }
     
-    func updateCall(call: Call) {
+    func updateCall(call: Call, voipUUID: UUID? = nil) {
         print("update call \(String(describing: call.callId))")
         self.call = call
-        call.uuid = voipUUID!
+        if let voipUUID = voipUUID
+        {
+            print("update voipUUID: \(voipUUID)")
+            call.uuid = voipUUID
+        }
         let otherCall = getOtherActiveWxcCall()
         if let otherCall = otherCall {
             webexCallStatesProcess(call: otherCall)

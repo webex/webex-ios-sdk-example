@@ -1,5 +1,6 @@
 import UIKit
 import WebexSDK
+import SwiftUI
 
 class LoginViewController: UIViewController {
     private var launchMessageInfo: (messageId: String, spaceId: String)?
@@ -78,6 +79,22 @@ class LoginViewController: UIViewController {
         return label
     }()
 
+    private lazy var swiftUIButton: UIButton = {
+        let view = UIButton(type: .system)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.addTarget(self, action: #selector(openInSwiftUI), for: .touchUpInside)
+        view.setTitle("SwiftUI", for: .normal)
+        view.accessibilityIdentifier = "swiftUIButton"
+        view.titleLabel?.font = .preferredFont(forTextStyle: .title3)
+        view.setTitleColor(.white, for: .normal)
+        view.backgroundColor = .momentumPink50
+        view.isHidden = true
+        view.layer.cornerRadius = 25
+        view.layer.masksToBounds = true
+        view.isHidden = true
+        return view
+    }()
+
     @objc func fedrampSwitchValueDidChange(_ sender: UISwitch) {
         DispatchQueue.main.async {
             if sender.isOn == true {
@@ -142,6 +159,11 @@ class LoginViewController: UIViewController {
         view.backgroundColor = .backgroundColor
         let bundleVersion = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
         versionLabel.text = "v\(Webex.version) (\(bundleVersion))"
+        if let webex = webex, webex.authenticator?.authorized == true {
+            self.switchRootController()
+            self.handleNotificationRoutingIfNeeded()
+            return
+        }
         guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
         if authType == "jwt" {
             initWebexUsingJWT()
@@ -385,6 +407,23 @@ class LoginViewController: UIViewController {
         
         self.present(alert, animated: true, completion: nil)
     }
+
+    @objc func openInSwiftUI() {
+        if #available(iOS 15.0, *) {
+            let loginView = LoginView()
+            let hostingController = UIHostingController(rootView: loginView)
+
+            if #available(iOS 16.0, *) {
+                hostingController.sizingOptions = .intrinsicContentSize
+            }
+            hostingController.modalPresentationStyle = .fullScreen
+            self.present(hostingController, animated: true)
+        } else {
+            let errorAlert = UIAlertController(title: "Error", message: "Minimum iOS 15 required", preferredStyle: .alert)
+            errorAlert.addAction(UIAlertAction.dismissAction())
+            self.present(errorAlert, animated: true, completion: nil)
+        }
+    }
     
     func setupViews() {
         view.addSubview(fedrampStackView)
@@ -394,6 +433,7 @@ class LoginViewController: UIViewController {
         view.addSubview(loginWithAccessTokenButton)
         view.addSubview(ciscoLogoView)
         view.addSubview(versionLabel)
+        view.addSubview(swiftUIButton)
     }
     
     func setupConstraints() {
@@ -423,6 +463,10 @@ class LoginViewController: UIViewController {
 
         versionLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).activate()
         versionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
+
+        swiftUIButton.setSize(width: 100, height: 50)
+        swiftUIButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).activate()
+        swiftUIButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).activate()
     }
 }
 

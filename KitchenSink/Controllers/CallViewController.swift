@@ -7,7 +7,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     // MARK: Properties
     var space: Space?
     var callInviteAddress: String?
-    var oldCallId: String?
+    var oldCall: Call?
     var call: Call?
     var currentCallId: String?
     var isLocalAudioMuted = false
@@ -28,6 +28,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     var renderMode: Call.VideoRenderMode = .fit
     var torchMode: Call.TorchMode = .off
     var flashMode: Call.FlashMode = .off
+    let audioModes: [Call.AudioOutputMode] = [.phone, .speaker, .bluetooth, .headset]
+    var audioMode: Call.AudioOutputMode = .phone
     var cameraTargetBias: Call.CameraExposureTargetBias?
     var cameraISO: Call.CameraExposureISO?
     var cameraDuration: Call.CameraExposureDuration?
@@ -59,11 +61,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var shareConfig: ShareConfig? // to store share config locally and send when screen-share extension connected
     private var isPhoneNumber =  false
     // MARK: Initializers
-    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCallId: String = "", incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false) {
+    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCall: Call? = nil, incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false) {
         self.space = space
         self.addedCall = addedCall
         self.currentCallId = currentCallId
-        self.oldCallId = oldCallId
+        self.oldCall = oldCall
         self.incomingCall = incomingCall
         self.isPhoneNumber = isPhoneNumber
         if incomingCall || addedCall {
@@ -341,7 +343,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
 
     private lazy var transcriptionsTable: UITableView = {
         let tv = UITableView()
-        tv.setHeight(200)
+        tv.setHeight(150)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .lightGray
         tv.dataSource = self
@@ -380,6 +382,40 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.delegate = self
         return view
     }()
+    
+    private lazy var closedCaptionsTextView: UITextView = {
+        let textView = UITextView(frame: .zero)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.accessibilityIdentifier = "textView"
+        textView.font = .preferredFont(forTextStyle: .headline)
+        textView.isUserInteractionEnabled = false
+        textView.clipsToBounds = true
+        textView.textContainerInset = UIEdgeInsets.zero
+        textView.autoresizesSubviews = false
+        textView.textContainer.lineFragmentPadding = 0.0
+        textView.layoutManager.allowsNonContiguousLayout = false
+        if #available(iOS 13.0, *) {
+            textView.automaticallyAdjustsScrollIndicatorInsets = false
+        }
+        textView.isEditable = false
+        textView.isSelectable = false
+        textView.showsHorizontalScrollIndicator = false
+        textView.showsVerticalScrollIndicator = false
+        textView.setHeight(80)
+        textView.layer.borderWidth = 1
+        textView.layer.cornerRadius = 8
+        textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 2, right: 16)
+        textView.isHidden = true
+        textView.backgroundColor = .lightGray
+        textView.textColor = .labelColor
+        return textView
+    }()
+        
+    var closedCaptionsTextDisplay: String = "" {
+        didSet {
+            presentCC()
+        }
+    }
     
     /// onAuxStreamChanged represent a call back when a existing auxiliary stream status changed.
     var onAuxStreamChanged: ((AuxStreamChangeEvent) -> Void)?
@@ -457,6 +493,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.updateMuteState()
         self.checkOtherActiveWxcCall()
     }
+    
     private func updateNoiseRemovalState() {
         var imageName = "noise-none-filled"
         self.noiseRemovalButton.isHidden = false
@@ -636,10 +673,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
 
     func checkOtherActiveWxcCall() {
-        if mergedCall {
-            swapCallButton.isHidden = true
-            return
-        }
+       
         let otherCall = getOtherActiveWxcCall()
         if let otherCall = otherCall {
             swapCallButton.setTitle(otherCall.title, for: .normal)
@@ -674,12 +708,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                     return
                 }
                 let otherCall = self.getOtherActiveWxcCall()
-                if let otherCall = otherCall {
+                if let otherCall = otherCall, let oldCall = self.oldCall {
                     return
-                }
-                DispatchQueue.main.async { [weak self] in
-                    print("CallVC dismiss endCall")
-                    self?.dismiss(animated: true)
                 }
             } else {
                 let alert = UIAlertController(title: "Error", message: error.debugDescription, preferredStyle: .alert)
@@ -708,6 +738,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         self.call?.holdCall(putOnHold: true)
         self.currentCallId = otherCall.callId
         self.call = otherCall
+        AppDelegate.shared.callKitManager?.updateCall(call: otherCall)
         self.call?.holdCall(putOnHold: false)
         self.webexCallStatesProcess(call: otherCall)
     }
@@ -720,7 +751,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         endCall(call: call)
-        AppDelegate.shared.callKitManager?.endCall(call: call)
+        print("CallVC end call: voipUUID \(call.uuid)")
+        AppDelegate.shared.callKitManager?.reportEndCall(uuid: call.uuid)
     }
     
     @objc private func handleNoiseRemovalAction(_ sender: UIButton) {
@@ -753,13 +785,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         call.holdCall(putOnHold: true)
-        let dialViewController = DialCallViewController(addedCall: true, oldCallId: self.currentCallId ?? "", call: call)
+        let dialViewController = DialCallViewController(addedCall: true, oldCall: call)
         dialViewController.presentationController?.delegate = self
         present(dialViewController, animated: true, completion: nil)
     }
     
     @objc private func handleMergeCallAction(_ sender: UIButton) {
-        guard let oldCallId = oldCallId, let call = CallObjectStorage.shared.getCallObject(callId: oldCallId) else {
+        guard let oldCallId = oldCall?.callId, let call = CallObjectStorage.shared.getCallObject(callId: oldCallId) else {
             let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
             alert.addAction(.dismissAction(withTitle: "Ok"))
             self.present(alert, animated: true)
@@ -793,15 +825,22 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     }
     
     @objc private func handletransferCallAction(_ sender: UIButton) {
-        guard let oldCallId = oldCallId, let call = CallObjectStorage.shared.getCallObject(callId: oldCallId) else {
+        guard let oldCallId = oldCall?.callId, let call = CallObjectStorage.shared.getCallObject(callId: oldCallId) else {
             let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
             alert.addAction(.dismissAction(withTitle: "Ok"))
             self.present(alert, animated: true)
             return
         }
         print("Transfer call old: \(oldCallId), new: \(currentCallId)")
+        self.oldCall = nil
         call.transferCall(toCallId: currentCallId ?? "")
-        self.dismiss(animated: true, completion: nil)
+        let otherCall = self.getOtherActiveWxcCall()
+        if otherCall != nil {
+            // do nothing
+        } else
+        {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc private func handleToggleVideoCallAction(_ sender: UIButton) {
@@ -816,6 +855,27 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     @objc private func handleScreenShareAction(_ sender: UIButton) {
         showScreenShareConfig()
+    }
+
+    func setAudioOutput(index: Array<Call.AudioOutputMode>.Index) {
+        var index = index
+        self.call?.setAudioOutput(mode: self.audioModes[index], completion: { res in
+            switch res {
+            case .success(_):
+                self.slideInStateView(slideInMsg: "Audio routed successfully to \(self.audioModes[index])")
+                self.audioMode = audioModes[index]
+            case .failure(let err):
+                print("Audio route failed to \(self.audioModes[index]) because \(err)")
+                if index == audioModes.count - 1 {
+                    index = 0
+                } else {
+                    index += 1
+                }
+                setAudioOutput(index: index)
+            @unknown default:
+                print("Audio route failed to \(self.audioModes[index])")
+            }
+        })
     }
     
     @objc private func handleMoreAction(_ sender: UIButton) {
@@ -835,7 +895,22 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         let alertController = UIAlertController.actionSheetWith(title: "", message: nil, sourceView: self.view)
         
         alertController.addAction(.dismissAction(withTitle: "Cancel"))
-        
+
+        alertController.addAction(UIAlertAction(title: "Set Audio Output - \(String(describing: self.audioMode))", style: .default) {  _ in
+            guard var index = self.audioModes.firstIndex(of: self.audioMode) else { return }
+            if index == self.audioModes.count - 1 {
+                index = 0
+            } else {
+                index += 1
+            }
+            self.setAudioOutput(index: index)
+        })
+
+        if call?.isClosedCaptionAllowed == true {
+            alertController.addAction(UIAlertAction(title: "ClosedCaption Options", style: .default) {  _ in
+                self.showClosedCaptionsLanguageOptions()
+            })
+        }
         alertController.addAction(UIAlertAction(title: "Composited Layout - \(String(describing: self.compositedLayout))", style: .default) {  _ in
             guard var index = compositedLayouts.firstIndex(of: self.compositedLayout) else { return }
             if index == compositedLayouts.count - 1 {
@@ -1268,6 +1343,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         view.addSubview(swapCameraButton)
         view.addSubview(endCallButton)
         view.addSubview(swapCallButton)
+        view.addSubview(closedCaptionsTextView)
     }
     
     private func setupConstraints() {
@@ -1328,7 +1404,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         multiStreamSettingsView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).activate()
         multiStreamSettingsView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).activate()
         
-        transcriptionsTable.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
+      
+    
+        closedCaptionsTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).activate()
+        closedCaptionsTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
+        closedCaptionsTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
+        
+        transcriptionsTable.bottomAnchor.constraint(equalTo: closedCaptionsTextView.topAnchor).activate()
         transcriptionsTable.leadingAnchor.constraint(equalTo: view.leadingAnchor).activate()
         transcriptionsTable.trailingAnchor.constraint(equalTo: view.trailingAnchor).activate()
     }
@@ -1522,8 +1604,6 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
             self.setMediaQualityInfoChangedCallback()
             DispatchQueue.main.async {
-                call.videoRenderViews = (self.selfVideoView, self.remoteVideoView.mediaRenderView)
-                call.screenShareRenderView = self.screenShareView
                 self.nameLabel.text = call.title
                 self.callingLabel.text = "On Call"
                 if self.addedCall {
@@ -1543,6 +1623,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.updateStates(callInfo: call)
             self.updateUI(isCUCMOrWxcCall: self.isCUCMOrWxcCall)
             call.updateAudioSession()
+            print("Caller Number: \(String(describing: call.callerNumber))")
         }
         
         call.onMediaChanged = { [weak self] mediaEvents in
@@ -1672,6 +1753,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 otherCall.holdCall(putOnHold: false)
                 self.swapCallButton.isHidden = true
                 self.call = otherCall
+                AppDelegate.shared.callKitManager?.updateCall(call: otherCall)
                 self.currentCallId = otherCall.callId
                 self.webexCallStatesProcess(call: otherCall)
                 return
@@ -1689,8 +1771,21 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         call.onDisconnected = { reason in
             self.player.stop()
             // We will need to report call ended to CallKit when we are disconnected from a CallKit call
-            AppDelegate.shared.callKitManager?.reportEndCall(uuid: call.uuid)
-
+            DispatchQueue.main.async {
+                AppDelegate.shared.callKitManager?.reportEndCall(uuid: call.uuid)
+            }
+            
+            if let oldCall = self.oldCall {
+                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                oldCall.holdCall(putOnHold: false)
+                self.call = oldCall
+                AppDelegate.shared.callKitManager?.updateCall(call: call)
+                self.currentCallId = oldCall.callId
+                self.webexCallStatesProcess(call: oldCall)
+                self.oldCall = nil
+                return
+            }
+            
             // check if other call is active, then resume it
             let otherCall = self.getOtherActiveWxcCall()
             if let otherCall = otherCall {
@@ -1698,6 +1793,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 otherCall.holdCall(putOnHold: false)
                 self.swapCallButton.isHidden = true
                 self.call = otherCall
+                AppDelegate.shared.callKitManager?.updateCall(call: otherCall)
                 self.currentCallId = otherCall.callId
                 self.webexCallStatesProcess(call: otherCall)
                 return
@@ -1708,7 +1804,9 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
                 DispatchQueue.main.async { [weak self] in
                     print("CallVC dismiss onDisconnected")
-                    self?.dismiss(animated: true)
+                    if CallObjectStorage.self.shared.getAllActiveCalls().count == 0 {
+                        self?.dismiss(animated: true)
+                    }
                 }
             case .error(let error):
                 print(error)
@@ -1800,6 +1898,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         
         call.onInfoChanged = {
+            let output = call.getCurrentAudioOutput()
+            print("Current audio output: \(output)")
+            self.audioMode = output
+
             self.onHold = call.isOnHold
             
             if self.isWXAEnabled != call.wxa.isEnabled {
@@ -1815,8 +1917,8 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
             
             DispatchQueue.main.async {
-                call.videoRenderViews?.local.isHidden = self.onHold
-                call.videoRenderViews?.remote.isHidden = self.onHold
+                call.videoRenderViews.local?.isHidden = self.onHold
+                call.videoRenderViews.remote?.isHidden = self.onHold
                 call.screenShareRenderView?.isHidden = self.onHold
                 self.selfVideoView.isHidden = self.onHold
                 self.remoteVideoView.isHidden = self.onHold
@@ -2431,7 +2533,7 @@ extension CallViewController: CallKitManagerDelegate {
         var otherCall: Call?
         let activeCalls = CallObjectStorage.self.shared.getAllActiveCalls()
         for call in activeCalls {
-            if call.isWebexCallingOrWebexForBroadworks && call.callId != self.call?.callId {
+            if call.isWebexCallingOrWebexForBroadworks && call.callId != self.call?.callId && call.callId != oldCall?.callId {
                 otherCall = call
                 break
             }
@@ -2503,5 +2605,136 @@ extension CallViewController {
             }))
             self.present(alert, animated: true, completion: nil)
         }
+    }
+}
+
+extension CallViewController: ClosedCaptionsMenuViewDelegate
+{
+    func closedCaptionToggled(isOn: Bool) {
+        if isOn
+        {
+            presentCC()
+        } else {
+            dismissCC(animated: true)
+        }
+    }
+    
+    func showClosedCaptionsLanguageOptions() {
+        guard let call = self.call else {
+            return
+        }
+        DispatchQueue.main.async { [weak self] in
+            let configView  = ClosedCaptionsMenuView(call: call)
+            configView.delegate = self
+            configView.frame = CGRect(x: 25, y: 70, width: 270, height: 250)
+            let alert = UIAlertController(title: "Closed Captions", message: "", preferredStyle: .alert)
+            alert.view.addSubview(configView)
+            let height = NSLayoutConstraint(item: alert.view as Any, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 370)
+            let width = NSLayoutConstraint(item: alert.view as Any, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 320)
+            alert.view.addConstraint(height)
+            alert.view.addConstraint(width)
+            alert.addAction(UIAlertAction(title: "close", style: .cancel, handler: { _ in
+                alert.dismiss(animated: true)
+                var previousSpeaker = ""
+                call.onClosedCaptionArrived = { [weak self] caption in
+                    if caption.displayName != previousSpeaker {
+                        self?.closedCaptionsTextDisplay = self?.closedCaptionsTextDisplay ?? "" + caption.displayName + ": " + caption.content
+                        previousSpeaker = caption.displayName
+                    }
+                    else {
+                        self?.closedCaptionsTextDisplay = caption.displayName + ": " + caption.content
+                    }
+                    self?.presentCC()
+                }
+            }))
+            self?.present(alert, animated: true, completion: nil)
+            }
+        }
+
+    func setSpokenLanguage(languageItem: WebexSDK.LanguageItem) {
+        call?.setCurrentSpokenLanguage(language: languageItem){
+            error in
+            print(error)
+        }
+    }
+
+    func setTranslationLanguage(languageItem: WebexSDK.LanguageItem) {
+        call?.setCurrentTranslationLanguage(language: languageItem)
+        {
+            error in
+            print(error)
+        }
+    }
+    
+    private func dismissCC(animated: Bool) {
+        let animations: () -> Void = { [weak self] in
+            self?.closedCaptionsTextView.alpha = 0
+        }
+        let completion: (Bool) -> Void = { [weak self] _ in
+            guard let self else { return }
+            self.closedCaptionsTextDisplay = ""
+            self.closedCaptionsTextView.isHidden = true
+        }
+        
+        if animated {
+            UIView.animate(withDuration: 0.5, animations: animations, completion: completion)
+        } else {
+            animations()
+            completion(true)
+        }
+    }
+    
+    private func presentCC(isRTLLanguage: Bool = false) {
+        guard !closedCaptionsTextDisplay.isEmpty else {
+            closedCaptionsTextView.isHidden = true
+            return
+        }
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.baseWritingDirection = isRTLLanguage ? .rightToLeft : .leftToRight
+        paragraphStyle.lineSpacing = 0.5
+        let labelAttributes: [NSAttributedString.Key: Any] = [.paragraphStyle: paragraphStyle]
+        
+        let text = closedCaptionsTextDisplay
+        
+        let attributedText = NSMutableAttributedString(string: text, attributes: labelAttributes)
+        attributedText.addAttribute(.font, value: UIFont.preferredFont(forTextStyle: .headline), range: NSRange(location: 0, length: text.count))
+        attributedText.addAttribute(.foregroundColor, value: UIColor.momentumGray50, range: NSRange(location: 0, length: closedCaptionsTextDisplay.count))
+        closedCaptionsTextView.attributedText = attributedText
+        
+        closedCaptionsTextView.scrollToBottom(animated: true)
+        
+        closedCaptionsTextView.isHidden = false
+        UIView.animate(withDuration: 0.5, animations: {  [weak self] in
+            self?.closedCaptionsTextView.alpha = 1
+        }, completion: nil)
+    }
+}
+
+extension UIScrollView {
+    public func scrollToTop(animated: Bool) {
+        scrollRectToVisible(CGRect(x: 0, y: 0, width: 1, height: 1), animated: animated)
+    }
+    
+    public func scrollToBottom(animated: Bool) {
+        scrollRectToVisible(CGRect(x: contentSize.width - 1, y: contentSize.height - 1, width: 1, height: 1), animated: animated)
+    }
+    
+    public var verticalPadding: CGFloat {
+        let verticalPadding = bounds.size.height > contentSize.height ? (bounds.size.height - contentSize.height) / 2 : 0
+        return verticalPadding
+    }
+    
+    public var horizontalPadding: CGFloat {
+        let horizontalPadding = bounds.size.width > contentSize.width ? (bounds.size.width - contentSize.width ) / 2 : 0
+        return horizontalPadding
+    }
+    
+    public var calcMinZoomScale: CGFloat {
+        guard contentSize.width > 0 && contentSize.height > 0 else { return maximumZoomScale }
+        let widthScale = bounds.width / contentSize.width
+        let heightScale = bounds.height / contentSize.height
+        let value = min(widthScale, heightScale)
+        return value
     }
 }

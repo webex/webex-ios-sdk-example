@@ -126,6 +126,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             webex.people.getMe(completionHandler: { [weak self] in
                 switch $0 {
                 case .success(let user):
+                    UserDefaults.standard.set(user.id, forKey: "selfId")
                     self?.currentUserButton.setTitle(user.initials, for: .normal)
                     self?.currentUserButton.layer.borderWidth = 2
                 case .failure(let error):
@@ -546,7 +547,7 @@ extension HomeViewController {
                else {
                    let bundleId = keys["bundleId"] as? String ?? ""
 
-                   webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken)
+                   webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken, appId: nil)
                    return
                }
            })
@@ -585,6 +586,19 @@ extension HomeViewController {
 extension HomeViewController {  // waiting call related code
     func setIncomingCallListener() {
         webex.phone.onIncoming = { call in
+            if call.isWebexCallingOrWebexForBroadworks {
+                if CallObjectStorage.shared.getAllActiveCalls().count > 0
+                {
+                    voipUUID = UUID()
+                    AppDelegate.shared.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: call.title ?? "") {
+                    AppDelegate.shared.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
+                        return
+                    }
+                }
+                print("webex.phone.onIncoming calll \(String(describing: call.callId))")
+                AppDelegate.shared.callKitManager?.updateCall(call: call)
+                return
+            }
             print("onIncoming Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
             CallObjectStorage.self.shared.addCallObject(call: call)
             call.onScheduleChanged = { c in

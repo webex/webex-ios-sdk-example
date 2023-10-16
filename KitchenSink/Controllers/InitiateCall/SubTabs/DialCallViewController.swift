@@ -3,16 +3,14 @@ import WebexSDK
 
 class DialCallViewController: UIViewController, DialPadViewDelegate, UITextFieldDelegate {
     var addedCall: Bool
-    var oldCallId: String?
-    var call: Call?
+    var oldCall: Call?
     var isPhoneNumber = false
     private var callButtonDialpadBottomConstraint: NSLayoutConstraint?
     private var callButtonTextFieldBottomConstraint: NSLayoutConstraint?
     
-    init(addedCall: Bool = false, oldCallId: String = "", call: Call? = nil) {
+    init(addedCall: Bool = false, oldCall: Call? = nil) {
         self.addedCall = addedCall
-        self.oldCallId = oldCallId
-        self.call = call
+        self.oldCall = oldCall
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -177,14 +175,14 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
     @objc private func handleCallAction(_ sender: UIButton) {
         let space = Space(id: textField.text ?? "", title: textField.text ?? "")
         if addedCall {
-            guard let oldCallId = oldCallId else { return }
-            guard let call = call else {
+            guard let oldCall = oldCall else {
                 let alert = UIAlertController(title: "Error", message: "Call not found", preferredStyle: .alert)
                 alert.addAction(.dismissAction(withTitle: "Ok"))
                 self.present(alert, animated: true)
                 return
             }
-            call.startAssociatedCall(dialNumber: space.id ?? "", associationType: .Transfer, isAudioCall: true, completionHandler: { [weak self] result in
+            
+            oldCall.startAssociatedCall(dialNumber: space.id ?? "", associationType: .Transfer, isAudioCall: true, completionHandler: { [weak self] result in
                 switch result {
                 case .success(let call):
                     guard let call = call else {
@@ -198,19 +196,24 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
                     // CallViewController is already open
                     DispatchQueue.main.async {
                         if let callVC = self?.presentingViewController as? CallViewController {
-                            print("Associated calll old: \(oldCallId), new: \(String(describing: call.callId))")
+                            print("Associated calll old: \(oldCall.callId), new: \(String(describing: call.callId))")
                             callVC.currentCallId = call.callId
                             callVC.addedCall = true
-                            callVC.oldCallId = oldCallId
+                            callVC.oldCall = oldCall
                             callVC.call = call
                             callVC.viewDidLoad()
                             self?.dismiss(animated: true)
                         }
                     }
                 case .failure(let error):
-                    let alert = UIAlertController(title: "Error", message: "\(error)", preferredStyle: .alert)
-                    alert.addAction(.dismissAction(withTitle: "Ok"))
-                    self?.present(alert, animated: true)
+                    DispatchQueue.main.async {
+                        self?.dismiss(animated: true)
+                        {
+                            let alert = UIAlertController(title: "Error", message: "\(error)", preferredStyle: .alert)
+                            alert.addAction(.dismissAction(withTitle: "Ok"))
+                            UIApplication.shared.topViewController()?.present(alert, animated: true)
+                        }
+                    }
                 }
             })
         } else {

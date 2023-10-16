@@ -86,7 +86,7 @@ class ScreenShareConfigView: UIView, UIPickerViewDataSource, UIPickerViewDelegat
     // MARK: - UIPickerViewDelegate
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-        let label = UILabel(frame: CGRectMake(0, 0, 400, 44));
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 400, height: 44));
         label.lineBreakMode = .byWordWrapping;
         label.numberOfLines = 0;
         label.text = optionList[row]

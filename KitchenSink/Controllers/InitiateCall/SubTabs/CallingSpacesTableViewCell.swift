@@ -1,25 +1,15 @@
 import UIKit
 import WebexSDK
 
-class SpaceTableViewCell: UITableViewCell, ReusableCell {
+class CallingSpacesTableViewCell: UITableViewCell, ReusableCell {
     typealias ButtonActionHandler = () -> Void
-    private var messageButtonHandler: ButtonActionHandler?
-    private var addButtonHandler: ButtonActionHandler?
-    
+    private var callButtonHandler: ButtonActionHandler?
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.accessibilityIdentifier = "TitleLabel"
         label.font = .preferredFont(forTextStyle: .title3)
-        return label
-    }()
-    
-    private let detailLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.accessibilityIdentifier = "DetailLabel"
-        label.font = .preferredFont(forTextStyle: .subheadline)
         return label
     }()
 
@@ -53,30 +43,30 @@ class SpaceTableViewCell: UITableViewCell, ReusableCell {
         return stack
     }()
 
-    private let messageButton: UIButton = {
+    private let callButton: UIButton = {
         let button = UIButton()
-        button.setBackgroundImage(UIImage(named: "bubble-left"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.accessibilityIdentifier = "MessageButton"
+        button.accessibilityIdentifier = "CallButton"
+        button.setImage(UIImage(named: "on-call"), for: .normal)
         return button
     }()
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupConstraints()
-        messageButton.addTarget(self, action: #selector(messageButtonTapped), for: .touchUpInside)
+        callButton.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError()
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
-        messageButtonHandler = nil
+        callButtonHandler = nil
     }
-    
-    func setupCell(name: String?, description: String?, isOnCall: Bool, presence: Presence?, messageButtonHandler: @escaping ButtonActionHandler = {}) {
+
+    func setupCell(name: String?, presence: Presence?, buttonActionHandler: @escaping ButtonActionHandler = {}) {
         if let presence = presence {
             displayStatus(presence: presence)
         } else {
@@ -84,20 +74,8 @@ class SpaceTableViewCell: UITableViewCell, ReusableCell {
             statusLabel.textColor = .momentumGray50
             statusIcon.image = UIImage(named: "unknown")
         }
-        detailLabel.text = description
-        if isOnCall {
-            titleLabel.text = name
-            titleLabel.textColor = .green
-            titleLabel.text?.append(" (On Call)")
-        } else {
-            titleLabel.text = name
-            if #available(iOS 13.0, *) {
-                titleLabel.textColor = .label
-            } else {
-                titleLabel.textColor = .black
-            }
-        }
-        self.messageButtonHandler = messageButtonHandler
+        titleLabel.text = name
+        self.callButtonHandler = buttonActionHandler
     }
 
     func displayStatus(presence: Presence) {
@@ -163,16 +141,12 @@ class SpaceTableViewCell: UITableViewCell, ReusableCell {
     }
 }
 
-extension SpaceTableViewCell {
+extension CallingSpacesTableViewCell {
     // MARK: Private Methods
-    @objc private func messageButtonTapped() {
-        messageButtonHandler?()
+    @objc private func callButtonTapped() {
+        callButtonHandler?()
     }
-    
-    @objc private func addButtonTapped() {
-        addButtonHandler?()
-    }
-    
+
     private func setupConstraints() {
         contentView.addSubview(titleLabel)
         NSLayoutConstraint.activate([
@@ -185,22 +159,30 @@ extension SpaceTableViewCell {
             NSLayoutConstraint(item: statusStackView, attribute: .leading, relatedBy: .equal, toItem: titleLabel, attribute: .leading, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: statusStackView, attribute: .top, relatedBy: .equal, toItem: titleLabel, attribute: .bottom, multiplier: 1, constant: 8),
         ])
-        
-        contentView.addSubview(detailLabel)
+
+        contentView.addSubview(callButton)
         NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: detailLabel, attribute: .leading, relatedBy: .equal, toItem: statusStackView, attribute: .leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: detailLabel, attribute: .top, relatedBy: .equal, toItem: statusStackView, attribute: .bottom, multiplier: 1, constant: 8),
-            NSLayoutConstraint(item: detailLabel, attribute: .bottom, relatedBy: .equal, toItem: contentView, attribute: .bottom, multiplier: 1, constant: -8)
+            NSLayoutConstraint(item: callButton, attribute: .leading, relatedBy: .equal, toItem: titleLabel, attribute: .trailing, multiplier: 1, constant: 8),
+            NSLayoutConstraint(item: callButton, attribute: .leading, relatedBy: .equal, toItem: statusStackView, attribute: .trailing, multiplier: 1, constant: 8),
+            NSLayoutConstraint(item: callButton, attribute: .centerY, relatedBy: .equal, toItem: contentView, attribute: .centerY, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: callButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 24),
+            NSLayoutConstraint(item: callButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 24),
+            NSLayoutConstraint(item: callButton, attribute: .trailing, relatedBy: .equal, toItem: contentView, attribute: .trailing, multiplier: 1, constant: -16)
         ])
-        
-        contentView.addSubview(messageButton)
-        NSLayoutConstraint.activate([
-            NSLayoutConstraint(item: messageButton, attribute: .leading, relatedBy: .equal, toItem: titleLabel, attribute: .trailing, multiplier: 1, constant: 8),
-            NSLayoutConstraint(item: messageButton, attribute: .leading, relatedBy: .equal, toItem: detailLabel, attribute: .trailing, multiplier: 1, constant: 8),
-            NSLayoutConstraint(item: messageButton, attribute: .centerY, relatedBy: .equal, toItem: contentView, attribute: .centerY, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: messageButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 24),
-            NSLayoutConstraint(item: messageButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 24),
-            NSLayoutConstraint(item: messageButton, attribute: .trailing, relatedBy: .equal, toItem: contentView, attribute: .trailing, multiplier: 1, constant: -16)
-        ])
+    }
+}
+
+extension TimeInterval {
+
+    func stringFromTimeInterval() -> String {
+        let time = NSInteger(self)
+        let minutes = (time / 60) % 60
+        let hours = (time / 3600)
+
+        if hours > 1 {
+            return String(format: "\(hours) hours ago")
+        } else {
+            return String(format: "\(minutes) minutes ago")
+        }
     }
 }

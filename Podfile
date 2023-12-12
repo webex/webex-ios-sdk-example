@@ -1,5 +1,4 @@
-# Uncomment the next line to define a global platform for your project
-# platform :ios, '13.0'
+platform :ios, '12.0'
 
 source 'https://github.com/CocoaPods/Specs.git'
 
@@ -8,9 +7,9 @@ target 'KitchenSink' do
   use_frameworks!
 
   # Pods for KitchenSink
-	pod 'WebexSDK','~> 3.10.0'
-  # pod 'WebexSDK/Meeting','~> 3.10.0'  # Uncomment this line and comment the above line for Meeting-only SDK
-  # pod 'WebexSDK/Wxc','~> 3.10.0'  # Uncomment this line and comment the above line for Calling-only SDK
+	pod 'WebexSDK','~> 3.10.1'
+  # pod 'WebexSDK/Meeting','~> 3.10.1'  # Uncomment this line and comment the above line for Meeting-only SDK
+  # pod 'WebexSDK/Wxc','~> 3.10.1'  # Uncomment this line and comment the above line for Calling-only SDK
 
 
   target 'KitchenSinkUITests' do
@@ -24,6 +23,14 @@ target 'KitchenSinkBroadcastExtension' do
   use_frameworks!
 
   # Pods for KitchenSinkBroadcastExtension 
-  pod 'WebexBroadcastExtensionKit','~> 3.10.0'
+  pod 'WebexBroadcastExtensionKit','~> 3.10.1'
   
+end
+
+post_install do |installer|
+ installer.pods_project.targets.each do |target|
+  target.build_configurations.each do |config|
+   config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+  end
+ end
 end

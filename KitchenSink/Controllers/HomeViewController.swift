@@ -67,6 +67,8 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        let capability = webex.people.getProductCapability()
+        print("Product Capability: \(capability.isMeetingSupported)")
         view.backgroundColor = .backgroundColor
 
         title = "Kitchen Sink"

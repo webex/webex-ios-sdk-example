@@ -38,9 +38,62 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
         setupViews()
         setupConstraints()
         participantsStatesProcess()
-        if call.isGroupCall && !call.isCUCMCall {
+        
+        guard !call.isCUCMCall else {return}
+        self.navigationItem.setLeftBarButton(inviteParticipant, animated: true)
+        if call.isGroupCall {
             self.navigationItem.setRightBarButton(muteAllButton, animated: true)
         }
+        
+    }
+
+     @objc private func inviteParticipant(_ sender: UIButton) {
+        let alert = UIAlertController(title: "Invite Participant", message: "Enter email id or contact id of participant", preferredStyle: .alert)
+        alert.addTextField { (textField) in
+            textField.placeholder = "Email or contact id"
+            textField.text = ""
+        }
+        alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { [weak self] _ in
+             guard let email = alert.textFields?.first?.text else { return }
+             self?.call.inviteParticipant(participant: email) {  result in
+                 var errorMessage = ""
+                 
+                 switch result {
+                 case .success():
+                     errorMessage = "added successfully"
+                 case .failure(let error):
+                     
+                     switch error as! InviteParticipantError
+                     {
+                     case .InvalidContactIdOrEmail:
+                         errorMessage = "Invalid ContactId Or Email"
+                         break
+                     case .AlreadyJoined:
+                         errorMessage = "Already Joined"
+                         break
+                     case .AlreadyInvited:
+                         errorMessage = "Already Invited"
+                         break
+                     case .NotAHostOrCoHost:
+                         errorMessage = "Not A Host Or CoHost"
+                         break
+                     case .UnknownError:
+                         errorMessage = "unknown error"
+                         break
+                     default:
+                         errorMessage = "unknown error"
+                     }                
+                 @unknown default:
+                     break
+                 }
+                 
+                 let alert2 = UIAlertController(title: "Add guest Result", message: errorMessage, preferredStyle: .alert)
+                 alert2.addAction(.dismissAction(withTitle: "OK"))
+                 self?.present(alert2, animated: true)
+             }
+         }))
+        alert.addAction(.dismissAction(withTitle: "Cancel"))
+        self.present(alert, animated: true)
     }
     
     // MARK: TableView Datasource
@@ -81,7 +134,7 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
         default:
             participant = inMeeting[indexPath.row]
         }
-        cell.setupCell(name: "\(participant.displayName ?? "ParticipantX"): \(participant.deviceType ?? .unknown)" , isAudioMuted: !participant.sendingAudio)
+        cell.setupCell(name: "\(participant.displayName ?? "ParticipantX"): \(participant.deviceType ?? .unknown)" , isAudioMuted: !participant.sendingAudio, isHost: participant.isHost, isCoHost: participant.isCohost, isPresenter: participant.isPresenter)
         return cell
     }
     
@@ -117,7 +170,7 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        if indexPath.section == 1 {
+        if indexPath.section == 1 || indexPath.section == 0 {
             return true
         } else {
             return false
@@ -125,19 +178,64 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let contextItem = UIContextualAction(style: .normal, title: "Let In") { _, _, _  in
-            var callMembershipsToLetIn: [CallMembership]
-            callMembershipsToLetIn = [self.inLobby[indexPath.row]]
-            self.call.letIn(callMembershipsToLetIn, completionHandler: { error in
-                if error != nil {
-                    print(error.debugDescription)
-                }
-            })
-        }
-        contextItem.backgroundColor = .momentumGreen50
-        let swipeActions = UISwipeActionsConfiguration(actions: [contextItem])
         
-        return swipeActions
+        if indexPath.section == 1 {
+            let contextItem = UIContextualAction(style: .normal, title: "Let In") { _, _, _  in
+                var callMembershipsToLetIn: [CallMembership]
+                callMembershipsToLetIn = [self.inLobby[indexPath.row]]
+                self.call.letIn(callMembershipsToLetIn, completionHandler: { error in
+                    if error != nil {
+                        print(error.debugDescription)
+                    }
+                })
+            }
+            contextItem.backgroundColor = .momentumGreen50
+            let swipeActions = UISwipeActionsConfiguration(actions: [contextItem])
+            
+            return swipeActions
+        } else if indexPath.section == 0 {
+            var contextItem = UIContextualAction(style: .normal, title: "Make Host") { _, _, _  in
+                self.call.makeHost(participantId:  self.inMeeting[indexPath.row].personId ?? "") { result in
+                    switch result {
+                    case .success():
+                        self.slideInStateView(slideInMsg: "makeHost success")
+                    case .failure(let error):
+                        self.slideInStateView(slideInMsg: "makeHost failed \(error)")
+                    }
+                }
+            }
+            
+            if self.inMeeting[indexPath.row].isSelf  { // for self user we show reclaim host
+                contextItem = UIContextualAction(style: .normal, title: "Reclaim Host") { _, _, _  in
+                    let alert = UIAlertController(title: "Reclaim Host", message: "Enter Host Key", preferredStyle: .alert)
+                    
+                    alert.addTextField { textField in
+                        textField.placeholder = "Enter Host Key"
+                        textField.text = ""
+                    }
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] _ in
+                        let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
+                        self.call.reclaimHost(hostKey: textField?.text ?? "") { result in
+                        switch result {
+                            case .success():
+                                self.slideInStateView(slideInMsg: "Reclaim Host success")
+                            case .failure(let error):
+                                self.slideInStateView(slideInMsg: "Reclaim Host failed \(error)")
+                            }
+                        }
+                    }))
+                    DispatchQueue.main.async {
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+            contextItem.backgroundColor = .momentumGreen50
+
+            let swipeActions = UISwipeActionsConfiguration(actions: [contextItem])
+            
+            return swipeActions
+        }
+        return nil
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -180,6 +278,12 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
         return button
     }()
     
+    // lazy var for inviteParticipant button
+    private lazy var inviteParticipant: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "Invite Participant", style: .done, target: self, action: #selector(inviteParticipant(_:)))
+        return button
+    }()
+
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero)
         table.dataSource = self
@@ -201,11 +305,13 @@ class ParticipantListViewController: UIViewController, UITableViewDataSource, UI
     }
     
     private func slideInStateView(slideInMsg: String) {
-        let alert = UIAlertController(title: nil, message: slideInMsg, preferredStyle: .alert)
-        self.present(alert, animated: true)
-        let duration: Double = 2
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
-            alert.dismiss(animated: true)
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: nil, message: slideInMsg, preferredStyle: .alert)
+            self.present(alert, animated: true)
+            let duration: Double = 2
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + duration) {
+                alert.dismiss(animated: true)
+            }
         }
     }
     

@@ -66,7 +66,7 @@ class CallingSpacesTableViewCell: UITableViewCell, ReusableCell {
         callButtonHandler = nil
     }
 
-    func setupCell(name: String?, presence: Presence?, buttonActionHandler: @escaping ButtonActionHandler = {}) {
+    func setupCell(name: String?, presence: Presence?, isGroupSpace: Bool, buttonActionHandler: @escaping ButtonActionHandler = {}) {
         if let presence = presence {
             displayStatus(presence: presence)
         } else {
@@ -75,6 +75,7 @@ class CallingSpacesTableViewCell: UITableViewCell, ReusableCell {
             statusIcon.image = UIImage(named: "unknown")
         }
         titleLabel.text = name
+        callButton.isHidden = isGroupSpace
         self.callButtonHandler = buttonActionHandler
     }
 

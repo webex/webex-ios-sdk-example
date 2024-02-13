@@ -1,6 +1,6 @@
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct LoginView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -11,12 +11,10 @@ struct LoginView: View {
     @State var showingOAuthAlert = false
     @State var showingGuestAlert = false
     @State var showWebView = false
-    @State var isFedRAMPEnabled = UserDefaults.standard.bool(forKey: "isFedRAMP")
+    @State var isFedRAMPEnabled = UserDefaults.standard.bool(forKey: Constants.fedRampKey)
     @State var loginValue = ""
     @State var loginUrl = ""
     @State var versionText = ""
-
-    var loginVC = LoginVC()
 
     var body: some View {
         ZStack {
@@ -26,7 +24,7 @@ struct LoginView: View {
                     KSButton(text: "FedRAMP \n Mode", didTap: isFedRAMPEnabled, action: toggleFedRampMode)
                         .accessibilityIdentifier("fedrampModeButton")
                         .frame(height: 100)
-                        .onAppear(perform: doAutoLogin)
+                        .onAppear(perform: tryAutoLogin)
                     Spacer()
                 }
                 if colorScheme == .light {
@@ -45,7 +43,7 @@ struct LoginView: View {
                     .alert(isPresented: $showingEmailAlert, title: "Login With Email", textFieldValue: $loginValue, action: doEmailLoginAction)
                     .accessibilityIdentifier("emailLoginButton")
                     .padding()
-                    .popover(isPresented: $model.showWebView) {
+                    .sheet(isPresented: $model.showWebView) {
                         WebView(viewModel: model)
                             .onDisappear(perform: doLoginAction)
                     }
@@ -68,58 +66,77 @@ struct LoginView: View {
                 ActivityIndicatorView()
             }
         }
+        .fullScreenCover(isPresented: $model.isLoggedIn) {
+            MainTabView()
+        }
     }
 
+    /// Toggles the state of the email alert, which triggers its display or dismissal.
     func loginWithEmail() {
         showingEmailAlert.toggle()
     }
 
+    /// Toggles the state of the guest alert, which triggers its display or dismissal.
     func loginWithGuestToken() {
         showingGuestAlert.toggle()
     }
 
+    /// Toggles the state of the OAuth alert, which triggers its display or dismissal.
     func loginWithOAuthToken() {
         showingOAuthAlert.toggle()
     }
 
+    /// Toggles the state of FedRAMP mode.
     func toggleFedRampMode() {
         isFedRAMPEnabled.toggle()
     }
 
+    /// Initiates a login action with an authorization code using the model.
     func doLoginAction() {
-        loginVC.loginWithAuthCode(code: model.code)
+        model.loginWithAuthCode(code: model.code)
     }
 
+    /// Initiates an email login action with the given email and FedRAMP mode state using the model.
     func doEmailLoginAction() {
-        loginVC.doEmailLogin(email: loginValue, isFedRAMPEnabled: isFedRAMPEnabled, model: model)
+        guard let authenticator = model.getAuthenticator(type: .email, email: loginValue, isFedRAMPMode: isFedRAMPEnabled) else { return }
+        model.doEmailLogin(email: loginValue, authenticator: authenticator)
     }
 
+    /// Initiates a guest login action with the given guest token using the model.
     func doGuestLoginAction() {
-        loginVC.doGuestLogin(guestToken: loginValue)
+        guard let authenticator = model.getAuthenticator(type: .jwt) else { return }
+        model.doGuestLogin(guestToken: loginValue, authenticator: authenticator)
     }
 
+    /// Initiates an OAuth login action with the given OAuth token and FedRAMP mode state using the model.
     func doOAuthLoginAction() {
-        loginVC.doOAuthLogin(OAuthToken: loginValue, isFedRAMPEnabled: isFedRAMPEnabled)
+        guard let authenticator = model.getAuthenticator(type: .token, isFedRAMPMode: isFedRAMPEnabled) else { return }
+        model.doOAuthLogin(OAuthToken: loginValue, authenticator: authenticator)
     }
 
+    /// Fetches and updates the version information text using the model.
     func getVersionLabelText() {
-        versionText = loginVC.getVersionInfo()
+        versionText = model.getVersionInfo()
     }
 
-    func doAutoLogin() {
-        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
-        if authType == "jwt" {
-            loginVC.doGuestLogin(guestToken: "")
-        } else if authType == "token" {
-            loginVC.doOAuthLogin(OAuthToken: "", isFedRAMPEnabled: isFedRAMPEnabled)
+    /// Initiates an auto login action based on the saved authentication type
+    func tryAutoLogin() {
+        var authType: AuthType = .token
+        guard let type = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
+        if type == Constants.loginTypeValue.email.rawValue {
+            authType = .email
+        } else if type == Constants.loginTypeValue.jwt.rawValue {
+            authType = .jwt
         } else {
-            guard let email = UserDefaults.standard.value(forKey: "userEmail") as? String else { return }
-            loginVC.doEmailLogin(email: email, isFedRAMPEnabled: isFedRAMPEnabled, model: model)
+            authType = .token
         }
+        let email = UserDefaults.standard.string(forKey: Constants.emailKey)
+        guard let authenticator = model.getAuthenticator(type: authType, email: email, isFedRAMPMode: isFedRAMPEnabled) else { return }
+        model.tryAutoLogin(authenticator: authenticator, loginType: type, email: email ?? "")
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView()
@@ -127,8 +144,9 @@ struct LoginView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 public extension View {
+    /// Presents an alert with a text field and an OK button
     func alert(isPresented: Binding<Bool>,
                title: String,
                dismissButton: Alert.Button? = nil,

@@ -2,20 +2,21 @@ import MessageUI
 import UIKit
 import WebexSDK
 
-class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    // MARK: Properties
-    fileprivate enum Feedback: CaseIterable {
-        static let recipient = "webex-mobile-sdk@cisco.com"
-        
-        case reportBug, featureRequest
-        
-        var title: String {
-            switch self {
-            case .reportBug: return "Bug Report"
-            case .featureRequest: return "Feature Request"
-            }
+enum Feedback: CaseIterable {
+    static let recipient = "webex-mobile-sdk@cisco.com"
+    
+    case reportBug, featureRequest
+    
+    var title: String {
+        switch self {
+        case .reportBug: return "Bug Report"
+        case .featureRequest: return "Feature Request"
         }
     }
+}
+
+class HomeViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+    // MARK: Properties
     weak var webexUCLoginDelegate = webex.ucLoginDelegate
     private let kCellId: String = "FeatureCell"
     private var isUCServicesStarted = false
@@ -45,9 +46,9 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
                 DispatchQueue.main.async { [weak self] in
                     guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else { fatalError() }
                     self?.navigationController?.dismiss(animated: true)
-                    UserDefaults.standard.removeObject(forKey: "loginType")
-                    UserDefaults.standard.removeObject(forKey: "userEmail")
-                    UserDefaults.standard.removeObject(forKey: "isFedRAMP")
+                    UserDefaults.standard.removeObject(forKey: Constants.loginTypeKey)
+                    UserDefaults.standard.removeObject(forKey: Constants.emailKey)
+                    UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
                     appDelegate.navigateToLoginViewController()
                 }
             })
@@ -128,7 +129,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             webex.people.getMe(completionHandler: { [weak self] in
                 switch $0 {
                 case .success(let user):
-                    UserDefaults.standard.set(user.id, forKey: "selfId")
+                    UserDefaults.standard.set(user.id, forKey: Constants.selfId)
                     self?.currentUserButton.setTitle(user.initials, for: .normal)
                     self?.currentUserButton.layer.borderWidth = 2
                 case .failure(let error):
@@ -521,7 +522,7 @@ extension HomeViewController {
                guard let keys = NSDictionary(contentsOfFile: path) else { return }
                guard let token = token, let voipToken = voipToken else { return }
 
-               if let urlString = keys["registerationUrl"] as? String  {
+               if let urlString = keys["registrationUrl"] as? String  {
                    guard let serviceUrl = URL(string: urlString) else { print("Invalid URL"); return }
 
                    let parameters: [String: Any] = [
@@ -601,7 +602,7 @@ extension HomeViewController {  // waiting call related code
                 AppDelegate.shared.callKitManager?.updateCall(call: call)
                 return
             }
-            print("onIncoming Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
+            print("onIncoming Call object : \(call.callId ?? ""),  correlationId : \(call.correlationId ?? "") , externalTrackingId: \(call.externalTrackingId ?? "")")
             CallObjectStorage.self.shared.addCallObject(call: call)
             call.onScheduleChanged = { c in
                 self.getUpdatedSchedule(call: c)
@@ -632,6 +633,7 @@ extension HomeViewController {  // waiting call related code
     
     func getUpdatedSchedule(call: Call) {
         guard let callSchedule = call.schedules else {
+            // Case: For instant meetings started in a space
             // Case : One to one call ( Only utilizes the title, Space, callId and isScheduledCall)
             let newCall = Meeting(organizer: call.title ?? "", start: Date(), end: Date(), meetingId: "", link: "", subject: "", isScheduledCall: false, space: Space(id: call.spaceId ?? "", title: call.title ?? ""), currentCallId: call.callId ?? "")
             // Flag to check if meeting is already scheduled (To enter change in the schedule)

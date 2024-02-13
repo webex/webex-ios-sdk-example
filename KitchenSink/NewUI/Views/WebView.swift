@@ -1,21 +1,7 @@
 import SwiftUI
 import WebKit
 
-@available(iOS 13.0, *)
-class LoginViewModel: ObservableObject {
-    @Published var link: URL?
-    @Published var showWebView: Bool = false
-    @Published var showLoading: Bool = false
-    @Published var redirectUri: String?
-    @Published var code: String = ""
-
-    init (link: URL, redirectUri: String) {
-        self.link = link
-        self.redirectUri = redirectUri
-    }
-} 
-
-@available(iOS 13.0, *)
+@available(iOS 16.0, *)
 struct WebView: UIViewRepresentable {
     var viewModel: LoginViewModel
 
@@ -57,10 +43,25 @@ struct WebView: UIViewRepresentable {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 16.0, *)
+struct WebFileView: UIViewRepresentable {
+
+    var url: URL
+
+    func makeUIView(context: Context) -> WKWebView {
+        return WKWebView()
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        let request = URLRequest(url: url)
+        webView.load(request)
+    }
+}
+
+@available(iOS 16.0, *)
 struct WebView_Previews: PreviewProvider {
     static var previews: some View {
 
-        WebView(viewModel: LoginViewModel(link: URL(string: "https://google.com")!, redirectUri: "https://www.devtechie.com/"))
+        WebView(viewModel: LoginViewModel(link: URL(string: "https://google.com")!, redirectUri: "https://google.com"))
     }
 }

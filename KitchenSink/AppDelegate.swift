@@ -66,7 +66,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func navigateToLoginViewController() {
         if !(UIApplication.shared.topViewController() is CallViewController) {
-            window?.rootViewController = LoginViewController()
+            if #available(iOS 16.0, *) {
+                window?.rootViewController = WelcomeViewController()
+            } else {
+                window?.rootViewController = LoginViewController()
+            }
         }
     }
     
@@ -234,10 +238,10 @@ extension AppDelegate: PKPushRegistryDelegate {
             return
         }
         
-        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
-        if authType == "jwt" {
+        guard let authType = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
+        if authType == Constants.loginTypeValue.jwt.rawValue {
             initWebexUsingJWT()
-        } else if authType == "token" {
+        } else if authType == Constants.loginTypeValue.token.rawValue{
             initWebexUsingToken()
         } else {
             initWebexUsingOauth()
@@ -266,7 +270,7 @@ extension AppDelegate: PKPushRegistryDelegate {
         let scopes = "spark:all" // spark:all is always mandatory
         
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
-        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
+        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: Constants.emailKey) as? String) {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
             let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
             webex = Webex(authenticator: authenticator)

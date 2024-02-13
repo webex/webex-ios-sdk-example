@@ -7,9 +7,9 @@ target 'KitchenSink' do
   use_frameworks!
 
   # Pods for KitchenSink
-	pod 'WebexSDK','~> 3.10.1'
-  # pod 'WebexSDK/Meeting','~> 3.10.1'  # Uncomment this line and comment the above line for Meeting-only SDK
-  # pod 'WebexSDK/Wxc','~> 3.10.1'  # Uncomment this line and comment the above line for Calling-only SDK
+	pod 'WebexSDK','~> 3.11.0'
+  # pod 'WebexSDK/Meeting','~> 3.11.0'  # Uncomment this line and comment the above line for Meeting-only SDK
+  # pod 'WebexSDK/Wxc','~> 3.11.0'  # Uncomment this line and comment the above line for Calling-only SDK
 
 
   target 'KitchenSinkUITests' do
@@ -23,14 +23,7 @@ target 'KitchenSinkBroadcastExtension' do
   use_frameworks!
 
   # Pods for KitchenSinkBroadcastExtension 
-  pod 'WebexBroadcastExtensionKit','~> 3.10.1'
+  pod 'WebexBroadcastExtensionKit','~> 3.11.0'
   
 end
 
-post_install do |installer|
- installer.pods_project.targets.each do |target|
-  target.build_configurations.each do |config|
-   config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-  end
- end
-end

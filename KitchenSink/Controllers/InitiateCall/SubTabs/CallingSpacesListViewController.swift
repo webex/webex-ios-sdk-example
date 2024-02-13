@@ -69,7 +69,7 @@ class CallingSpacesListViewController: UIViewController, UITableViewDataSource {
             presence = presenceForSpaceId
         }
 
-        cell.setupCell(name: space.title ?? "", presence: presence, buttonActionHandler: { [weak self] in self?.callSpace(space) })
+        cell.setupCell(name: space.title ?? "", presence: presence, isGroupSpace: (space.type == .group), buttonActionHandler: { [weak self] in self?.callSpace(space) })
         return cell
     }
 
@@ -116,7 +116,7 @@ extension CallingSpacesListViewController: NavigationItemSetupProtocol {
 
 extension CallingSpacesListViewController {
     func getPresenceStatus() {
-        let selfId = UserDefaults.standard.string(forKey: "selfId")
+        let selfId = UserDefaults.standard.string(forKey: Constants.selfId)
         for spaceId in directSpaceIds {
             webex.memberships.list(spaceId: spaceId, completionHandler: { result in
                 switch result {

@@ -7,14 +7,6 @@ class LoginViewController: UIViewController {
     private var launchWebexCallId: String?
     private var launchCUCMCallId: String?
     private var isFedRAMPMode: Bool = false
-
-    private var ciscoLogoView: UIImageView = {
-        let ciscoLogo = UIImageView(frame: .zero)
-        ciscoLogo.translatesAutoresizingMaskIntoConstraints = false
-        ciscoLogo.contentMode = .scaleAspectFit
-        ciscoLogo.image = UIImage(named: "cisco-logo")
-        return ciscoLogo
-    }()
     
     private var webexLogoView: UIImageView = {
         let webexLogo = UIImageView(frame: .zero)
@@ -40,7 +32,7 @@ class LoginViewController: UIViewController {
 
     private lazy var fedrampSwitch: UISwitch = {
         let toggle = UISwitch(frame: .zero)
-        toggle.isOn = UserDefaults.standard.bool(forKey: "isFedRAMP")
+        toggle.isOn = UserDefaults.standard.bool(forKey: Constants.fedRampKey)
         toggle.setHeight(30)
         toggle.onTintColor = .momentumBlue50
         toggle.addTarget(self, action: #selector(fedrampSwitchValueDidChange(_:)), for: .valueChanged)
@@ -55,7 +47,7 @@ class LoginViewController: UIViewController {
         label.text = "Fedramp Mode"
         label.adjustsFontSizeToFitWidth = true
         label.font = .boldSystemFont(ofSize: 20)
-        label.textColor = .white
+        label.textColor = .labelColor
         return label
     }()
 
@@ -77,22 +69,6 @@ class LoginViewController: UIViewController {
         label.font = .boldSystemFont(ofSize: 20)
         label.textColor = .labelColor
         return label
-    }()
-
-    private lazy var swiftUIButton: UIButton = {
-        let view = UIButton(type: .system)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.addTarget(self, action: #selector(openInSwiftUI), for: .touchUpInside)
-        view.setTitle("SwiftUI", for: .normal)
-        view.accessibilityIdentifier = "swiftUIButton"
-        view.titleLabel?.font = .preferredFont(forTextStyle: .title3)
-        view.setTitleColor(.white, for: .normal)
-        view.backgroundColor = .momentumPink50
-        view.isHidden = true
-        view.layer.cornerRadius = 25
-        view.layer.masksToBounds = true
-        view.isHidden = true
-        return view
     }()
 
     @objc func fedrampSwitchValueDidChange(_ sender: UISwitch) {
@@ -164,10 +140,10 @@ class LoginViewController: UIViewController {
             self.handleNotificationRoutingIfNeeded()
             return
         }
-        guard let authType = UserDefaults.standard.string(forKey: "loginType") else { return }
-        if authType == "jwt" {
+        guard let authType = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
+        if authType == Constants.loginTypeValue.jwt.rawValue {
             initWebexUsingJWT()
-        } else if authType == "token" {
+        } else if authType == Constants.loginTypeValue.token.rawValue {
             initWebexUsingToken()
         } else {
             initWebexUsingOauth(completion: nil)
@@ -191,7 +167,7 @@ class LoginViewController: UIViewController {
                 }
                 
                 if isLoggedIn {
-                    UserDefaults.standard.setValue(self.isFedRAMPMode, forKey: "isFedRAMP")
+                    UserDefaults.standard.setValue(self.isFedRAMPMode, forKey: Constants.fedRampKey)
                     self.switchRootController()
                     self.handleNotificationRoutingIfNeeded()
                 } else {
@@ -200,17 +176,17 @@ class LoginViewController: UIViewController {
                 }
             }
         }
-        
     }
-    
+
     func switchRootController() {
         DispatchQueue.main.async {
             guard let window = self.keyWindow else { return }
             window.rootViewController = UINavigationController(rootViewController: HomeViewController())
             window.makeKeyAndVisible()
         }
+        return
     }
-    
+
     private func handleNotificationRoutingIfNeeded() {
         guard let handler = keyWindow?.rootViewController as? PushNotificationHandler else { return }
         if let messageInfo = launchMessageInfo {
@@ -236,7 +212,7 @@ class LoginViewController: UIViewController {
         let scopes = "spark:all" // spark:all is always mandatory
         
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
-        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: "userEmail") as? String) {
+        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: Constants.emailKey) as? String) {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
             let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString(), isFedRAMPEnvironment: isFedRAMPMode)
             webex = Webex(authenticator: authenticator)
@@ -262,7 +238,7 @@ class LoginViewController: UIViewController {
                 return
             }
             
-            UserDefaults.standard.setValue(email.toString(), forKey: "userEmail")
+            UserDefaults.standard.setValue(email.toString(), forKey: Constants.emailKey)
 
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
             let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString(), isFedRAMPEnvironment: self.isFedRAMPMode)
@@ -304,10 +280,10 @@ class LoginViewController: UIViewController {
                             self?.loginButton.setTitle("Login", for: .normal)
                             self?.loginButton.isEnabled = true
                             print("Login failed!")
-                            UserDefaults.standard.removeObject(forKey: "userEmail")
+                            UserDefaults.standard.removeObject(forKey: Constants.emailKey)
                             return
                         }
-                        UserDefaults.standard.setValue("auth", forKey: "loginType")
+                        UserDefaults.standard.setValue(Constants.loginTypeValue.email.rawValue, forKey: Constants.loginTypeKey)
                         self?.switchRootController()
                     }
                 }
@@ -345,7 +321,7 @@ class LoginViewController: UIViewController {
                         return
                     case .success(let authenticated):
                         if authenticated {
-                        UserDefaults.standard.setValue("jwt", forKey: "loginType")
+                        UserDefaults.standard.setValue(Constants.loginTypeValue.jwt.rawValue, forKey: Constants.loginTypeKey)
                         self.switchRootController()
                         } else {
                             print("JWT Login failed")
@@ -386,8 +362,7 @@ class LoginViewController: UIViewController {
                         print("Login failed!")
                         return
                     }
-                    
-                    UserDefaults.standard.setValue("token", forKey: "loginType")
+                    UserDefaults.standard.setValue(Constants.loginTypeValue.token.rawValue, forKey: Constants.loginTypeKey)
                     authenticator.onTokenExpired = {
                         // Handle when auth token has expired.
                         // When a token expires, new instances of `Webex` and `Authenticator` need to be created and used with a new token
@@ -408,32 +383,13 @@ class LoginViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
 
-    @objc func openInSwiftUI() {
-        if #available(iOS 15.0, *) {
-            let loginView = LoginView()
-            let hostingController = UIHostingController(rootView: loginView)
-
-            if #available(iOS 16.0, *) {
-                hostingController.sizingOptions = .intrinsicContentSize
-            }
-            hostingController.modalPresentationStyle = .fullScreen
-            self.present(hostingController, animated: true)
-        } else {
-            let errorAlert = UIAlertController(title: "Error", message: "Minimum iOS 15 required", preferredStyle: .alert)
-            errorAlert.addAction(UIAlertAction.dismissAction())
-            self.present(errorAlert, animated: true, completion: nil)
-        }
-    }
-    
     func setupViews() {
         view.addSubview(fedrampStackView)
         view.addSubview(webexLogoView)
         view.addSubview(loginButton)
         view.addSubview(loginWithJWTButton)
         view.addSubview(loginWithAccessTokenButton)
-        view.addSubview(ciscoLogoView)
         view.addSubview(versionLabel)
-        view.addSubview(swiftUIButton)
     }
     
     func setupConstraints() {
@@ -457,16 +413,8 @@ class LoginViewController: UIViewController {
         fedrampStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).activate()
         fedrampStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).activate()
 
-        ciscoLogoView.setSize(width: 100, height: 100)
-        ciscoLogoView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).activate()
-        ciscoLogoView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).activate()
-
         versionLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0).activate()
         versionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).activate()
-
-        swiftUIButton.setSize(width: 100, height: 50)
-        swiftUIButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).activate()
-        swiftUIButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).activate()
     }
 }
 

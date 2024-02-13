@@ -63,7 +63,7 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Custom cell for one to one call
-        if incomingCallData[indexPath.row].isScheduledCall == false {
+        if !incomingCallData[indexPath.row].isScheduledCall {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: IncomingCallViewCell.reuseIdentifier, for: indexPath) as? IncomingCallViewCell else { return UITableViewCell() }
             
             cell.setupCallCell(name: incomingCallData[indexPath.row].organizer, connectButtonActionHandler: { [weak self] in self?.connectCallTapped(indexPath: indexPath) }, endButtonActionHandler: { [weak self] in self?.endCallTapped(indexPath: indexPath) })
@@ -100,10 +100,6 @@ class ScheduledMeetingViewController: UIViewController, UITableViewDelegate, UIT
             alert.addAction(UIAlertAction(title: "Close", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
             return }
-        DispatchQueue.main.async {
-            incomingCallData.remove(at: indexPath.row)
-            self.tableView.reloadData()
-        }
         if let callId = incomingCallData[indexPath.row].currentCallId, let call = CallObjectStorage.self.shared.getCallObject(callId: callId) {
             let callVC = CallViewController(space: space, addedCall: false, currentCallId: currentCallId, incomingCall: true, call: call)
             self.present(callVC, animated: true)

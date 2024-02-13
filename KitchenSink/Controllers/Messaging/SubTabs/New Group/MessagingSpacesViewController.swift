@@ -506,7 +506,7 @@ extension SpaceReadStatus {
 
 extension MessagingSpacesViewController {
     func getPresenceStatus() {
-        let selfId = UserDefaults.standard.string(forKey: "selfId")
+        let selfId = UserDefaults.standard.string(forKey: Constants.selfId)
         for spaceId in directSpaceIds {
             webex.memberships.list(spaceId: spaceId, completionHandler: { result in
                 switch result {

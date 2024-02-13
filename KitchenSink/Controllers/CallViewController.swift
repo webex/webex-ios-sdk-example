@@ -1800,11 +1800,27 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             }
             switch reason {
             case .callEnded, .localLeft, .localDecline, .localCancel, .remoteLeft, .remoteDecline, .remoteCancel, .otherConnected, .otherDeclined:
-                print("Call Disconnected: \(reason)")
-                CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                var shouldRemove = true
+                switch reason {
+                    case .localLeft:
+                    // Meetings should not stop if local left and other party is still in meeting
+                    if call.isMeeting {
+                        // TODO: Also need to confirm if selfUser is not the meeting host when we have an API for it
+                        shouldRemove = false
+                    }
+                default:
+                    break
+                }
+                if shouldRemove {
+                    incomingCallData = incomingCallData.filter { $0.meetingId != call.meetingId }
+                    CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
+                    NotificationCenter.default.post(name: Notification.Name("IncomingCallListChanged"), object: nil, userInfo: ["ring": false])
+                }
                 DispatchQueue.main.async { [weak self] in
-                    print("CallVC dismiss onDisconnected")
-                    if CallObjectStorage.self.shared.getAllActiveCalls().count == 0 {
+                    // Need to dismiss CallVC only if no active calls are present or if the currently dismissed active call was a meeting
+                    call.isSpaceMeeting
+                    if call.isScheduledMeeting || CallObjectStorage.self.shared.getAllActiveCalls().filter({ $0.callId != call.callId}).count == 0 {
+                        print("CallVC dismiss onDisconnected")
                         self?.dismiss(animated: true)
                     }
                 }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct KSButton: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -8,8 +8,11 @@ struct KSButton: View {
     let text: String
     let action: (() -> Void)
     var didTap: Bool
+    var isSmall: Bool = false
 
-    init(text: String, didTap: Bool = false, action: @escaping (() -> Void )) {
+    /// Initializes a new instance.
+    init(isSmall: Bool = false, text: String, didTap: Bool = false, action: @escaping (() -> Void )) {
+        self.isSmall = isSmall
         self.text = text
         self.action = action
         self.didTap = didTap
@@ -19,7 +22,7 @@ struct KSButton: View {
         if colorScheme == .dark {
             Button(action: action, label: {
                 Text(text)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, isSmall ? 0 : 12)
                     .padding(.horizontal, -3)
                     .frame(maxWidth: UIScreen.main.bounds.width - 30)
                     .foregroundColor(.black)
@@ -31,7 +34,7 @@ struct KSButton: View {
         } else {
             Button(action: action, label: {
                 Text(text)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, isSmall ? 0 : 10)
                     .padding(.horizontal, -3)
                     .tint(didTap ? .blue : .black)
                     .frame(maxWidth: UIScreen.main.bounds.width - 30)
@@ -52,7 +55,7 @@ struct KSButton: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 16.0, *)
 struct DarkButtonView_Previews: PreviewProvider {
     static var previews: some View {
         KSButton(text: "FedRAMP Enabled", didTap: false, action: printText)

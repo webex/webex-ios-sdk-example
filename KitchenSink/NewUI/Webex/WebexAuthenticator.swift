@@ -14,23 +14,41 @@ protocol JWTAuthenticationProtocol: AnyObject {
 
 protocol TokenAuthenticationProtocol: AnyObject {
     func getTokenAuthenticator(isFedRAMP: Bool) -> TokenAuthenticator
-    func loginWithOAuthTocken(authenticator: TokenAuthenticator, token: String, completion: @escaping (Bool) -> Void)
+    func loginWithOAuthToken(authenticator: TokenAuthenticator, token: String, completion: @escaping (Bool) -> Void)
 }
 
 class WebexAuthenticator {
     var authenticator: OAuthAuthenticator?
     
+    /// Retrieves the version of the Webex SDK.
     func getWebexVersion() -> String {
         return Webex.version
     }
 
+    /// Initializes a Webex instance.
     func initializeWebex(webex: Webex, completion: @escaping (Bool) -> Void) {
         webex.initialize(completionHandler: completion)
+    }
+    
+    /// Retrieves the access token.
+    func getAcessToken(completion: @escaping (String, String) -> Void) {
+        webex.authenticator?.accessToken(completionHandler: { result in
+            switch result {
+            case .success(let accessToken):
+                completion("Success: Access Token", accessToken)
+            case .failure(let error):
+                completion("Failure: No Access Token", error.localizedDescription)
+            @unknown default:
+                break
+            }
+        })
     }
 }
 
 // MARK: OAuthAuthenticator
 extension WebexAuthenticator : OAuthAuthenticationProtocol {
+    
+    /// Creates and returns an OAuthAuthenticator instance.
     func getOAuthAuthenticator(email: String, isFedRAMP: Bool) -> OAuthAuthenticator? {
         guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return nil }
         guard let keys = NSDictionary(contentsOfFile: path) else { return nil }
@@ -46,6 +64,7 @@ extension WebexAuthenticator : OAuthAuthenticationProtocol {
         return authenticator
     }
 
+    /// Retrieves the authorization URL.
     func getAuthorizationUrl(authenticator: OAuthAuthenticator, completion: @escaping ((URL?) -> Void)) {
         authenticator.getAuthorizationUrl(completionHandler: { result, url in
             if result == .success {
@@ -53,7 +72,8 @@ extension WebexAuthenticator : OAuthAuthenticationProtocol {
             }
         })
     }
-
+    
+    /// Login the user using an authorization code.
     func loginWithAuthCode(code: String, completion: @escaping (Bool) -> Void) {
         authenticator?.authorize(oauthCode: code, completionHandler: { res in
             if res == .success {
@@ -88,13 +108,50 @@ extension WebexAuthenticator: TokenAuthenticationProtocol {
         return authenticator
     }
 
-    func loginWithOAuthTocken(authenticator: TokenAuthenticator, token: String, completion: @escaping (Bool) -> Void) {
-        authenticator.authorizedWith(accessToken: token, expiryInSeconds: 100, completionHandler: { res in
+    func loginWithOAuthToken(authenticator: TokenAuthenticator, token: String, completion: @escaping (Bool) -> Void) {
+        authenticator.authorizedWith(accessToken: token, expiryInSeconds: nil, completionHandler: { res in
             if res == .success {
                 completion(true)
             } else {
                 completion(false)
             }
         })
+    }
+}
+
+extension WebexAuthenticator {
+    /// Signs the user out of the application.
+    func signOut(completion: @escaping (() -> Void)) {
+        webex.authenticator?.deauthorize(completionHandler: completion)
+    }
+
+    /// Enables logging based on the provided level.
+    func enableLogging(level: String) {
+        var logLevel: LogLevel = .verbose
+        if level == "no" {
+            webex.logLevel = .no
+            webex.enableConsoleLogger = false
+            return
+        }
+        else if level == "info" {
+            logLevel = .info
+        }
+        else if level == "debug" {
+            logLevel = .debug
+        }
+        else if level == "warning" {
+            logLevel = .warning
+        }
+        else if level == "verbose" {
+            logLevel = .verbose
+        }
+        else if level == "all" {
+            logLevel = .all
+        }
+        else if level == "error" {
+            logLevel = .error
+        }
+        webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
+        webex.logLevel = logLevel
     }
 }

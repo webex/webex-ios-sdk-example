@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -41,6 +41,7 @@
 		2EB6BD7324B79A2900DC3B7D /* MessagingSpacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD7224B79A2900DC3B7D /* MessagingSpacesViewController.swift */; };
 		2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */; };
 		2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */; };
+		4F162FEA2B61760E0063DBCF /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F162FE92B61760E0063DBCF /* WelcomeViewController.swift */; };
 		4F238BA227BBEB5C0035754A /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */; };
 		4F2593A9284F8FC9001A777E /* MediaStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2593A7284F8FC9001A777E /* MediaStreamView.swift */; };
 		4F2593AA284F8FC9001A777E /* MultiStreamSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2593A8284F8FC9001A777E /* MultiStreamSettingsView.swift */; };
@@ -50,14 +51,63 @@
 		4F7DA3EF2AD90AE800FEE2D7 /* CloseCaptionsMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3EE2AD90AE800FEE2D7 /* CloseCaptionsMenuView.swift */; };
 		4F7DA3F22AD90B9000FEE2D7 /* LanguageSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F02AD90B9000FEE2D7 /* LanguageSelectionViewController.swift */; };
 		4F7DA3F32AD90B9000FEE2D7 /* ClosedCaptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F12AD90B9000FEE2D7 /* ClosedCaptionsViewController.swift */; };
-		4F7DA3F82AD90BBA00FEE2D7 /* KSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F42AD90BBA00FEE2D7 /* KSButton.swift */; };
-		4F7DA3F92AD90BBA00FEE2D7 /* ActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F52AD90BBA00FEE2D7 /* ActivityIndicatorView.swift */; };
-		4F7DA3FA2AD90BBA00FEE2D7 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F62AD90BBA00FEE2D7 /* WebView.swift */; };
-		4F7DA3FB2AD90BBA00FEE2D7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3F72AD90BBA00FEE2D7 /* LoginView.swift */; };
-		4F7DA3FD2AD90BFE00FEE2D7 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3FC2AD90BFE00FEE2D7 /* LoginVC.swift */; };
 		4F7DA3FF2AD90E6D00FEE2D7 /* OAuthUrlUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA3FE2AD90E6D00FEE2D7 /* OAuthUrlUtil.swift */; };
-		4F7DA4012AD90EAA00FEE2D7 /* WebexAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA4002AD90EAA00FEE2D7 /* WebexAuthenticator.swift */; };
 		4F7DA4032AD90F2D00FEE2D7 /* CallingSpacesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DA4022AD90F2D00FEE2D7 /* CallingSpacesTableViewCell.swift */; };
+		4F7DE4812B60BE2F00AF9DED /* WebexTeamMembership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4782B60BE2F00AF9DED /* WebexTeamMembership.swift */; };
+		4F7DE4822B60BE2F00AF9DED /* WebexMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4792B60BE2F00AF9DED /* WebexMessage.swift */; };
+		4F7DE4832B60BE2F00AF9DED /* WebexPhone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47A2B60BE2F00AF9DED /* WebexPhone.swift */; };
+		4F7DE4842B60BE2F00AF9DED /* WebexAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47B2B60BE2F00AF9DED /* WebexAuthenticator.swift */; };
+		4F7DE4852B60BE2F00AF9DED /* WebexMembership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47C2B60BE2F00AF9DED /* WebexMembership.swift */; };
+		4F7DE4862B60BE2F00AF9DED /* WebexCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47D2B60BE2F00AF9DED /* WebexCalendar.swift */; };
+		4F7DE4872B60BE2F00AF9DED /* WebexTeams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47E2B60BE2F00AF9DED /* WebexTeams.swift */; };
+		4F7DE4882B60BE2F00AF9DED /* WebexPeople.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE47F2B60BE2F00AF9DED /* WebexPeople.swift */; };
+		4F7DE4892B60BE2F00AF9DED /* WebexSpaces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4802B60BE2F00AF9DED /* WebexSpaces.swift */; };
+		4F7DE48E2B60BE3900AF9DED /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE48A2B60BE3900AF9DED /* Constants.swift */; };
+		4F7DE48F2B60BE3900AF9DED /* Throttler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE48B2B60BE3900AF9DED /* Throttler.swift */; };
+		4F7DE4902B60BE3900AF9DED /* MessagingHomeUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE48C2B60BE3900AF9DED /* MessagingHomeUtil.swift */; };
+		4F7DE4912B60BE3900AF9DED /* MessageComposerUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE48D2B60BE3900AF9DED /* MessageComposerUtil.swift */; };
+		4F7DE49E2B60BE4300AF9DED /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4922B60BE4300AF9DED /* LoginViewModel.swift */; };
+		4F7DE49F2B60BE4300AF9DED /* MainTabViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4932B60BE4300AF9DED /* MainTabViewModel.swift */; };
+		4F7DE4A02B60BE4300AF9DED /* MessagingHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4942B60BE4300AF9DED /* MessagingHomeViewModel.swift */; };
+		4F7DE4A12B60BE4300AF9DED /* SearchSpaceListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4952B60BE4300AF9DED /* SearchSpaceListViewModel.swift */; };
+		4F7DE4A22B60BE4300AF9DED /* SpaceMembershipListSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4962B60BE4300AF9DED /* SpaceMembershipListSearchViewModel.swift */; };
+		4F7DE4A32B60BE4300AF9DED /* MessageListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4972B60BE4300AF9DED /* MessageListViewModel.swift */; };
+		4F7DE4A42B60BE4300AF9DED /* TeamSpaceMemberShipViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4982B60BE4300AF9DED /* TeamSpaceMemberShipViewModel.swift */; };
+		4F7DE4A52B60BE4300AF9DED /* SpaceDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4992B60BE4300AF9DED /* SpaceDetailViewModel.swift */; };
+		4F7DE4A62B60BE4300AF9DED /* MeetingsHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE49A2B60BE4300AF9DED /* MeetingsHomeViewModel.swift */; };
+		4F7DE4A72B60BE4300AF9DED /* MessageComposerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE49B2B60BE4300AF9DED /* MessageComposerViewModel.swift */; };
+		4F7DE4A82B60BE4300AF9DED /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE49C2B60BE4300AF9DED /* SettingsViewModel.swift */; };
+		4F7DE4A92B60BE4300AF9DED /* TeamSpaceMemberSearchViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE49D2B60BE4300AF9DED /* TeamSpaceMemberSearchViewmodel.swift */; };
+		4F7DE4C22B60BE4D00AF9DED /* KSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AA2B60BE4D00AF9DED /* KSButton.swift */; };
+		4F7DE4C32B60BE4D00AF9DED /* MeetingsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AB2B60BE4D00AF9DED /* MeetingsHomeView.swift */; };
+		4F7DE4C42B60BE4D00AF9DED /* FilterSpaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AC2B60BE4D00AF9DED /* FilterSpaceView.swift */; };
+		4F7DE4C52B60BE4D00AF9DED /* SpaceRowViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AD2B60BE4D00AF9DED /* SpaceRowViewCell.swift */; };
+		4F7DE4C62B60BE4D00AF9DED /* CreateNewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AE2B60BE4D00AF9DED /* CreateNewButton.swift */; };
+		4F7DE4C72B60BE4D00AF9DED /* CallingTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4AF2B60BE4D00AF9DED /* CallingTabView.swift */; };
+		4F7DE4C82B60BE4D00AF9DED /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B02B60BE4D00AF9DED /* SettingsView.swift */; };
+		4F7DE4C92B60BE4D00AF9DED /* SpaceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B12B60BE4D00AF9DED /* SpaceDetailView.swift */; };
+		4F7DE4CA2B60BE4D00AF9DED /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B22B60BE4D00AF9DED /* LoginView.swift */; };
+		4F7DE4CB2B60BE4D00AF9DED /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B32B60BE4D00AF9DED /* SearchView.swift */; };
+		4F7DE4CC2B60BE4D00AF9DED /* MailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B42B60BE4D00AF9DED /* MailView.swift */; };
+		4F7DE4CD2B60BE4D00AF9DED /* TeamSpaceMemberSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B52B60BE4D00AF9DED /* TeamSpaceMemberSearchView.swift */; };
+		4F7DE4CE2B60BE4D00AF9DED /* SpaceMembershipListSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B62B60BE4D00AF9DED /* SpaceMembershipListSearchView.swift */; };
+		4F7DE4CF2B60BE4D00AF9DED /* MessageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B72B60BE4D00AF9DED /* MessageListView.swift */; };
+		4F7DE4D02B60BE4D00AF9DED /* TeamSpaceMemberShipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B82B60BE4D00AF9DED /* TeamSpaceMemberShipView.swift */; };
+		4F7DE4D12B60BE4D00AF9DED /* ActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4B92B60BE4D00AF9DED /* ActivityIndicatorView.swift */; };
+		4F7DE4D22B60BE4D00AF9DED /* KSIconButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BA2B60BE4D00AF9DED /* KSIconButton.swift */; };
+		4F7DE4D32B60BE4D00AF9DED /* MessageComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BB2B60BE4D00AF9DED /* MessageComposerView.swift */; };
+		4F7DE4D42B60BE4D00AF9DED /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BC2B60BE4D00AF9DED /* WebView.swift */; };
+		4F7DE4D52B60BE4D00AF9DED /* WaitingCallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BD2B60BE4D00AF9DED /* WaitingCallView.swift */; };
+		4F7DE4D62B60BE4D00AF9DED /* CallControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BE2B60BE4D00AF9DED /* CallControllerView.swift */; };
+		4F7DE4D72B60BE4D00AF9DED /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4BF2B60BE4D00AF9DED /* MainTabView.swift */; };
+		4F7DE4D82B60BE4D00AF9DED /* MessagingHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4C02B60BE4D00AF9DED /* MessagingHomeView.swift */; };
+		4F7DE4D92B60BE4D00AF9DED /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4C12B60BE4D00AF9DED /* ImagePickerView.swift */; };
+		4F7DE4DE2B60C06B00AF9DED /* SpaceMembershipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4DC2B60C06B00AF9DED /* SpaceMembershipModel.swift */; };
+		4F7DE4DF2B60C06B00AF9DED /* TeamMembershipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4DD2B60C06B00AF9DED /* TeamMembershipModel.swift */; };
+		4F7DE4E42B60C07500AF9DED /* TeamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4E02B60C07500AF9DED /* TeamModel.swift */; };
+		4F7DE4E52B60C07500AF9DED /* SpaceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4E12B60C07500AF9DED /* SpaceModel.swift */; };
+		4F7DE4E62B60C07500AF9DED /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4E22B60C07500AF9DED /* MessageModel.swift */; };
+		4F7DE4E72B60C07500AF9DED /* MeetingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7DE4E32B60C07500AF9DED /* MeetingModel.swift */; };
 		4FFF6F982A2E183800B55A3E /* ScreenShareConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFF6F962A2E183800B55A3E /* ScreenShareConfigView.swift */; };
 		4FFF6F992A2E183800B55A3E /* AttachmentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFF6F972A2E183800B55A3E /* AttachmentCollectionViewCell.swift */; };
 		592BABD224D3378C0071B85B /* MessagingReadStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */; };
@@ -203,6 +253,7 @@
 		2EB6BD7224B79A2900DC3B7D /* MessagingSpacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MessagingSpacesViewController.swift; path = "../New Group/MessagingSpacesViewController.swift"; sourceTree = "<group>"; };
 		2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
 		2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertAction+Extensions.swift"; sourceTree = "<group>"; };
+		4F162FE92B61760E0063DBCF /* WelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		4F2593A7284F8FC9001A777E /* MediaStreamView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaStreamView.swift; sourceTree = "<group>"; };
 		4F2593A8284F8FC9001A777E /* MultiStreamSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiStreamSettingsView.swift; sourceTree = "<group>"; };
@@ -212,14 +263,63 @@
 		4F7DA3EE2AD90AE800FEE2D7 /* CloseCaptionsMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseCaptionsMenuView.swift; sourceTree = "<group>"; };
 		4F7DA3F02AD90B9000FEE2D7 /* LanguageSelectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LanguageSelectionViewController.swift; sourceTree = "<group>"; };
 		4F7DA3F12AD90B9000FEE2D7 /* ClosedCaptionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClosedCaptionsViewController.swift; sourceTree = "<group>"; };
-		4F7DA3F42AD90BBA00FEE2D7 /* KSButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KSButton.swift; path = SwiftUI/KSButton.swift; sourceTree = "<group>"; };
-		4F7DA3F52AD90BBA00FEE2D7 /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ActivityIndicatorView.swift; path = SwiftUI/ActivityIndicatorView.swift; sourceTree = "<group>"; };
-		4F7DA3F62AD90BBA00FEE2D7 /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebView.swift; path = SwiftUI/WebView.swift; sourceTree = "<group>"; };
-		4F7DA3F72AD90BBA00FEE2D7 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoginView.swift; path = SwiftUI/LoginView.swift; sourceTree = "<group>"; };
-		4F7DA3FC2AD90BFE00FEE2D7 /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoginVC.swift; path = SwiftUI/LoginVC.swift; sourceTree = "<group>"; };
 		4F7DA3FE2AD90E6D00FEE2D7 /* OAuthUrlUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuthUrlUtil.swift; sourceTree = "<group>"; };
-		4F7DA4002AD90EAA00FEE2D7 /* WebexAuthenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebexAuthenticator.swift; path = KitchenSink/Webex/WebexAuthenticator.swift; sourceTree = SOURCE_ROOT; };
 		4F7DA4022AD90F2D00FEE2D7 /* CallingSpacesTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallingSpacesTableViewCell.swift; sourceTree = "<group>"; };
+		4F7DE4782B60BE2F00AF9DED /* WebexTeamMembership.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexTeamMembership.swift; sourceTree = "<group>"; };
+		4F7DE4792B60BE2F00AF9DED /* WebexMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexMessage.swift; sourceTree = "<group>"; };
+		4F7DE47A2B60BE2F00AF9DED /* WebexPhone.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexPhone.swift; sourceTree = "<group>"; };
+		4F7DE47B2B60BE2F00AF9DED /* WebexAuthenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexAuthenticator.swift; sourceTree = "<group>"; };
+		4F7DE47C2B60BE2F00AF9DED /* WebexMembership.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexMembership.swift; sourceTree = "<group>"; };
+		4F7DE47D2B60BE2F00AF9DED /* WebexCalendar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexCalendar.swift; sourceTree = "<group>"; };
+		4F7DE47E2B60BE2F00AF9DED /* WebexTeams.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexTeams.swift; sourceTree = "<group>"; };
+		4F7DE47F2B60BE2F00AF9DED /* WebexPeople.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexPeople.swift; sourceTree = "<group>"; };
+		4F7DE4802B60BE2F00AF9DED /* WebexSpaces.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebexSpaces.swift; sourceTree = "<group>"; };
+		4F7DE48A2B60BE3900AF9DED /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		4F7DE48B2B60BE3900AF9DED /* Throttler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Throttler.swift; sourceTree = "<group>"; };
+		4F7DE48C2B60BE3900AF9DED /* MessagingHomeUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessagingHomeUtil.swift; sourceTree = "<group>"; };
+		4F7DE48D2B60BE3900AF9DED /* MessageComposerUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageComposerUtil.swift; sourceTree = "<group>"; };
+		4F7DE4922B60BE4300AF9DED /* LoginViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4932B60BE4300AF9DED /* MainTabViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4942B60BE4300AF9DED /* MessagingHomeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessagingHomeViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4952B60BE4300AF9DED /* SearchSpaceListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchSpaceListViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4962B60BE4300AF9DED /* SpaceMembershipListSearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceMembershipListSearchViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4972B60BE4300AF9DED /* MessageListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageListViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4982B60BE4300AF9DED /* TeamSpaceMemberShipViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamSpaceMemberShipViewModel.swift; sourceTree = "<group>"; };
+		4F7DE4992B60BE4300AF9DED /* SpaceDetailViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceDetailViewModel.swift; sourceTree = "<group>"; };
+		4F7DE49A2B60BE4300AF9DED /* MeetingsHomeViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeetingsHomeViewModel.swift; sourceTree = "<group>"; };
+		4F7DE49B2B60BE4300AF9DED /* MessageComposerViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageComposerViewModel.swift; sourceTree = "<group>"; };
+		4F7DE49C2B60BE4300AF9DED /* SettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		4F7DE49D2B60BE4300AF9DED /* TeamSpaceMemberSearchViewmodel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamSpaceMemberSearchViewmodel.swift; sourceTree = "<group>"; };
+		4F7DE4AA2B60BE4D00AF9DED /* KSButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSButton.swift; sourceTree = "<group>"; };
+		4F7DE4AB2B60BE4D00AF9DED /* MeetingsHomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeetingsHomeView.swift; sourceTree = "<group>"; };
+		4F7DE4AC2B60BE4D00AF9DED /* FilterSpaceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterSpaceView.swift; sourceTree = "<group>"; };
+		4F7DE4AD2B60BE4D00AF9DED /* SpaceRowViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceRowViewCell.swift; sourceTree = "<group>"; };
+		4F7DE4AE2B60BE4D00AF9DED /* CreateNewButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateNewButton.swift; sourceTree = "<group>"; };
+		4F7DE4AF2B60BE4D00AF9DED /* CallingTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallingTabView.swift; sourceTree = "<group>"; };
+		4F7DE4B02B60BE4D00AF9DED /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		4F7DE4B12B60BE4D00AF9DED /* SpaceDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceDetailView.swift; sourceTree = "<group>"; };
+		4F7DE4B22B60BE4D00AF9DED /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		4F7DE4B32B60BE4D00AF9DED /* SearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		4F7DE4B42B60BE4D00AF9DED /* MailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailView.swift; sourceTree = "<group>"; };
+		4F7DE4B52B60BE4D00AF9DED /* TeamSpaceMemberSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamSpaceMemberSearchView.swift; sourceTree = "<group>"; };
+		4F7DE4B62B60BE4D00AF9DED /* SpaceMembershipListSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceMembershipListSearchView.swift; sourceTree = "<group>"; };
+		4F7DE4B72B60BE4D00AF9DED /* MessageListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageListView.swift; sourceTree = "<group>"; };
+		4F7DE4B82B60BE4D00AF9DED /* TeamSpaceMemberShipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamSpaceMemberShipView.swift; sourceTree = "<group>"; };
+		4F7DE4B92B60BE4D00AF9DED /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorView.swift; sourceTree = "<group>"; };
+		4F7DE4BA2B60BE4D00AF9DED /* KSIconButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KSIconButton.swift; sourceTree = "<group>"; };
+		4F7DE4BB2B60BE4D00AF9DED /* MessageComposerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageComposerView.swift; sourceTree = "<group>"; };
+		4F7DE4BC2B60BE4D00AF9DED /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		4F7DE4BD2B60BE4D00AF9DED /* WaitingCallView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitingCallView.swift; sourceTree = "<group>"; };
+		4F7DE4BE2B60BE4D00AF9DED /* CallControllerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallControllerView.swift; sourceTree = "<group>"; };
+		4F7DE4BF2B60BE4D00AF9DED /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		4F7DE4C02B60BE4D00AF9DED /* MessagingHomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessagingHomeView.swift; sourceTree = "<group>"; };
+		4F7DE4C12B60BE4D00AF9DED /* ImagePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		4F7DE4DC2B60C06B00AF9DED /* SpaceMembershipModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceMembershipModel.swift; sourceTree = "<group>"; };
+		4F7DE4DD2B60C06B00AF9DED /* TeamMembershipModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamMembershipModel.swift; sourceTree = "<group>"; };
+		4F7DE4E02B60C07500AF9DED /* TeamModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeamModel.swift; sourceTree = "<group>"; };
+		4F7DE4E12B60C07500AF9DED /* SpaceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceModel.swift; sourceTree = "<group>"; };
+		4F7DE4E22B60C07500AF9DED /* MessageModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
+		4F7DE4E32B60C07500AF9DED /* MeetingModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeetingModel.swift; sourceTree = "<group>"; };
 		4FFF6F962A2E183800B55A3E /* ScreenShareConfigView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenShareConfigView.swift; sourceTree = "<group>"; };
 		4FFF6F972A2E183800B55A3E /* AttachmentCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttachmentCollectionViewCell.swift; sourceTree = "<group>"; };
 		592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingReadStatusUITests.swift; sourceTree = "<group>"; };
@@ -442,6 +542,116 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		4F7DE4732B60BDDD00AF9DED /* NewUI */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE4DA2B60C03700AF9DED /* Models */,
+				4F7DE4772B60BE0400AF9DED /* Webex */,
+				4F7DE4762B60BDFB00AF9DED /* Utils */,
+				4F7DE4752B60BDF400AF9DED /* ViewModels */,
+				4F7DE4742B60BDE900AF9DED /* Views */,
+			);
+			path = NewUI;
+			sourceTree = "<group>";
+		};
+		4F7DE4742B60BDE900AF9DED /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE4B92B60BE4D00AF9DED /* ActivityIndicatorView.swift */,
+				4F7DE4BE2B60BE4D00AF9DED /* CallControllerView.swift */,
+				4F7DE4AF2B60BE4D00AF9DED /* CallingTabView.swift */,
+				4F7DE4AE2B60BE4D00AF9DED /* CreateNewButton.swift */,
+				4F7DE4AC2B60BE4D00AF9DED /* FilterSpaceView.swift */,
+				4F7DE4C12B60BE4D00AF9DED /* ImagePickerView.swift */,
+				4F7DE4AA2B60BE4D00AF9DED /* KSButton.swift */,
+				4F7DE4BA2B60BE4D00AF9DED /* KSIconButton.swift */,
+				4F7DE4B22B60BE4D00AF9DED /* LoginView.swift */,
+				4F7DE4B42B60BE4D00AF9DED /* MailView.swift */,
+				4F7DE4BF2B60BE4D00AF9DED /* MainTabView.swift */,
+				4F7DE4AB2B60BE4D00AF9DED /* MeetingsHomeView.swift */,
+				4F7DE4BB2B60BE4D00AF9DED /* MessageComposerView.swift */,
+				4F7DE4B72B60BE4D00AF9DED /* MessageListView.swift */,
+				4F7DE4C02B60BE4D00AF9DED /* MessagingHomeView.swift */,
+				4F7DE4B32B60BE4D00AF9DED /* SearchView.swift */,
+				4F7DE4B02B60BE4D00AF9DED /* SettingsView.swift */,
+				4F7DE4B12B60BE4D00AF9DED /* SpaceDetailView.swift */,
+				4F7DE4B62B60BE4D00AF9DED /* SpaceMembershipListSearchView.swift */,
+				4F7DE4AD2B60BE4D00AF9DED /* SpaceRowViewCell.swift */,
+				4F7DE4B52B60BE4D00AF9DED /* TeamSpaceMemberSearchView.swift */,
+				4F7DE4B82B60BE4D00AF9DED /* TeamSpaceMemberShipView.swift */,
+				4F7DE4BD2B60BE4D00AF9DED /* WaitingCallView.swift */,
+				4F7DE4BC2B60BE4D00AF9DED /* WebView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4F7DE4752B60BDF400AF9DED /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE4922B60BE4300AF9DED /* LoginViewModel.swift */,
+				4F7DE4932B60BE4300AF9DED /* MainTabViewModel.swift */,
+				4F7DE49A2B60BE4300AF9DED /* MeetingsHomeViewModel.swift */,
+				4F7DE49B2B60BE4300AF9DED /* MessageComposerViewModel.swift */,
+				4F7DE4972B60BE4300AF9DED /* MessageListViewModel.swift */,
+				4F7DE4942B60BE4300AF9DED /* MessagingHomeViewModel.swift */,
+				4F7DE4952B60BE4300AF9DED /* SearchSpaceListViewModel.swift */,
+				4F7DE49C2B60BE4300AF9DED /* SettingsViewModel.swift */,
+				4F7DE4992B60BE4300AF9DED /* SpaceDetailViewModel.swift */,
+				4F7DE4962B60BE4300AF9DED /* SpaceMembershipListSearchViewModel.swift */,
+				4F7DE49D2B60BE4300AF9DED /* TeamSpaceMemberSearchViewmodel.swift */,
+				4F7DE4982B60BE4300AF9DED /* TeamSpaceMemberShipViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		4F7DE4762B60BDFB00AF9DED /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE48A2B60BE3900AF9DED /* Constants.swift */,
+				4F7DE48D2B60BE3900AF9DED /* MessageComposerUtil.swift */,
+				4F7DE48C2B60BE3900AF9DED /* MessagingHomeUtil.swift */,
+				4F7DE48B2B60BE3900AF9DED /* Throttler.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		4F7DE4772B60BE0400AF9DED /* Webex */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE47B2B60BE2F00AF9DED /* WebexAuthenticator.swift */,
+				4F7DE47D2B60BE2F00AF9DED /* WebexCalendar.swift */,
+				4F7DE47C2B60BE2F00AF9DED /* WebexMembership.swift */,
+				4F7DE4792B60BE2F00AF9DED /* WebexMessage.swift */,
+				4F7DE47F2B60BE2F00AF9DED /* WebexPeople.swift */,
+				4F7DE47A2B60BE2F00AF9DED /* WebexPhone.swift */,
+				4F7DE4802B60BE2F00AF9DED /* WebexSpaces.swift */,
+				4F7DE4782B60BE2F00AF9DED /* WebexTeamMembership.swift */,
+				4F7DE47E2B60BE2F00AF9DED /* WebexTeams.swift */,
+			);
+			path = Webex;
+			sourceTree = "<group>";
+		};
+		4F7DE4DA2B60C03700AF9DED /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE4E32B60C07500AF9DED /* MeetingModel.swift */,
+				4F7DE4E22B60C07500AF9DED /* MessageModel.swift */,
+				4F7DE4E12B60C07500AF9DED /* SpaceModel.swift */,
+				4F7DE4E02B60C07500AF9DED /* TeamModel.swift */,
+				4F7DE4DB2B60C04D00AF9DED /* Memberships */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4F7DE4DB2B60C04D00AF9DED /* Memberships */ = {
+			isa = PBXGroup;
+			children = (
+				4F7DE4DC2B60C06B00AF9DED /* SpaceMembershipModel.swift */,
+				4F7DE4DD2B60C06B00AF9DED /* TeamMembershipModel.swift */,
+			);
+			path = Memberships;
+			sourceTree = "<group>";
+		};
 		904F183E24F71BB700FA043A /* Teams */ = {
 			isa = PBXGroup;
 			children = (
@@ -530,7 +740,6 @@
 		9DD2D6B524AA5FB9005F4ABE /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				4F7DA4002AD90EAA00FEE2D7 /* WebexAuthenticator.swift */,
 				4F7DA3FE2AD90E6D00FEE2D7 /* OAuthUrlUtil.swift */,
 				1FDC6E0F298158590054EC1B /* CallKitManager.swift */,
 				9D8236972726EA420099D44D /* DateUtils.swift */,
@@ -553,6 +762,7 @@
 		9DDC829124AA35E400F06E31 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				4F7DE4732B60BDDD00AF9DED /* NewUI */,
 				4F238BA027BBEB3C0035754A /* Extensions */,
 				9DD2D6B424AA52F4005F4ABE /* KitchenSink.entitlements */,
 				08CE26FA2583687A00F041DA /* ThirdPary */,
@@ -581,7 +791,7 @@
 		9DDC82B424AA36A300F06E31 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				4F7DA3FC2AD90BFE00FEE2D7 /* LoginVC.swift */,
+				4F162FE92B61760E0063DBCF /* WelcomeViewController.swift */,
 				4F7DA3F12AD90B9000FEE2D7 /* ClosedCaptionsViewController.swift */,
 				4F7DA3F02AD90B9000FEE2D7 /* LanguageSelectionViewController.swift */,
 				1FDC6E0D298158090054EC1B /* LoadingViewController.swift */,
@@ -638,10 +848,6 @@
 		9DDC82C524AA36A300F06E31 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				4F7DA3F52AD90BBA00FEE2D7 /* ActivityIndicatorView.swift */,
-				4F7DA3F42AD90BBA00FEE2D7 /* KSButton.swift */,
-				4F7DA3F72AD90BBA00FEE2D7 /* LoginView.swift */,
-				4F7DA3F62AD90BBA00FEE2D7 /* WebView.swift */,
 				4F7DA3EE2AD90AE800FEE2D7 /* CloseCaptionsMenuView.swift */,
 				4FFF6F972A2E183800B55A3E /* AttachmentCollectionViewCell.swift */,
 				4FFF6F962A2E183800B55A3E /* ScreenShareConfigView.swift */,
@@ -938,45 +1144,73 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F7DE4DF2B60C06B00AF9DED /* TeamMembershipModel.swift in Sources */,
 				2E621CBE24EEA5F1009E64F6 /* ReusableCell.swift in Sources */,
 				4FFF6F992A2E183800B55A3E /* AttachmentCollectionViewCell.swift in Sources */,
 				9D8236962726EA330099D44D /* VirtualBackgroundViewCell.swift in Sources */,
 				9DDC82DA24AA36A300F06E31 /* DialButton.swift in Sources */,
 				9DB243E3260CC458006B18C5 /* Dropdown.swift in Sources */,
 				4F7DA4032AD90F2D00FEE2D7 /* CallingSpacesTableViewCell.swift in Sources */,
+				4F7DE4C62B60BE4D00AF9DED /* CreateNewButton.swift in Sources */,
 				9DDC82DB24AA36A300F06E31 /* FeatureCollectionViewCell.swift in Sources */,
 				4F326C8B28EB073F00EA57D9 /* PersonFormViewController.swift in Sources */,
+				4F7DE4C22B60BE4D00AF9DED /* KSButton.swift in Sources */,
 				9DB243CF260CC3EC006B18C5 /* ScheduledMeetingTableViewCell.swift in Sources */,
+				4F7DE4D22B60BE4D00AF9DED /* KSIconButton.swift in Sources */,
 				9CB90C0924E72685009D9D75 /* FilterSpacesViewController.swift in Sources */,
+				4F7DE4E52B60C07500AF9DED /* SpaceModel.swift in Sources */,
+				4F7DE4C82B60BE4D00AF9DED /* SettingsView.swift in Sources */,
+				4F7DE4892B60BE2F00AF9DED /* WebexSpaces.swift in Sources */,
 				9DB243CE260CC3EC006B18C5 /* IncomingCallViewCell.swift in Sources */,
+				4F7DE4CC2B60BE4D00AF9DED /* MailView.swift in Sources */,
+				4F7DE4A22B60BE4300AF9DED /* SpaceMembershipListSearchViewModel.swift in Sources */,
+				4F7DE4D92B60BE4D00AF9DED /* ImagePickerView.swift in Sources */,
 				2E621CCC24EEA624009E64F6 /* SpaceTableViewCell.swift in Sources */,
+				4F7DE4A92B60BE4300AF9DED /* TeamSpaceMemberSearchViewmodel.swift in Sources */,
+				4F7DE4872B60BE2F00AF9DED /* WebexTeams.swift in Sources */,
 				9DDC82D324AA36A300F06E31 /* CallViewController.swift in Sources */,
+				4F7DE4C72B60BE4D00AF9DED /* CallingTabView.swift in Sources */,
 				9DDC82D124AA36A300F06E31 /* HistoryCallViewController.swift in Sources */,
+				4F7DE4D42B60BE4D00AF9DED /* WebView.swift in Sources */,
 				2E57915224CA15AE00B196A9 /* BasicTableViewController.swift in Sources */,
 				9D8236902726EA270099D44D /* CalendarMeetingsViewController.swift in Sources */,
-				4F7DA4012AD90EAA00FEE2D7 /* WebexAuthenticator.swift in Sources */,
 				1FDC6E10298158590054EC1B /* CallKitManager.swift in Sources */,
-				4F7DA3F92AD90BBA00FEE2D7 /* ActivityIndicatorView.swift in Sources */,
 				1FEE696E253E45170070E6C9 /* WebhooksViewController.swift in Sources */,
+				4F7DE4D32B60BE4D00AF9DED /* MessageComposerView.swift in Sources */,
+				4F7DE48E2B60BE3900AF9DED /* Constants.swift in Sources */,
+				4F7DE4912B60BE3900AF9DED /* MessageComposerUtil.swift in Sources */,
 				9D39519A256BD4CD00B4718D /* GetMeViewController.swift in Sources */,
 				9DDC829324AA35E400F06E31 /* AppDelegate.swift in Sources */,
 				2EB6BD7024B7996800DC3B7D /* MessagingViewController.swift in Sources */,
+				4F7DE4A72B60BE4300AF9DED /* MessageComposerViewModel.swift in Sources */,
 				9D1CCC272657FD3400EB302C /* CallObjectStorage.swift in Sources */,
+				4F7DE4E42B60C07500AF9DED /* TeamModel.swift in Sources */,
 				2E39A40B24BCAAA90081D077 /* UILabel+Extensions.swift in Sources */,
 				1FEE6973253E67190070E6C9 /* NewWebhookFormViewController.swift in Sources */,
+				4F7DE4E62B60C07500AF9DED /* MessageModel.swift in Sources */,
+				4F7DE4CD2B60BE4D00AF9DED /* TeamSpaceMemberSearchView.swift in Sources */,
+				4F7DE4832B60BE2F00AF9DED /* WebexPhone.swift in Sources */,
 				2E9FA34F24D99E0700C914D4 /* String+Extension.swift in Sources */,
 				4F7DA3F32AD90B9000FEE2D7 /* ClosedCaptionsViewController.swift in Sources */,
 				2E9FA34D24D9967100C914D4 /* SpaceMessagesTableViewController.swift in Sources */,
 				9DDC82CE24AA36A300F06E31 /* InitiateCallViewController.swift in Sources */,
+				4F7DE4A02B60BE4300AF9DED /* MessagingHomeViewModel.swift in Sources */,
+				4F7DE4902B60BE3900AF9DED /* MessagingHomeUtil.swift in Sources */,
 				9D82368F2726EA270099D44D /* CalendarMeetingDetailViewController.swift in Sources */,
+				4F7DE49E2B60BE4300AF9DED /* LoginViewModel.swift in Sources */,
 				08CE26C22582620100F041DA /* EncryptionUtils.swift in Sources */,
-				4F7DA3FB2AD90BBA00FEE2D7 /* LoginView.swift in Sources */,
+				4F7DE4DE2B60C06B00AF9DED /* SpaceMembershipModel.swift in Sources */,
+				4F7DE4D02B60BE4D00AF9DED /* TeamSpaceMemberShipView.swift in Sources */,
 				9D1CCC292657FD4600EB302C /* AuxCollectionViewCell.swift in Sources */,
 				4F7DA3FF2AD90E6D00FEE2D7 /* OAuthUrlUtil.swift in Sources */,
+				4F7DE4842B60BE2F00AF9DED /* WebexAuthenticator.swift in Sources */,
 				9D82369A2726EA420099D44D /* FileUtils.swift in Sources */,
+				4F7DE4A42B60BE4300AF9DED /* TeamSpaceMemberShipViewModel.swift in Sources */,
 				1FEE6970253E52050070E6C9 /* WebhookTableViewCell.swift in Sources */,
 				9DD5215B252F8B4E008727E1 /* AttachmentPreviewViewController.swift in Sources */,
+				4F7DE4D52B60BE4D00AF9DED /* WaitingCallView.swift in Sources */,
 				9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */,
+				4F7DE4A82B60BE4300AF9DED /* SettingsViewModel.swift in Sources */,
 				4F238BA227BBEB5C0035754A /* UIAlertController+Extension.swift in Sources */,
 				1FDC6E0E298158090054EC1B /* LoadingViewController.swift in Sources */,
 				4F7DA3F22AD90B9000FEE2D7 /* LanguageSelectionViewController.swift in Sources */,
@@ -984,50 +1218,72 @@
 				4F2593A9284F8FC9001A777E /* MediaStreamView.swift in Sources */,
 				9DDC82D624AA36A300F06E31 /* HomeViewController.swift in Sources */,
 				9D8236922726EA270099D44D /* FilterCalendarMeetingsViewController.swift in Sources */,
+				4F7DE4A62B60BE4300AF9DED /* MeetingsHomeViewModel.swift in Sources */,
+				4F162FEA2B61760E0063DBCF /* WelcomeViewController.swift in Sources */,
 				9D37019B24ABDD02004E480E /* ConstraintsExtension.swift in Sources */,
 				9DDC82CD24AA36A300F06E31 /* ViewUtils.swift in Sources */,
+				4F7DE4D72B60BE4D00AF9DED /* MainTabView.swift in Sources */,
+				4F7DE48F2B60BE3900AF9DED /* Throttler.swift in Sources */,
 				2EB6BD8424B7B86700DC3B7D /* UIAlertAction+Extensions.swift in Sources */,
+				4F7DE4D12B60BE4D00AF9DED /* ActivityIndicatorView.swift in Sources */,
+				4F7DE4CE2B60BE4D00AF9DED /* SpaceMembershipListSearchView.swift in Sources */,
 				1FDC6E2C298159B10054EC1B /* UIViewController+Extenstion.swift in Sources */,
 				4F2593AC284F8FD2001A777E /* UIView+Extenstion.swift in Sources */,
+				4F7DE4C32B60BE4D00AF9DED /* MeetingsHomeView.swift in Sources */,
 				4FFF6F982A2E183800B55A3E /* ScreenShareConfigView.swift in Sources */,
+				4F7DE4C42B60BE4D00AF9DED /* FilterSpaceView.swift in Sources */,
 				9D3951AD256D0D5400B4718D /* MessageComposerViewController.swift in Sources */,
 				9DDC82CF24AA36A300F06E31 /* DialCallViewController.swift in Sources */,
 				9D3F77E224C604A400A6FB59 /* ParticipantListViewController.swift in Sources */,
+				4F7DE49F2B60BE4300AF9DED /* MainTabViewModel.swift in Sources */,
 				9DB243DC260CC412006B18C5 /* SetupViewController.swift in Sources */,
 				9DDC82D924AA36A300F06E31 /* ColorUtils.swift in Sources */,
+				4F7DE4D82B60BE4D00AF9DED /* MessagingHomeView.swift in Sources */,
+				4F7DE4822B60BE2F00AF9DED /* WebexMessage.swift in Sources */,
+				4F7DE4CA2B60BE4D00AF9DED /* LoginView.swift in Sources */,
 				08CE26ED258339E200F041DA /* SwCrypt.swift in Sources */,
 				9D8236912726EA270099D44D /* CalendarAtendeesTableViewController.swift in Sources */,
+				4F7DE4852B60BE2F00AF9DED /* WebexMembership.swift in Sources */,
+				4F7DE4E72B60C07500AF9DED /* MeetingModel.swift in Sources */,
 				2EAFB41424FEB8B700494183 /* SpaceMembershipReadStatusViewController.swift in Sources */,
+				4F7DE4D62B60BE4D00AF9DED /* CallControllerView.swift in Sources */,
 				9DB243CD260CC3EC006B18C5 /* ScheduledCallViewController.swift in Sources */,
 				9DDC82D524AA36A300F06E31 /* IncomingCallViewController.swift in Sources */,
 				2EB6BD7324B79A2900DC3B7D /* MessagingSpacesViewController.swift in Sources */,
+				4F7DE4A12B60BE4300AF9DED /* SearchSpaceListViewModel.swift in Sources */,
 				4F7DA3EF2AD90AE800FEE2D7 /* CloseCaptionsMenuView.swift in Sources */,
 				90F9B01924B7AC7800447A9D /* NavigationItemSetupProtocol.swift in Sources */,
 				9DB243DD260CC412006B18C5 /* ExtrasViewController.swift in Sources */,
+				4F7DE4C52B60BE4D00AF9DED /* SpaceRowViewCell.swift in Sources */,
 				2EB6BD7624B7B66300DC3B7D /* UIAlertController+Extensions.swift in Sources */,
 				9D8236952726EA330099D44D /* CalendarMeetingTableViewCell.swift in Sources */,
 				1FDC6E0C298157D90054EC1B /* CallHistoryRecordTableViewCell.swift in Sources */,
-				4F7DA3FD2AD90BFE00FEE2D7 /* LoginVC.swift in Sources */,
 				9C3E5A0424DC3FDD0030855E /* PeopleViewController.swift in Sources */,
+				4F7DE4862B60BE2F00AF9DED /* WebexCalendar.swift in Sources */,
+				4F7DE4882B60BE2F00AF9DED /* WebexPeople.swift in Sources */,
 				9DAFA61524C9760C00A47221 /* ParticipantTableViewCell.swift in Sources */,
-				4F7DA3FA2AD90BBA00FEE2D7 /* WebView.swift in Sources */,
 				9DDC82D224AA36A300F06E31 /* SearchContactViewController.swift in Sources */,
 				9DDC82CC24AA36A300F06E31 /* Feature.swift in Sources */,
+				4F7DE4CB2B60BE4D00AF9DED /* SearchView.swift in Sources */,
+				4F7DE4812B60BE2F00AF9DED /* WebexTeamMembership.swift in Sources */,
+				4F7DE4C92B60BE4D00AF9DED /* SpaceDetailView.swift in Sources */,
 				9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */,
 				0864BA1D2582285F0029C3AF /* PushNotificationHandler.swift in Sources */,
 				9D8236992726EA420099D44D /* DateUtils.swift in Sources */,
-				4F7DA3F82AD90BBA00FEE2D7 /* KSButton.swift in Sources */,
 				2E176D2924D9E3E7004BB3F6 /* MessageTableViewCell.swift in Sources */,
 				9DDC82D824AA36A300F06E31 /* LoginViewController.swift in Sources */,
 				904F184024F71C3300FA043A /* TeamMembershipViewController.swift in Sources */,
+				4F7DE4CF2B60BE4D00AF9DED /* MessageListView.swift in Sources */,
 				2E621CCE24EEB4CD009E64F6 /* ContactSearchViewController.swift in Sources */,
 				9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */,
 				1FDC6E2B298159B10054EC1B /* UIApplication+Extenstion.swift in Sources */,
 				90F9B00B24B79FB200447A9D /* TeamsViewController.swift in Sources */,
+				4F7DE4A32B60BE4300AF9DED /* MessageListViewModel.swift in Sources */,
 				9CB90C0824E72685009D9D75 /* (null) in Sources */,
 				9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */,
 				9D3701A924ABDD43004E480E /* ImageExtension.swift in Sources */,
 				4F326C8928EB073100EA57D9 /* PasswordCaptchaView.swift in Sources */,
+				4F7DE4A52B60BE4300AF9DED /* SpaceDetailViewModel.swift in Sources */,
 				9DDC82D024AA36A300F06E31 /* CallingSpacesListViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1348,7 +1604,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1400,7 +1656,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = KitchenSinkBroadcastExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1442,7 +1698,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31001;
+				CURRENT_PROJECT_VERSION = 31100;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1459,13 +1715,13 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.10.1;
+				MARKETING_VERSION = 3.11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1502,7 +1758,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31001;
+				CURRENT_PROJECT_VERSION = 31100;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1515,13 +1771,13 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = KitchenSink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.10.1;
+				MARKETING_VERSION = 3.11.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";

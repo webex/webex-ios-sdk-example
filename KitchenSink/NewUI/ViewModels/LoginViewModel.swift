@@ -80,14 +80,8 @@ class LoginViewModel: ObservableObject {
         loadingIndicator(show: true)
         webexAuthenticator.loginWithAuthCode(code: code, completion: { res in
             if res {
-                self.webexAuthenticator.initializeWebex(webex: webex, completion: { res in
-                    if res {
-                        self.loginType = Constants.loginTypeValue.email.rawValue
-                        self.switchRootController()
-                    } else {
-                        self.loadingIndicator(show: false)
-                    }
-                })
+                self.loginType = Constants.loginTypeValue.email.rawValue
+                self.switchRootController()
             } else {
                 self.loadingIndicator(show: false)
             }
@@ -103,14 +97,8 @@ class LoginViewModel: ObservableObject {
         if !guestToken.isEmpty {
             self.webexAuthenticator.loginWithJWT(authenticator: authenticator, jwt: guestToken, completion: { res in
                 if res {
-                    self.webexAuthenticator.initializeWebex(webex: webex, completion: { res in
-                        if res {
-                            self.loginType = Constants.loginTypeValue.jwt.rawValue
-                            self.switchRootController()
-                        } else {
-                            self.loadingIndicator(show: false)
-                        }
-                    })
+                    self.loginType = Constants.loginTypeValue.jwt.rawValue
+                    self.switchRootController()
                 } else {
                     self.loadingIndicator(show: false)
                 }
@@ -129,14 +117,8 @@ class LoginViewModel: ObservableObject {
         if !OAuthToken.isEmpty {
             self.webexAuthenticator.loginWithOAuthToken(authenticator: authenticator, token: OAuthToken, completion: { res in
                 if res {
-                    self.webexAuthenticator.initializeWebex(webex: webex, completion: { res in
-                        if res {
-                            self.loginType = Constants.loginTypeValue.token.rawValue
-                            self.switchRootController()
-                        } else {
-                            self.loadingIndicator(show: false)
-                        }
-                    })
+                    self.loginType = Constants.loginTypeValue.token.rawValue
+                    self.switchRootController()
                 } else {
                     self.loadingIndicator(show: false)
                 }
@@ -151,16 +133,11 @@ class LoginViewModel: ObservableObject {
         if type == .email {
             guard let email = email else { return nil }
             guard let authenticator = webexAuthenticator.getOAuthAuthenticator(email: email, isFedRAMP: isFedRAMPMode) else { return nil }
-            webex = Webex(authenticator: authenticator)
             return authenticator
         } else if type == .jwt {
-            let authenticator = webexAuthenticator.getJWTAuthenticator()
-            webex = Webex(authenticator: authenticator)
-            return authenticator
+            return webexAuthenticator.getJWTAuthenticator()
         } else {
-            let authenticator = webexAuthenticator.getTokenAuthenticator(isFedRAMP: isFedRAMPMode)
-            webex = Webex(authenticator: authenticator)
-            return authenticator
+            return webexAuthenticator.getTokenAuthenticator(isFedRAMP: isFedRAMPMode)
         }
     }
 

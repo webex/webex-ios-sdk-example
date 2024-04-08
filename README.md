@@ -35,7 +35,7 @@ This demo supports iOS device with **iOS 13** or later
 
 ## Download App
 You can download our Demo App from TestFlight.
-1. Download TestFlight from App Stroe.
+1. Download TestFlight from App Store.
 1. Open the public url(https://testflight.apple.com/join/obJ7Inof) from your iPhone browser.
 1. Start Testing and install Ktichen Sink App from TestFlight.
 
@@ -94,3 +94,6 @@ Here are the steps to setup Xcode project using [CocoaPods](http://cocoapods.org
 
 ## API Reference
 For complete API Reference, see [documentation](https://webex.github.io/webex-ios-sdk/)
+
+## Privacy Manifest
+In order to use WebexSDK in your iOS app, .xcprivacy file should be added to your application. Privacy manifest file can be found in [here](https://github.com/webex/webex-ios-sdk-example/blob/master/KitchenSink/PrivacyInfo.xcprivacy). 

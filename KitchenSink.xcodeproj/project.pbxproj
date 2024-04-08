@@ -171,6 +171,8 @@
 		9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */; };
 		9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C924AA36A300F06E31 /* DialPadView.swift */; };
 		9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82CA24AA36A300F06E31 /* CallButton.swift */; };
+		BB0A70962BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */; };
+		BB0A70982BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */; };
 		D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */; };
 		D84398FF3EAE857155C4FAA8 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
 		E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */; };
@@ -397,6 +399,8 @@
 		AF69537487765CF124BE512E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		BFC684BBFE9497C4EA1AEDEC /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -730,6 +734,7 @@
 		9DD11CCC2567CAC500B2C2CA /* KitchenSinkBroadcastExtension */ = {
 			isa = PBXGroup;
 			children = (
+				BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */,
 				9DD11DD82568E24700B2C2CA /* KitchenSinkBroadcastExtension.entitlements */,
 				9DD11D8D2568D77500B2C2CA /* SampleHandler.swift */,
 				9DD11CCF2567CAC600B2C2CA /* Info.plist */,
@@ -762,6 +767,7 @@
 		9DDC829124AA35E400F06E31 /* KitchenSink */ = {
 			isa = PBXGroup;
 			children = (
+				BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */,
 				4F7DE4732B60BDDD00AF9DED /* NewUI */,
 				4F238BA027BBEB3C0035754A /* Extensions */,
 				9DD2D6B424AA52F4005F4ABE /* KitchenSink.entitlements */,
@@ -990,6 +996,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB0A70982BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -997,6 +1004,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB0A70962BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy in Resources */,
 				9DDC829F24AA35E800F06E31 /* LaunchScreen.storyboard in Resources */,
 				9DDC829C24AA35E800F06E31 /* Assets.xcassets in Resources */,
 				9DA5F01B257F865200A1340C /* call_1_1_ringtone.wav in Resources */,

@@ -41,19 +41,23 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         Feature(title: "Extras", icon: "webhook", tileColor: .momentumGold50, action: { [weak self] in
             self?.navigationController?.pushViewController(ExtrasViewController(), animated: true)
         }),
-        Feature(title: "Logout", icon: "sign-out", tileColor: .momentumRed50, action: {
-            webex.authenticator?.deauthorize(completionHandler: {
-                DispatchQueue.main.async { [weak self] in
-                    guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else { fatalError() }
-                    self?.navigationController?.dismiss(animated: true)
-                    UserDefaults.standard.removeObject(forKey: Constants.loginTypeKey)
-                    UserDefaults.standard.removeObject(forKey: Constants.emailKey)
-                    UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
-                    appDelegate.navigateToLoginViewController()
-                }
-            })
-        })
+        Feature(title: "Logout", icon: "sign-out", tileColor: .momentumRed50, action: logout)
     ]
+
+    func logout() {
+        webex.authenticator?.deauthorize(completionHandler: cleanupOnLogout)
+    }
+
+    func cleanupOnLogout() {
+        DispatchQueue.main.async { [weak self] in
+            guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else { fatalError() }
+            self?.navigationController?.dismiss(animated: true)
+            UserDefaults.standard.removeObject(forKey: Constants.loginTypeKey)
+            UserDefaults.standard.removeObject(forKey: Constants.emailKey)
+            UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
+            appDelegate.navigateToLoginViewController()
+        }
+    }
 
     private let versionLabel: UILabel = {
         let label = UILabel()
@@ -101,6 +105,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         webex.ucLoginDelegate = self
+        webex.authDelegate = AppDelegate.shared
         webex.startUCServices()
         isUCServicesStarted = true
         webex.messages.onEvent = { messageEvent in
@@ -368,6 +373,13 @@ extension HomeViewController {
         
         alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
         present(alert, animated: true)
+    }
+}
+
+extension HomeViewController: WebexAuthDelegate {
+    func onReLoginRequired() {
+        print("onReLoginRequired called")
+        cleanupOnLogout()
     }
 }
 

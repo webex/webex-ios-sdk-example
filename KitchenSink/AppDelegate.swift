@@ -237,7 +237,7 @@ extension AppDelegate: PKPushRegistryDelegate {
             processVoipPush(payload: payload)
             return
         }
-        
+
         guard let authType = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
         if authType == Constants.loginTypeValue.jwt.rawValue {
             initWebexUsingJWT()
@@ -260,7 +260,7 @@ extension AppDelegate: PKPushRegistryDelegate {
             }
         }
     }
-    
+
     func initWebexUsingOauth() {
         guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
         guard let keys = NSDictionary(contentsOfFile: path) else { return }
@@ -268,7 +268,7 @@ extension AppDelegate: PKPushRegistryDelegate {
         let clientSecret = keys["clientSecret"] as? String ?? ""
         let redirectUri = keys["redirectUri"] as? String ?? ""
         let scopes = "spark:all" // spark:all is always mandatory
-        
+
         // See if we already have an email stored in UserDefaults else get it from user and do new Login
         if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: Constants.emailKey) as? String) {
             // The scope parameter can be a space separated list of scopes that you want your access token to possess
@@ -277,13 +277,32 @@ extension AppDelegate: PKPushRegistryDelegate {
             return
         }
     }
-    
+
     func initWebexUsingJWT() {
         webex = Webex(authenticator: JWTAuthenticator())
     }
-    
+
     func initWebexUsingToken() {
         webex = Webex(authenticator: TokenAuthenticator())
     }
 }
 
+extension AppDelegate: WebexAuthDelegate {
+    func onReLoginRequired() {
+        print("onReLoginRequired called")
+        cleanupOnLogout()
+    }
+
+    func cleanupOnLogout() {
+        DispatchQueue.main.async {
+            UIApplication.shared.topViewController()?.dismiss(animated: true) { [weak self] in
+                DispatchQueue.main.async {
+                    self?.navigateToLoginViewController()
+                }
+            }
+            UserDefaults.standard.removeObject(forKey: Constants.loginTypeKey)
+            UserDefaults.standard.removeObject(forKey: Constants.emailKey)
+            UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
+        }
+    }
+}

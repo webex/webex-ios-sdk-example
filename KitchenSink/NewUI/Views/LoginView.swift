@@ -1,10 +1,10 @@
 import SwiftUI
+import Combine
 
 @available(iOS 16.0, *)
 struct LoginView: View {
 
     @Environment(\.colorScheme) var colorScheme
-
     @ObservedObject var model = LoginViewModel(link: URL(string: "https://google.com")!, redirectUri: "")
 
     @State var showingEmailAlert = false
@@ -45,6 +45,7 @@ struct LoginView: View {
                     .padding()
                     .sheet(isPresented: $model.showWebView) {
                         WebView(viewModel: model)
+                            .accessibilityIdentifier("loginWebView")
                             .onDisappear(perform: doLoginAction)
                     }
                 KSButton(text: "Guest Token", didTap: showingGuestAlert, action: loginWithGuestToken)
@@ -61,6 +62,13 @@ struct LoginView: View {
                     .accessibilityIdentifier("versionLabel")
 
             }
+            .alert("Error", isPresented: $model.showErrorAlert, actions: {
+                Button("Ok") {
+                    model.showErrorAlert = false
+                }
+            }, message: {
+                Text(model.alertErrorMessage)
+            })
             .ignoresSafeArea(.keyboard, edges: .bottom)
             if model.showLoading {
                 ActivityIndicatorView()
@@ -94,6 +102,7 @@ struct LoginView: View {
     /// Initiates a login action with an authorization code using the model.
     func doLoginAction() {
         model.loginWithAuthCode(code: model.code)
+        loginValue = ""
     }
 
     /// Initiates an email login action with the given email and FedRAMP mode state using the model.
@@ -121,18 +130,7 @@ struct LoginView: View {
 
     /// Initiates an auto login action based on the saved authentication type
     func tryAutoLogin() {
-        var authType: AuthType = .token
-        guard let type = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
-        if type == Constants.loginTypeValue.email.rawValue {
-            authType = .email
-        } else if type == Constants.loginTypeValue.jwt.rawValue {
-            authType = .jwt
-        } else {
-            authType = .token
-        }
-        let email = UserDefaults.standard.string(forKey: Constants.emailKey)
-        guard let authenticator = model.getAuthenticator(type: authType, email: email, isFedRAMPMode: isFedRAMPEnabled) else { return }
-        model.tryAutoLogin(authenticator: authenticator, loginType: type, email: email ?? "")
+        model.tryAutoLogin()
     }
 }
 
@@ -150,12 +148,14 @@ public extension View {
     func alert(isPresented: Binding<Bool>,
                title: String,
                dismissButton: Alert.Button? = nil,
-               textFieldValue: Binding<String>,
+               textFieldValue: Binding<String>, buttonText: String = "OK",
                action: @escaping () -> Void) -> some View {
         ZStack {
             alert(title, isPresented: isPresented) {
                 TextField("Enter the value", text: textFieldValue)
-                Button("OK", action: action)
+                    .accessibilityIdentifier("alertTextField")
+                Button(buttonText, action: action)
+                    .accessibilityIdentifier("alertOkBtn")
             }
         }
     }

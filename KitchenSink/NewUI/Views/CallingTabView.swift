@@ -1,5 +1,7 @@
 import SwiftUI
 import WebexSDK
+import ReplayKit
+import AVKit
 
 enum KSSegmentedControl: CaseIterable, Identifiable {
     case call, history
@@ -33,6 +35,8 @@ struct CallingTabView: View {
                      SegmentView(segment: selectedOption)
                     .navigationViewStyle(StackNavigationViewStyle())
                     .navigationBarTitle("Calling", displayMode: .inline)
+                    .accessibilityIdentifier("callSegment")
+                Spacer()
             }
         }
     }
@@ -45,7 +49,7 @@ struct SegmentView: View {
     var body: some View {
         switch segment {
         case .call:
-            DailCallControllerView()
+            DialControlView(viewModel: DialControlViewModel(), phoneServicesViewModel: UCLoginServicesViewModel())
         case .history:
             HistoryListView()
         }
@@ -60,6 +64,7 @@ struct HistoryListView: View {
         List {
             ForEach(historyListViewModel.fetchResult()) { result in
                 HistoryListRowView(history: result)
+                    .accessibilityIdentifier("historyList")
             }
         }
     }
@@ -69,9 +74,26 @@ struct HistoryListView: View {
 @available(iOS 16.0, *)
 struct HistoryListRowView: View {
     @State var history: CallHistoryRecord
+    @State private var showCallingView = false
     
     var body: some View {
         HStack {
+            if history.isMissedCall {
+                Image("missed-call")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+            }
+            else if history.callDirection == .outgoing {
+                Image("outgoing-call")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+            }
+            else if history.callDirection == .incoming {
+                Image("incoming-call")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+            }
+            
             VStack {
                 Text(history.displayName)
                     .font(.title3)
@@ -81,12 +103,16 @@ struct HistoryListRowView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             KSIconButton(action: call, image: "phone", foregroundColor: .green)
+                .accessibilityIdentifier("dial")
+        }
+        .fullScreenCover(isPresented: $showCallingView){
+            CallingScreenView(callingVM: CallViewModel(joinAddress: history.callbackAddress, isPhoneNumber: history.isPhoneNumber))
         }
     }
     
     /// Calling method
     private func call() {
-        print("Calling ")
+        self.showCallingView = true
     }
     
     /// Formats and returns the start time and duration of the given call history record as a string.

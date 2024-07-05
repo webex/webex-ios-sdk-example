@@ -76,7 +76,9 @@ struct SpaceDetailView: View {
                         isSearchViewPresented = true
                     } label: {
                         Image(systemName: "person.crop.circle.badge.plus")
+                            .accessibilityIdentifier("addMembershipToSpaceButton")
                     }
+                    
                 }
             }
             Picker("", selection: $selectedOption) {
@@ -108,62 +110,77 @@ struct SpaceDetailView: View {
                     }) {
                         Text("Fetch Space by Id")
                     }
+                    .accessibility(identifier: "fetchSpaceByIdButton")
                     Button(action: {
                         fetchMeetingSpaceInfo(spaceId: space.id ?? "")
                     }) {
                         Text("Get Space Meeting Info")
                     }
+                    .accessibility(identifier: "getSpaceMeetingInfoButton")
                     Button(action: {
                         fetchSpaceReadStatus(spaceId: space.id ?? "")
                     }) {
                         Text("Fetch Space Read Status")
                     }
+                    .accessibility(identifier: "fetchSpaceReadStatusButton")
                     Button(action: {
                         self.messageViewPresented = true
                     }) {
                         Text("Show Messages in Space")
                     }
+                    .accessibility(identifier: "showMessageInSpaceButton")
                     Button(action: {
                         self.updateAlertPresented = true
                     }) {
                         Text("Update Space Title")
                     }
+                    .accessibility(identifier: "updateSpaceTitleButton")
                     Button(action: {
                         self.deleteAlertPresented = true
                     }) {
                         Text("Delete Space")
                     }
+                    .accessibility(identifier: "spaceDeleteButton")
                     Button(action: {
                         markSpaceRead(spaceId: space.id ?? "")
                     }) {
                         Text("Mark Space Read")
                     }
+                    .accessibility(identifier: "markSpaceReadButton")
                 } label: {
                     Label("Menu", systemImage: "ellipsis.circle")
+                        .accessibility(identifier: "spacesMenuButton")
+                    
                 }
                 .sheet(isPresented: $messageViewPresented, content: {
                     MessageListView(space: space)
                 })
                 .alert(alertTitle, isPresented: $isAlertPresented) {
                     Button("Dismiss") { }
+                        .accessibility(identifier: "dismissButton")
                 } message: {
                     Text(self.alertMessage)
                 }
                 .alert("Update Space Title", isPresented: $updateAlertPresented) {
                     TextField("", text: $spaceName)
                     Button("Update", action: updateSpaceTitle)
+                        .accessibility(identifier: "updateSpaceTitleButton")
                     Button("Cancel", role: .cancel) { }
+                        .accessibility(identifier: "updateSpaceTitleCancelButton")
                 } message: {
                     Text("Enter the new title of the Space")
                 }
                 .alert("Please Confirm", isPresented: $deleteAlertPresented) {
                     Button("Delete", action: deleteSpace)
+                        .accessibility(identifier: "deleteSpaceAlertButton")
                     Button("Cancel", role: .cancel) { }
+                        .accessibility(identifier: "deleteSpaceCancelButton")
                 } message: {
                     Text("This action will delete space: \(space.name ?? "")")
                 }
                 .alert("Error", isPresented: $spaceDetailVM.showError) {
                     Button("Ok") { }
+                        .accessibility(identifier: "errorOKButton")
                 } message: {
                     Text(spaceDetailVM.error)
                 }
@@ -179,9 +196,11 @@ struct SpaceDetailView: View {
                     Button("By Person Id") {
                         createMembership(personId: selectedSearchItem.id ?? "", spaceId: space.id ?? "", personDisplayName: selectedSearchItem.displayName ?? "")
                     }
+                    .accessibility(identifier: "createMembershipPersonIdButton")
                     Button("By Email Address") {
                        addTeamMembershipWithEmail()
                     }
+                    .accessibility(identifier: "createMembershipPersonEmailButton")
                 }
             }
         }
@@ -306,6 +325,7 @@ struct SpaceMembershipView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .accessibilityIdentifier("Email-\(membership.personEmail?.toString() ?? "")")
                     .onTapGesture {
                         selectedItem = membership
                         showConfirmDialog.toggle()
@@ -318,29 +338,37 @@ struct SpaceMembershipView: View {
                     }
                 }
         }
+        .accessibilityIdentifier("spaceMembershipListView")
         .confirmationDialog("Membership Actions", isPresented: $showConfirmDialog, titleVisibility: .visible) {
             Button("Fetch Membership by Id") {
                 fetchMembership(membershipId: selectedItem?.id ?? "")
             }
+            .accessibility(identifier: "fetchMembershipByIdButton")
             Button("Show All Memberships For This Space and PersonId") {
                 showAllMembershipForSpaceAndPersonId()
             }
+            .accessibility(identifier: "showAllMembershipPersonIdButton")
             Button("Show All Memberships For This Space and PersonEmail") {
                 showAllMembershipForSpaceAndPersonEmail()
             }
+            .accessibility(identifier: "showAllMembershipPersonEmailButton")
             let isModerator = selectedItem?.isModerator ?? false
             Button(isModerator ? "Remove Moderator" : "Set Moderator") {
                 setModerator(membershipId: selectedItem?.id ?? "", isModerator: !isModerator)
             }
+            .accessibility(identifier: isModerator ? "removeModeratorButton" : "setModeratorButton")
         }
         .alert(alertTitle, isPresented: $isAlertPresented) {
             Button("Dismiss") { }
+            .accessibility(identifier: "dismissButton")
         } message: {
             Text(self.alertMessage)
         }
         .alert("Please Confirm", isPresented: $deleteMembershipAlertPresented) {
             Button("Delete", action: deleteMembership)
+                .accessibility(identifier: "deleteMembershipButton")
             Button("Cancel", role: .cancel) { }
+                .accessibility(identifier: "deleteMembershipCancelButton")
         } message: {
             Text("This action will delete the membership")
         }
@@ -476,6 +504,7 @@ struct SpaceAllMembershipListView: View {
                 }
             }
         }
+        .accessibilityIdentifier("spaceAllMembershipListView")
         .listStyle(.plain)
     }
     

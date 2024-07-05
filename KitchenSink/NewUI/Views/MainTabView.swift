@@ -12,33 +12,39 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selection) {
             Group {
-                MessagingHomeView()
+                MessagingHomeView(model: MessagingHomeViewModel())
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Image(systemName: "bubble.left")
                         Text("Messaging")
+                            .accessibilityIdentifier("messagingTab")
                     }.tag(0)
                 SearchView<SearchSpaceListViewModel>(searchViewModel: searchSpaceViewModel)
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Image(systemName: "magnifyingglass")
                         Text("Search")
+                            .accessibilityIdentifier("searchTab")
                     }.tag(1)
                 CallingTabView()
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Image(systemName: "phone")
                         Text("Calling")
+                            .accessibilityIdentifier("callingTab")
                     }.tag(2)
                 MeetingsHomeView()
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Image(systemName: "calendar")
                         Text("Meetings")
+                            .accessibilityIdentifier("meetingTab")
                     }.tag(3)
             }
             .toolbarBackground(.visible, for: .tabBar)
-        }.onAppear(perform: registerDevice)
+        }
+        .onAppear(perform: registerDevice)
+        .accessibilityIdentifier("mainTab")
     }
 
     func registerDevice() {
@@ -49,6 +55,9 @@ struct MainTabView: View {
 }
 
 @available(iOS 16.0, *)
-#Preview {
-    MainTabView()
+struct MainTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainTabView()
+            .previewDevice("iPhone 14 Pro Max")
+    }
 }

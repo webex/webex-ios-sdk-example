@@ -6,10 +6,13 @@ import WebexSDK
 public protocol SearchViewModelProtocol: ObservableObject {
     associatedtype ResultType:Identifiable
     
+    var incomingCall: Call? { get }
     var results: [ResultType] { get }
     var searchString: String { get set }
+    var isCallIncoming: Bool { get set }
 
     func filter(for searchString: String)
+    func registerIncomingCall()
 }
 
 @available(iOS 16.0, *)
@@ -18,9 +21,11 @@ class SearchSpaceListViewModel: SearchViewModelProtocol {
 
     @Published var results = [SpaceKS]()
     @Published var searchString: String = ""
-    
+    @Published var incomingCall: Call?
+    @Published var isCallIncoming: Bool = false
+
     var webexSearchType = WebexSpaces()
-    
+
     /// Filters the list of spaces based on the given search string
     func filter(for searchString: String) {
         self.results = []
@@ -45,5 +50,19 @@ class SearchSpaceListViewModel: SearchViewModelProtocol {
             .sink { [weak self] value in
                 self?.filter(for: value)
             }.store(in: &subscriptions)
+    }
+}
+
+// MARK: Phone
+@available(iOS 16.0, *)
+extension SearchSpaceListViewModel {
+    /// Registers a callback for Incoming call event.
+    func registerIncomingCall() {
+        webex.phone.onIncoming = { call in
+            if !call.isMeeting || !call.isScheduledMeeting || !call.isSpaceMeeting {
+                self.incomingCall = call
+                self.isCallIncoming = true
+            }
+        }
     }
 }

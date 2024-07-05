@@ -9,6 +9,10 @@ struct WebView: UIViewRepresentable {
 
     func makeUIView(context: UIViewRepresentableContext<WebView>) -> WKWebView {
         self.webView.navigationDelegate = context.coordinator
+        if #available(iOS 16.4, *) {
+            self.webView.isInspectable = true
+        }
+        self.webView.accessibilityIdentifier = "webView"
         if let url = viewModel.link {
             self.webView.load(URLRequest(url: url))
         }
@@ -49,7 +53,11 @@ struct WebFileView: UIViewRepresentable {
     var url: URL
 
     func makeUIView(context: Context) -> WKWebView {
-        return WKWebView()
+        let webView = WKWebView()
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
+        return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {

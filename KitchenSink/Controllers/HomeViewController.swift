@@ -1,6 +1,7 @@
 import MessageUI
 import UIKit
 import WebexSDK
+import AVFoundation
 
 enum Feedback: CaseIterable {
     static let recipient = "webex-mobile-sdk@cisco.com"
@@ -21,7 +22,10 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     private let kCellId: String = "FeatureCell"
     private var isUCServicesStarted = false
     private var isSSOLogin = false
-    
+    let cameraDeviceManager = CameraDeviceManager()
+
+    var discoverySession: AVCaptureDevice.DiscoverySession?
+
     private lazy var features: [Feature] = [
         Feature(title: "UC Login", icon: "sign-in", tileColor: .momentumBlue50, action: { [weak self] in
             self?.setPreferencesForUCLogin()
@@ -75,7 +79,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         let capability = webex.people.getProductCapability()
         print("Product Capability: \(capability.isMeetingSupported)")
         view.backgroundColor = .backgroundColor
-
+        setupExternalCameraConnectionNotifications()
         title = "Kitchen Sink"
         navigationController?.navigationBar.prefersLargeTitles = true
         let bundleVersion = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
@@ -727,6 +731,51 @@ extension HomeViewController {  // waiting call related code
             }
             incomingCallData = incomingCallData.filter { $0.currentCallId != call.callId }
             self.notifyIncomingCallListChanged(false)
+        }
+    }
+}
+
+extension HomeViewController {
+
+    func setupExternalCameraConnectionNotifications() {
+        if #available(iOS 17.0, *) {
+            cameraDeviceManager.onExternalCameraDeviceConnected = { camera in
+
+                let alert = UIAlertController(title: "External camera connected: \(camera.name)", message: "", preferredStyle: .alert)
+
+                alert.addAction(.init(title: "Ok", style: .cancel, handler: { _ in
+                    alert.dismiss(animated: true, completion: {
+                        webex.phone.updateSystemPreferredCamera(camera: camera, completionHandler: {
+                            result in
+                            switch result {
+                            case .success():
+                                print("External camera was connected with device ID: \(camera.id)")
+                            case .failure(let err):
+                                print("External camera was not connected with error: \(err)")
+                            }
+                        })
+                    })
+                }))
+
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+            }
+
+            cameraDeviceManager.onExternalCameraDeviceDisconnected = {
+                let alert = UIAlertController(title: "External camera disconnected", message: "", preferredStyle: .alert)
+
+                alert.addAction(.init(title: "Ok", style: .cancel, handler: { _ in
+                    alert.dismiss(animated: true, completion: nil)
+                }))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+
+                print("External camera was disconnected")
+            }
+        } else {
+            print("External Camera Error: Requires iOS 17.0 and above")
         }
     }
 }

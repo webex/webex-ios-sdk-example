@@ -60,14 +60,16 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var timer = Timer()
     private var shareConfig: ShareConfig? // to store share config locally and send when screen-share extension connected
     private var isPhoneNumber =  false
+    private var moveMeeting =  false
     // MARK: Initializers
-    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCall: Call? = nil, incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false) {
+    init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCall: Call? = nil, incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false, moveMeeting: Bool = false) {
         self.space = space
         self.addedCall = addedCall
         self.currentCallId = currentCallId
         self.oldCall = oldCall
         self.incomingCall = incomingCall
         self.isPhoneNumber = isPhoneNumber
+        self.moveMeeting = moveMeeting
         if incomingCall || addedCall {
             self.call = call
         }
@@ -76,12 +78,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         modalTransitionStyle = .crossDissolve
     }
     
-    init(callInviteAddress: String, isPhoneNumber: Bool = false) {
+    init(callInviteAddress: String, isPhoneNumber: Bool = false, moveMeeting: Bool = false) {
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
         modalTransitionStyle = .crossDissolve
         self.callInviteAddress = callInviteAddress
         self.isPhoneNumber = isPhoneNumber
+        self.moveMeeting = moveMeeting
     }
     
     required init?(coder: NSCoder) {
@@ -428,6 +431,13 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let cameras = webex.phone.getListOfCameras()
+        print("List of cameras: \(cameras)")
+        var count = 1
+        for camera in cameras {
+            print("Camera \(count): \(camera.name)")
+            count += 1
+        }
         view.backgroundColor = .backgroundColor
         setupViews()
         setupConstraints()
@@ -607,7 +617,10 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
-        let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword, captchaId: captcha?.id ?? "", captchaVerifyCode: captchaVerifyCode)
+        
+        let companionMode = moveMeeting ? CompanionMode.MoveMeeting : CompanionMode.None
+
+        let mediaOption = getMediaOption(isModerator: isModerator, pin: pinOrPassword, captchaId: captcha?.id ?? "", captchaVerifyCode: captchaVerifyCode, companionMode: companionMode)
        
         if self.isPhoneNumber
         {
@@ -639,11 +652,11 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         })
     }
     
-    func getMediaOption(isModerator: Bool, pin: String?, captchaId: String = "", captchaVerifyCode: String = "") -> MediaOption {
-        var mediaOption = MediaOption.audioOnly()
+    func getMediaOption(isModerator: Bool, pin: String?, captchaId: String = "", captchaVerifyCode: String = "", companionMode: CompanionMode = .None) -> MediaOption {
+        var mediaOption = MediaOption.audioOnly(companionMode: companionMode)
         let hasVideo = UserDefaults.standard.bool(forKey: "hasVideo")
         if hasVideo {
-            mediaOption = MediaOption.audioVideoScreenShare(video: (local: selfVideoView, remote: remoteVideoView.mediaRenderView), screenShare: screenShareView)
+            mediaOption = MediaOption.audioVideoScreenShare(video: (local: selfVideoView, remote: remoteVideoView.mediaRenderView), screenShare: screenShareView, companionMode: companionMode)
         }
         mediaOption.moderator = isModerator
         mediaOption.pin = pin
@@ -2463,6 +2476,16 @@ extension CallViewController: PasswordCaptchaViewViewDelegate {   // captcha
                 captchaView.setupViewForPasswordAndCaptcha()
             case .requireH264:
                 let alert = UIAlertController(title: "Call Failed", message: "\(error)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
+                    print("CallVC dismiss connectCall")
+                    self.dismiss(animated: true)
+                }))
+                DispatchQueue.main.async {
+                    self.present(alert, animated: true)
+                }
+                return
+            case .companionModeNotSupported:
+                let alert = UIAlertController(title: "NotSupported", message: "\(error)", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: {_ in
                     print("CallVC dismiss connectCall")
                     self.dismiss(animated: true)

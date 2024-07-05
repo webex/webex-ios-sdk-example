@@ -2,7 +2,7 @@ import UIKit
 import CallKit
 import AVFoundation
 import WebexSDK
-
+import SwiftUI
 
 protocol CallKitManagerDelegate : AnyObject {
     // these delegate functions will be called when user perform actions on native callkit interface
@@ -19,6 +19,7 @@ class CallKitManager: NSObject, CXProviderDelegate {
     var callController : CXCallController?
     var call: Call?
     var sender: String = ""
+
     weak var delegate : CallKitManagerDelegate?
     
     override init() {
@@ -52,9 +53,11 @@ class CallKitManager: NSObject, CXProviderDelegate {
         })
     }
     
-    func reportEndCall(uuid: UUID) {
+    func reportEndCall(uuid: UUID?) {
         print("endCallreported")
-        provider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
+        if let uuid = uuid {
+            provider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
+        }
     }
     
     func updateCall(call: Call, voipUUID: UUID? = nil) {
@@ -157,30 +160,57 @@ class CallKitManager: NSObject, CXProviderDelegate {
     }
     
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-        print("CXAnswerCallAction \(String(describing: call?.callId))")
-        guard let call = call else {
-            reportEndCall(uuid: action.callUUID)
-            action.fulfill()
-            return
-        }
+           print("CXAnswerCallAction \(String(describing: call?.callId))")
+           guard let call = call else {
+               reportEndCall(uuid: action.callUUID)
+               action.fulfill()
+               return
+           }
+           
+           CallObjectStorage.self.shared.addCallObject(call: call)
+           let isNewUI = UserDefaults.standard.bool(forKey: "isNewUI")
+           // Create your SwiftUI view
+           if #available(iOS 16.0, *), isNewUI {
+               // Create the ViewModel for your SwiftUI view
+                    // Check if the top view controller is a UIHostingController with a CallingScreenView
+                    if let topController = UIApplication.shared.topViewController(),
+                       let hostingController = topController as? UIHostingController<CallingScreenView> {
+                            hostingController.rootView.callingVM.holdAndAcceptSecondIncomingCall(call: CallKS(call: call))
+                            print("Second call CXAnswerCallAction \(String(describing: call.callId))")
+                    } else {
+                        print("First call CXAnswerCallAction \(String(describing: call.callId))")
+                        // Present the new hosting controller
+                            let call = CallKS(call: call)
+                            let callViewModel = CallViewModel(call: call)
+                            
+                             // Create your SwiftUI view with the ViewModel
+                             let callingScreenView = CallingScreenView(callingVM: callViewModel)
 
-        CallObjectStorage.self.shared.addCallObject(call: call)
-        let callVC = CallViewController(space: Space(id: call.spaceId ?? "", title: call.title ?? ""), addedCall: false, currentCallId: call.callId ?? "", incomingCall: true, call: call)
-        DispatchQueue.main.async {
-            // if CallViewController is already open
-            if let callVC = UIApplication.shared.topViewController() as? CallViewController {
-                print("Second calll CXAnswerCallAction \(String(describing: call.callId))")
-                callVC.currentCallId = call.callId
-                callVC.incomingCall = true
-                callVC.call = call
-                callVC.viewDidLoad()
-            } else {
-                print("First calll CXAnswerCallAction \(String(describing: call.callId))")
-                UIApplication.shared.topViewController()?.present(callVC, animated: true)
-            }
-        }
-        action.fulfill()
-    }
+                             // Wrap your SwiftUI view in a UIHostingController
+                             let hostingController = UIHostingController(rootView: callingScreenView)
+                                 hostingController.modalPresentationStyle = .fullScreen
+                        DispatchQueue.main.async {
+                            UIApplication.shared.topViewController()?.present(hostingController, animated: true)
+                        }
+                    }
+           } else {
+               let callVC = CallViewController(space: Space(id: call.spaceId ?? "", title: call.title ?? ""), addedCall: false, currentCallId: call.callId ?? "", incomingCall: true, call: call)
+               DispatchQueue.main.async {
+                   // if CallViewController is already open
+                   if let callVC = UIApplication.shared.topViewController() as? CallViewController {
+                       print("Second calll CXAnswerCallAction \(String(describing: call.callId))")
+                       callVC.currentCallId = call.callId
+                       callVC.incomingCall = true
+                       callVC.call = call
+                       callVC.viewDidLoad()
+                   } else {
+                       print("First calll CXAnswerCallAction \(String(describing: call.callId))")
+                       UIApplication.shared.topViewController()?.present(callVC, animated: true)
+                   }
+               }
+           }
+           action.fulfill()
+       }
     
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         print("CXEndCallAction \(String(describing: call?.callId))")

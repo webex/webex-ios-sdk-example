@@ -10,9 +10,10 @@ struct MeetingsKS: Identifiable {
     var canJoin: Bool
     var link: String
     var sipUrl: String
+    var isOngoingMeeting: Bool
 
     ///constructs a `MeetingsKS` instance from a `WebexSDK.Meeting` object.
     static func buildFrom(meeting: WebexSDK.Meeting) -> Self {
-        return MeetingsKS(title: meeting.subject, id: meeting.meetingId, start: getLocalDate(serverDate: meeting.startTime), end: getLocalDate(serverDate: meeting.endTime), canJoin: meeting.canJoin, link: meeting.link, sipUrl: meeting.sipUrl)
+        return MeetingsKS(title: meeting.subject, id: meeting.meetingId, start: getLocalDate(serverDate: meeting.startTime), end: getLocalDate(serverDate: meeting.endTime), canJoin: meeting.canJoin, link: meeting.link, sipUrl: meeting.sipUrl, isOngoingMeeting: meeting.isOngoingMeeting)
     }
 }

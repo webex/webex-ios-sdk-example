@@ -65,9 +65,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func navigateToLoginViewController() {
-        if !(UIApplication.shared.topViewController() is CallViewController) {
+        if !WebexManager.shared.isCurrentScreenIsCallScreen() {
             if #available(iOS 16.0, *) {
                 window?.rootViewController = WelcomeViewController()
+                window?.backgroundColor = .backgroundColor
             } else {
                 window?.rootViewController = LoginViewController()
             }
@@ -91,21 +92,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         print("enter didReceiveRemoteNotification")
         if let webex = webex, webex.authenticator?.authorized == true {
-            do {
-                let data = try JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted)
-                let string = String(data: data, encoding: .utf8) ?? ""
-                print("Received push: string")
-                print(string)
-                webex.phone.processPushNotification(message: string) { error in
-                    print("didReceiveRemoteNotification processPushNotification")
-                    if let error = error {
-                        print("didReceiveRemoteNotification processPushNotification error" + error.localizedDescription)
+        do {
+        let data = try JSONSerialization.data(withJSONObject: userInfo, options: .prettyPrinted)
+        let string = String(data: data, encoding: .utf8) ?? ""
+        print("Received push: string")
+        print(string)
+        webex.phone.processPushNotification(message: string) { error in
+        print("didReceiveRemoteNotification processPushNotification")
+        if let error = error {
+        print("didReceiveRemoteNotification processPushNotification error" + error.localizedDescription)
+        }
+                        }
                     }
-                }
-            }
-            catch (let error){
-                print("didReceiveRemoteNotification processPushNotification exception" + error.localizedDescription)
-            }
+                    catch (let error){
+                        print("didReceiveRemoteNotification processPushNotification exception" + error.localizedDescription)
+        }
                     }
     }
     
@@ -171,15 +172,15 @@ extension AppDelegate: PKPushRegistryDelegate {
         debugPrint("Received push: voIP")
         debugPrint(payload.dictionaryPayload)
         print("enter voip didReceiveIncomingPushWith")
-
+        WebexManager.shared.checkAndAssignWebexInstance()
         if type == .voIP {
             // Report the call to CallKit, and let it display the call UI.
             guard let callerInfo = webex.parseVoIPPayload(payload: payload) else {
-                print("error parsing VoIP payload")
-                return
+print("error parsing VoIP payload")
+                    return
             }
             print("callerInfo: \(String(describing: callerInfo))")
-            if CallObjectStorage.shared.getAllActiveCalls().count > 0 // ignore if there is already active call, it will be handled in  webex.phone.onIncoming
+            if WebexManager.shared.isCurrentScreenIsCallScreen() // ignore if there is already active call, it will be handled in  webex.phone.onIncoming
             {
                 return
             }
@@ -201,7 +202,7 @@ extension AppDelegate: PKPushRegistryDelegate {
             print("processVoipPush onIncoming")
 
             if call.isWebexCallingOrWebexForBroadworks {
-                if CallObjectStorage.shared.getAllActiveCalls().count > 0
+                if WebexManager.shared.isCurrentScreenIsCallScreen()
                 {
                     voipUUID = UUID()
                     print("voipUUID: \(voipUUID)")
@@ -233,58 +234,12 @@ extension AppDelegate: PKPushRegistryDelegate {
     }
     
     func establishConnection(payload: PKPushPayload) {
-        if let webex = webex, webex.authenticator?.authorized == true {
-            processVoipPush(payload: payload)
-            return
-        }
-
-        guard let authType = UserDefaults.standard.string(forKey: Constants.loginTypeKey) else { return }
-        if authType == Constants.loginTypeValue.jwt.rawValue {
-            initWebexUsingJWT()
-        } else if authType == Constants.loginTypeValue.token.rawValue{
-            initWebexUsingToken()
-        } else {
-            initWebexUsingOauth()
-        }
-        print("processVoipPush before  webex.initialize")
-
-        DispatchQueue.main.async {
-            webex.initialize { [weak self] success in
-                print("processVoipPush after  webex.initialize" + "\(success)")
-
-                if success {
-                    self?.processVoipPush(payload: payload)
-                } else {
-                    print("Failed to initialise WebexSDK on receiving incoming call push notification")
-                }
+        WebexManager.shared.initializeWebex { success in
+            if success {
+                self.processVoipPush(payload: payload)
             }
         }
-    }
-
-    func initWebexUsingOauth() {
-        guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
-        guard let keys = NSDictionary(contentsOfFile: path) else { return }
-        let clientId = keys["clientId"] as? String ?? ""
-        let clientSecret = keys["clientSecret"] as? String ?? ""
-        let redirectUri = keys["redirectUri"] as? String ?? ""
-        let scopes = "spark:all" // spark:all is always mandatory
-
-        // See if we already have an email stored in UserDefaults else get it from user and do new Login
-        if let email = EmailAddress.fromString(UserDefaults.standard.value(forKey: Constants.emailKey) as? String) {
-            // The scope parameter can be a space separated list of scopes that you want your access token to possess
-            let authenticator = OAuthAuthenticator(clientId: clientId, clientSecret: clientSecret, scope: scopes, redirectUri: redirectUri, emailId: email.toString())
-            webex = Webex(authenticator: authenticator)
-            return
-        }
-    }
-
-    func initWebexUsingJWT() {
-        webex = Webex(authenticator: JWTAuthenticator())
-    }
-
-    func initWebexUsingToken() {
-        webex = Webex(authenticator: TokenAuthenticator())
-    }
+    }  
 }
 
 extension AppDelegate: WebexAuthDelegate {
@@ -292,7 +247,7 @@ extension AppDelegate: WebexAuthDelegate {
         print("onReLoginRequired called")
         cleanupOnLogout()
     }
-
+    
     func cleanupOnLogout() {
         DispatchQueue.main.async {
             UIApplication.shared.topViewController()?.dismiss(animated: true) { [weak self] in

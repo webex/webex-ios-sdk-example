@@ -7,9 +7,9 @@ target 'KitchenSink' do
   use_frameworks!
 
   # Pods for KitchenSink
-	pod 'WebexSDK','~> 3.12'
-  # pod 'WebexSDK/Meeting','~> 3.12'  # Uncomment this line and comment the above line for Meeting-only SDK
-  # pod 'WebexSDK/Wxc','~> 3.12'  # Uncomment this line and comment the above line for Calling-only SDK
+	pod 'WebexSDK','~> 3.12.0'
+  # pod 'WebexSDK/Meeting','~> 3.12.0'  # Uncomment this line and comment the above line for Meeting-only SDK
+  # pod 'WebexSDK/Wxc','~> 3.12.0'  # Uncomment this line and comment the above line for Calling-only SDK
 
 
   target 'KitchenSinkUITests' do
@@ -23,7 +23,7 @@ target 'KitchenSinkBroadcastExtension' do
   use_frameworks!
 
   # Pods for KitchenSinkBroadcastExtension 
-  pod 'WebexBroadcastExtensionKit','~> 3.12'
+  pod 'WebexBroadcastExtensionKit','~> 3.12.0'
   
 end
 

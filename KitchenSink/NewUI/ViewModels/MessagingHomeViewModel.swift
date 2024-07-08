@@ -38,10 +38,14 @@ class MessagingHomeViewModel: ObservableObject {
     @Published var teams: [TeamKS] = []
     @Published var showError: Bool = false
     @Published var error: String = ""
-
-    var directSpaceIds : [String] = []
-    var selfPersonId: String?
-    var spaceIdPersonIdDict: [String : String] = [:]
+    @Published var incomingCall: CallKS?
+    @Published var isCallIncoming: Bool = false
+    @Published var showAlert = false
+    @Published var alertTitle = ""
+    @Published var alertMessage = ""
+    @Published var shouldDeleteTeam = false
+    @Published var selectedTeam: TeamKS?
+    var mailVM = MailViewModel()
     var handles: [PresenceHandle] = []
     let webexSpace = WebexSpaces()
     let webexTeam = WebexTeams()
@@ -56,6 +60,12 @@ class MessagingHomeViewModel: ObservableObject {
         registerSpaceCallBackWithPayload()
     }
 
+    func showAlert(alertTitle: String, alertMessage: String, selectedTeam: TeamKS) {
+        self.showAlert = true
+        self.alertTitle = alertTitle
+        self.alertMessage = alertMessage
+        self.selectedTeam = selectedTeam
+    }
 }
 
 // MARK: Spaces
@@ -68,6 +78,7 @@ extension MessagingHomeViewModel {
             case.success(_):
                 DispatchQueue.main.async {
                     self.created = true
+                    self.getListOfSpaces()
                 }
             case .failure(let error):
                 self.showError(error: error)
@@ -236,6 +247,7 @@ extension MessagingHomeViewModel {
             case.success(_):
                 DispatchQueue.main.async {
                     self.created = true
+                    self.getListOfTeams()
                 }
             case .failure(let error):
                 self.showError(error: error)
@@ -251,7 +263,7 @@ extension MessagingHomeViewModel {
         webexTeam.getListOfTeams(completion: { result in
             switch result {
             case.success(let teams):
-                let teamsKS = teams.map{ TeamKS.buildFrom(team: $0) }
+                let teamsKS = teams.filter { !$0.isDeleted }.map{ TeamKS.buildFrom(team: $0) }
                 DispatchQueue.main.async {
                     self.loadingIndicator(show: false)
                     self.teams = teamsKS
@@ -263,6 +275,31 @@ extension MessagingHomeViewModel {
             @unknown default:
                 break
             }})
+    }
+    
+    /// Deletes selected team
+    func deleteTeam() {
+        loadingIndicator(show: true)
+        guard let team = self.selectedTeam, let teamId = team.id else { return }
+        webexTeam.deleteTeam(id: teamId) { result in
+            switch result {
+            case.success(_):
+                DispatchQueue.main.async {
+                    self.shouldDeleteTeam = false
+                    self.showAlert = true
+                    self.alertTitle = "Success"
+                    self.alertMessage = "Team has been deleted"
+                    self.teams = self.teams.filter { $0.id != teamId }
+                }
+            case .failure(let error):
+                self.shouldDeleteTeam = false
+                self.showAlert = true
+                self.alertTitle = "Failure"
+                self.alertMessage = "Team deletion failure \n \(error)"
+            @unknown default:
+                break
+            }
+        }
     }
 }
 
@@ -279,11 +316,49 @@ extension MessagingHomeViewModel {
                 UserDefaults.standard.set(person.id, forKey: Constants.selfId)
                 DispatchQueue.main.async {
                     self.profile = ProfileKS(imageUrl: person.avatar, name: person.displayName, status: person.status)
+                    self.registerPush(personId: person.encodedId ?? "")
                 }
             @unknown default:
                 break
             }
         })
+    }
+    func registerPush(personId: String) {
+        guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist") else { return }
+        guard let keys = NSDictionary(contentsOfFile: path) else { return }
+        guard let token = token, let voipToken = voipToken else { return }
+
+        if let urlString = keys["registrationUrl"] as? String  {
+            guard let serviceUrl = URL(string: urlString) else { print("Invalid URL"); return }
+
+            let parameters: [String: Any] = [
+                "voipToken": voipToken,
+                "deviceToken": token,
+                "pushProvider": "APNS",
+                "userId": personId,
+                "prod": false
+            ]
+            var request = URLRequest(url: serviceUrl)
+            request.httpMethod = "POST"
+            request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+            guard let httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: []) else {
+                return
+            }
+            request.httpBody = httpBody
+            request.timeoutInterval = 20
+            let session = URLSession.shared
+            session.dataTask(with: request) { (data, response, error) in
+                if let response = response {
+                    print("DEVICE REGISTRATION: \(response)")
+                }
+            }.resume()
+        }
+        else {
+            let bundleId = keys["bundleId"] as? String ?? ""
+
+            webex.phone.setPushTokens(bundleId: bundleId, deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "", deviceToken: token, voipToken: voipToken, appId: nil)
+            return
+        }
     }
 }
 
@@ -291,40 +366,20 @@ extension MessagingHomeViewModel {
 @available(iOS 16.0, *)
 extension MessagingHomeViewModel {
     /// Fetches the presence status for all direct spaces
-    func getPresenceStatusForSpaces() {
-        guard let selfId = UserDefaults.standard.string(forKey: "selfId") else { return }
-        for spaceId in self.directSpaceIds {
-            self.webexMembership.listMemberships(spaceId: spaceId, queue: .global(qos: .default), completion: { result in
-                switch result {
-                case .success(let memberships):
-                    var personId = ""
-                    for membership in memberships {
-                        if membership.personId != selfId {
-                            personId = membership.personId ?? ""
-                            self.spaceIdPersonIdDict[personId] = spaceId
+    func getPresenceStatusForSpaces(directSpaceIds: [String]) {
+        self.handles = self.webexPeople.startWatchingPresenceForSpaces(spaceIds: directSpaceIds,  completion: { presence in
+            if let index = self.spaces.firstIndex(where: { $0.id == presence.spaceId }) {
+                // Not getting presence status for space read status
+                if self.spaces[index].presenceStatus?.image != "" {
+                    let presenceStatusKS = self.messagingHomeUtil.getPresenceStatusKS(presence: presence)
+                    if (self.spaces[index].presenceStatus?.title != presenceStatusKS.title) {
+                        DispatchQueue.main.async {
+                            self.spaces[index].presenceStatus = presenceStatusKS
                         }
                     }
-                    self.handles = self.webexPeople.startWatchingPresence(contactIds: [personId], completion: { presence in
-                        let spaceId = self.spaceIdPersonIdDict[personId]
-                        if let index = self.spaces.firstIndex(where: { $0.id == spaceId }) {
-                            // Not getting presence status for space read status
-                            if self.spaces[index].presenceStatus?.image != "" {
-                                let presenceStatusKS = self.messagingHomeUtil.getPresenceStatusKS(presence: presence)
-                                if (self.spaces[index].presenceStatus?.title != presenceStatusKS.title) {
-                                    DispatchQueue.main.async {
-                                        self.spaces[index].presenceStatus = presenceStatusKS
-                                    }
-                                }
-                            }
-                        }
-                    })
-                case .failure(let error):
-                    self.showError(error: error)
-                @unknown default:
-                    return
                 }
-            })
-        }
+            }
+        })
     }
 
     /// Asynchronously displays an error message on the main queue.
@@ -344,6 +399,33 @@ extension MessagingHomeViewModel {
     func loadingIndicator(show: Bool) {
         DispatchQueue.main.async {
             self.showLoading = show
+        }
+    }
+}
+
+// MARK: Phone
+@available(iOS 16.0, *)
+extension MessagingHomeViewModel {
+    /// Registers a callback for Incoming call event.
+    func registerIncomingCall() {
+        webex.phone.onIncoming = { call in
+            if call.isWebexCallingOrWebexForBroadworks {
+                if WebexManager.shared.isCurrentScreenIsCallScreen()
+                {
+                    voipUUID = UUID()
+                    AppDelegate.shared.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: call.title ?? "") {
+                    AppDelegate.shared.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
+                        return
+                    }
+                }
+                print("webex.phone.onIncoming calll \(String(describing: call.callId))")
+                AppDelegate.shared.callKitManager?.updateCall(call: call)
+                return
+            }
+            if !call.isMeeting || !call.isScheduledMeeting || !call.isSpaceMeeting {
+                self.incomingCall = CallKS(call: call)
+                self.isCallIncoming = true
+            }
         }
     }
 }

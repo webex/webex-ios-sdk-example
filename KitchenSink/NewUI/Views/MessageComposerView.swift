@@ -31,6 +31,7 @@ struct MessageComposerView: View {
                         Spacer()
                     }
                     TextEditor(text: $model.text)
+                        .accessibilityIdentifier("sendMessageTextfield")
                         .onChange(of: model.text) { newValue in
                             if newValue.last == "@" && !showMentionList {
                                 model.text = String(model.text.dropLast())
@@ -48,11 +49,13 @@ struct MessageComposerView: View {
                             KSButton(isSmall: true, text: textMode, didTap: false, action: {
                                 showingTextModes = true
                             })
+                            .accessibilityIdentifier("messageTypeButton")
                             .padding()
                             KSButton(isSmall: true, text: "Send", didTap: true, action: {
                                 sendMessage()
                             })
                             .padding()
+                            .accessibilityIdentifier("sendMessageButton")
                         }
                 
                     Grid {
@@ -70,7 +73,7 @@ struct MessageComposerView: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     Spacer()
-                }
+                }                
                 .navigationBarTitle("Send Message", displayMode: .inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -95,14 +98,15 @@ struct MessageComposerView: View {
                     Button("Plain") {
                         textMode = "Plain"
                     }
-
+                    .accessibilityIdentifier("plainText")
                     Button("Markdown") {
                         textMode = "Markdown"
                     }
-
+                    .accessibilityIdentifier("markdownText")
                     Button("HTML") {
                         textMode = "HTML"
                     }
+                    .accessibilityIdentifier("htmlText")
                 }
                 .alert("Error", isPresented: $model.showError) {
                     Button("Ok") { }
@@ -116,6 +120,7 @@ struct MessageComposerView: View {
                     }
                 } message: {
                     Text(model.sentText)
+                        .accessibilityIdentifier("alertMessageText")
                 }
                 .sheet(isPresented: $showMentionList) {
                     MentionsListView(model: model, space: space) { index in

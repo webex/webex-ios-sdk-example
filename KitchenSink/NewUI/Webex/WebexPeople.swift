@@ -8,9 +8,8 @@ class WebexPeople {
         webex.people.getMe(completionHandler: completion)
     }
 
-    /// Starts watching the presence of the specified contacts.
-    func startWatchingPresence(contactIds: [String], completion: @escaping (Presence) -> Void) -> [PresenceHandle] {
-        return webex.people.startWatchingPresences(contactIds: contactIds, completionHandler: completion)
+    func startWatchingPresenceForSpaces(spaceIds: [String], completion: @escaping (Presence) -> Void) -> [PresenceHandle] {
+        return webex.people.startWatchingPresenceForSpaces(spaceIds: spaceIds, completionHandler: completion)
     }
 
     /// Stops watching the presence of the specified contacts.

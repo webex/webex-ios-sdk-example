@@ -15,6 +15,7 @@ struct FilterSpaceView: View {
     @State private var spaceTypeValue: SpaceTypeKS?
     @State private var sortByValue: SortTypeKS?
 
+
     var model: MessagingHomeViewModel
     var spaceValueTypes = ["Space", "Read Status"]
 
@@ -24,6 +25,7 @@ struct FilterSpaceView: View {
                 Text("Filter Spaces")
                     .font(.largeTitle)
                     .padding(.leading, 15)
+                    .accessibilityIdentifier("filterSpaces")
                 Spacer()
             }
 
@@ -75,6 +77,8 @@ struct FilterSpaceView: View {
                         })
                         .font(.subheadline)
                         .foregroundColor(.blue)
+                        .accessibilityIdentifier("sortByDisclosureButton")
+                        
                         Button("Created", action: {
                             withAnimation {
                                 sortBy = "Created"
@@ -84,6 +88,8 @@ struct FilterSpaceView: View {
                         })
                         .font(.subheadline)
                         .foregroundColor(.blue)
+                        .accessibilityIdentifier("sortByCreatedButton")
+                        
                         Button("Last Activity", action: {
                             withAnimation {
                                 sortBy = "Last Activity"
@@ -93,9 +99,11 @@ struct FilterSpaceView: View {
                         })
                         .font(.subheadline)
                         .foregroundColor(.blue)
+                        .accessibilityIdentifier("sortByLastActivityButton")
                     }
                     .font(.headline)
                     .foregroundColor(.primary)
+                    .accessibilityIdentifier("sortByDisclosureButton")
                 }
                 .padding(20)
             }
@@ -118,11 +126,14 @@ struct FilterSpaceView: View {
                     resetForm()
                 })
                 .padding(20)
+                .accessibilityIdentifier("filterSpaceClearButton")
+                
                 Spacer()
                 KSButton(isSmall: true, text: "Done", didTap: true, action: {
                     filterSpace()
                 })
                 .padding(20)
+                .accessibilityIdentifier("filterSpaceDoneButton")
             }
             .padding(.top, 30)
             Spacer()

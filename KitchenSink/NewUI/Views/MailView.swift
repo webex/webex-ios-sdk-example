@@ -51,6 +51,7 @@ struct MailView: UIViewControllerRepresentable {
                                    didFinishWith result: MFMailComposeResult,
                                    error: Error?) {
             parent.viewModel.isShowing = false
+            controller.dismiss(animated: true)
         }
     }
 }

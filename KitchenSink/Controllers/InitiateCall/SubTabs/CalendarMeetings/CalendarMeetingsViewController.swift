@@ -121,15 +121,15 @@ class CalendarMeetingsViewController: UIViewController, UITableViewDataSource {
         // Present joining options
         let alertController = UIAlertController.actionSheetWith(title: "Join Meeting", message: nil, sourceView: self.view)
         alertController.addAction(UIAlertAction(title: "Join by Meeting Id", style: .default) { _ in
-            let callVC = CallViewController(callInviteAddress: meeting.meetingId)
+            let callVC = CallViewController(callInviteAddress: meeting.meetingId, moveMeeting: meeting.isOngoingMeeting)
             self.present(callVC, animated: true)
         })
         alertController.addAction(UIAlertAction(title: "Join by Meeting Link", style: .default) { _ in
-            let callVC = CallViewController(callInviteAddress: meeting.link)
+            let callVC = CallViewController(callInviteAddress: meeting.link, moveMeeting: meeting.isOngoingMeeting)
             self.present(callVC, animated: true)
         })
         alertController.addAction(UIAlertAction(title: "Join by Meeting Number", style: .default) { _ in
-            let callVC = CallViewController(callInviteAddress: meeting.sipUrl)
+            let callVC = CallViewController(callInviteAddress: meeting.sipUrl, moveMeeting: meeting.isOngoingMeeting)
             self.present(callVC, animated: true)
         })
         alertController.addAction(.dismissAction())

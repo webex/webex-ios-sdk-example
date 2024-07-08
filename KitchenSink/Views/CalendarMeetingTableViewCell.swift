@@ -27,7 +27,7 @@ class CalendarMeetingTableViewCell: UITableViewCell, ReusableCell {
         buttonActionHandler = handler
         
         if shouldShowJoinButton {
-            addButtonToAccessoryView()
+            addButtonToAccessoryView(showMove: meeting.isOngoingMeeting && webex.calendarMeetings.isMoveMeetingSupported(meetingId: meeting.meetingId))
         } else {
             accessoryView = nil
         }
@@ -43,11 +43,13 @@ class CalendarMeetingTableViewCell: UITableViewCell, ReusableCell {
         buttonActionHandler?()
     }
     
-    private func addButtonToAccessoryView() {
+    private func addButtonToAccessoryView(showMove: Bool = false) {
         let button = UIButton(type: .system)
-        button.setTitle("Join", for: .normal)
+        let title = showMove ? "Move Meeting here" : "Join"
+        let width = showMove ? 145.0 : 45.0
+        button.setTitle(title, for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.frame.size = CGSize(width: 45, height: 25)
+        button.frame.size = CGSize(width: width, height: 35)
         button.backgroundColor = .momentumGreen40
         button.layer.cornerRadius = 10
         button.addTarget(self, action: #selector(handleButtonAction), for: .touchUpInside)

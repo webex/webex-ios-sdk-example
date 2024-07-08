@@ -1,7 +1,7 @@
 import UIKit
 import WebexSDK
 
-class MediaStreamView: UIView {
+public class MediaStreamView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -115,10 +115,10 @@ class MediaStreamView: UIView {
     
     func setupConstraints() {
         var customConstraints: [NSLayoutConstraint] = []
-        customConstraints.append(mediaRenderView.widthAnchor.constraint(equalToConstant: 170))
-        customConstraints.append(mediaRenderView.heightAnchor.constraint(equalToConstant: 130))
-        customConstraints.append(mediaRenderView.centerXAnchor.constraint(equalTo: self.centerXAnchor))
-        customConstraints.append(mediaRenderView.centerYAnchor.constraint(equalTo: self.centerYAnchor))
+        customConstraints.append(mediaRenderView.leadingAnchor.constraint(equalTo: leadingAnchor))
+        customConstraints.append(mediaRenderView.trailingAnchor.constraint(equalTo: trailingAnchor))
+        customConstraints.append(mediaRenderView.topAnchor.constraint(equalTo: topAnchor))
+        customConstraints.append(mediaRenderView.bottomAnchor.constraint(equalTo: bottomAnchor))
                 
         customConstraints.append(muteButton.bottomAnchor.constraint(equalTo: mediaRenderView.bottomAnchor, constant: 4))
         customConstraints.append(muteButton.leftAnchor.constraint(equalTo: mediaRenderView.leftAnchor))

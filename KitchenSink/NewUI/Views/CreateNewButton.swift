@@ -29,5 +29,6 @@ struct CreateNewButton: View {
         .frame(maxHeight: .infinity, alignment: .bottom)
         .padding(.bottom, 20)
         .padding(.trailing, 25)
+        .accessibilityIdentifier("createNewButton")
     }
 }

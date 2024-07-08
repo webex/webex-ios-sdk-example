@@ -69,6 +69,8 @@ extension WebexAuthenticator : OAuthAuthenticationProtocol {
         authenticator.getAuthorizationUrl(completionHandler: { result, url in
             if result == .success {
                 completion(url)
+            } else {
+                completion(nil)
             }
         })
     }

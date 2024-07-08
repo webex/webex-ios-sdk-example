@@ -11,5 +11,10 @@ class WebexTeams {
     func createTeam(title: String, completion: @escaping (Result<Team>) -> Void) {
         webex.teams.create(name: title, completionHandler: completion)
     }
+    
+    /// Deletes selected team
+    func deleteTeam(id: String, completion: @escaping (Result<Void>) -> Void) {
+        webex.teams.delete(teamId: id, queue: DispatchQueue.global(qos: .default), completionHandler: completion)
+    }
 }
 

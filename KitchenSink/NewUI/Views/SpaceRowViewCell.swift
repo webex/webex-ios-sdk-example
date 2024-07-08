@@ -35,7 +35,7 @@ struct SpaceRowViewCell: View, SearchRowViewProtocol {
             Spacer()
             KSIconButton(action: showMessageView, image: "bubble.left", foregroundColor: .blue)
             .padding(.trailing)
-            KSIconButton(action: showCallView, image: "phone", foregroundColor: .green)
+            KSIconButton(action: showCallView, image: "phone", foregroundColor: data.type == .group ? .green : .gray)
         }
         .sheet(item: $buttonType) { item in
             switch item {
@@ -55,6 +55,10 @@ struct SpaceRowViewCell: View, SearchRowViewProtocol {
     
     /// Function checks, If the data type is 'group', it changes the button type to 'call'.
     func showCallView() {
-        self.buttonType = .call
+        if data.type == .group {
+            self.buttonType = .call
+        } else {
+            print("Operation not allowed!")
+        }
     }
 }

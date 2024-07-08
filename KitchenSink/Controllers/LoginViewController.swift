@@ -357,7 +357,7 @@ class LoginViewController: UIViewController {
                 let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
                 authenticator.authorizedWith(accessToken: textField?.text ?? "", expiryInSeconds: nil, completionHandler: { result in 
                     guard result == .success else {
-                        self.loginWithAccessTokenButton.setTitle("Login", for: .normal)
+                        self.loginWithAccessTokenButton.setTitle("Login with Token", for: .normal)
                         self.loginWithAccessTokenButton.isEnabled = true
                         print("Login failed!")
                         return

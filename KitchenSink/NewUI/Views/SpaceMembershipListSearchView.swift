@@ -28,18 +28,21 @@ struct SpaceMembershipListSearchView<ViewModel: SearchViewModelProtocol>: View {
                             Text(data.emails?.first?.toString() ?? "")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .accessibilityIdentifier("\(data.emails?.first?.toString() ?? "")")
                         }.onTapGesture {
                             onSearchItemSelected(data,true)
                             dismiss()
                         }
                     }
                 }
+                .accessibilityIdentifier("spaceMembershipSearchView")
                 .listStyle(.plain)
                 .onAppear {
                     searchViewModel.searchString = searchText
                 }
             }
             .searchable(text: $searchText, prompt: "Search by name or email")
+            .accessibilityIdentifier("searchTextField")
             .navigationTitle("Search Contacts")
             .onChange(of: searchText) { newValue in
                 searchViewModel.searchString = newValue

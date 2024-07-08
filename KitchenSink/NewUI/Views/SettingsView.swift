@@ -3,7 +3,6 @@ import MessageUI
 
 @available(iOS 16.0, *)
 struct SettingsView: View {
-
     @State private var multiStream: Bool = true
     @State private var isAlertPresented = false
     @State private var showingWaitingScreen = false
@@ -15,13 +14,16 @@ struct SettingsView: View {
     @State private var loggingModes: [String] = ["no", "error", "warning", "info", "debug", "verbose", "all"]
     @State private var alertMessage = ""
     @State private var alertTitle = ""
+    @State private var isPhoneServicesOn = false
+    @State private var showSetupView = false
 
     @Environment(\.dismiss) var dismiss
 
     @ObservedObject var model: SettingsViewModel
-    @ObservedObject var mailVM: MailViewModel
+    @ObservedObject var phoneServicesViewModel = UCLoginServicesViewModel()
 
     var body: some View {
+    NavigationView {
         VStack {
             AsyncImage(url: URL(string: model.profile.imageUrl ?? "")) { image in
                 image
@@ -37,7 +39,7 @@ struct SettingsView: View {
             .overlay(Circle()
                 .stroke(.green, lineWidth: 2))
             .padding(.top, 30)
-
+            
             Text(model.profile.name ?? "")
                 .font(.title)
                 .padding(.leading, 15)
@@ -46,25 +48,74 @@ struct SettingsView: View {
                 .padding(.leading, 15)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 30)
-
+            
             List {
+                HStack {
+                    Toggle("Phone Services:    \(phoneServicesViewModel.uCServerConnectionStatus)", isOn: $isPhoneServicesOn)
+                        .onChange(of: isPhoneServicesOn) { newValue in
+                            phoneServicesViewModel.togglePhoneServices(isOn: newValue)
+                        }
+                        .onReceive(phoneServicesViewModel.$phoneServiceConnected) { newValue in
+                            if newValue != isPhoneServicesOn {
+                                isPhoneServicesOn = newValue
+                            }
+                        }
+                        .accessibilityIdentifier("phoneServicesToggle")
+                }.onTapGesture {
+                    phoneServicesViewModel.togglePhoneServices(isOn: !isPhoneServicesOn)
+                }
+                
+                HStack {
+                    Toggle("Start Call With Video ", isOn: $model.isStartCallWithVideoOn)
+                        .accessibilityIdentifier("startCallWithVideo")
+                }.onTapGesture {
+                    model.updateStartCallWithVideoOn()
+                }
+                
+                HStack {
+                    Toggle("Auxiliary Mode", isOn: $model.isAuxiliaryMode)
+                        .accessibilityIdentifier("auxiliaryMode")
+                }.onTapGesture {
+                    model.updateIsAuxiliaryMode()
+                }
+                
+                HStack {
+                    Toggle("Enable 1080p Video", isOn: $model.enable1080pVideo)
+                        .accessibilityIdentifier("isEnable1080pVideo")
+                }.onTapGesture {
+                    model.updateIsEnable1080pVideo()
+                }
+                
+                HStack {
+                    Toggle("Background Connection", isOn: $model.enableBackgroundConnection)
+                        .accessibilityIdentifier("backgroundConnection")
+                }.onTapGesture {
+                    model.updateBackgroundConnection()
+                }
+                
                 Text("Incoming Call")
                     .onTapGesture {
                         showingWaitingScreen = true
                     }
                 Text("Access Tokens")
                     .onTapGesture {
-                            getAccessToken()
-                        }
+                        getAccessToken()
+                    }
+                NavigationLink(destination: CameraSettingView(cameraSettingVM: CameraSettingViewModel())) {
+                    Text("Camera Settings")
+                        .accessibilityIdentifier("cameraSettings")
+                }
+                
                 Section("Phone") {
                     Text("Video")
                         .onTapGesture {
 
                         }
-                    Toggle("New Multi Streeam", isOn: $multiStream)
-                        .onTapGesture {
-
+                    Toggle("New Multi Stream", isOn: $multiStream)
+                        .onChange(of: multiStream) { newValue in
+                            UserDefaults.standard.set(newValue, forKey: "isMultiStreamEnabled")
                         }
+                        .accessibilityIdentifier("isMultiStreamEnabled")
                     Text("Virtual Background")
                         .onTapGesture {
 
@@ -82,19 +133,20 @@ struct SettingsView: View {
                             }
                     }
                 }
-
+                
                 Text("Send Feedback")
                     .foregroundColor(.orange)
                     .onTapGesture {
                         self.sendFeedbackDialogPresented = true
                     }
-
+                
                 Text("Logout")
                     .foregroundColor(.red)
                     .onTapGesture {
-                        dismiss()
                         model.signOut()
-                    }
+                        dismiss()
+                        callAppDelegateMethod()
+                    }.accessibilityIdentifier("logout")
             }
             Text(model.version)
                 .multilineTextAlignment(.center)
@@ -102,6 +154,7 @@ struct SettingsView: View {
                 .padding(.leading, 15)
                 .foregroundColor(.secondary)
         }
+       }// nav
         .alert("Could Not Send Email", isPresented: $mailSentFailAlert) {
             Button("Ok") {}
         } message: {
@@ -110,13 +163,13 @@ struct SettingsView: View {
         .confirmationDialog("Choose Topic", isPresented: $sendFeedbackDialogPresented, titleVisibility: .visible) {
             Button("Bug Report") {
                 configureMailMessage()
-                mailVM.feedback = Feedback.reportBug
-                mailVM.isShowing.toggle()
+                model.mailVM.feedback = Feedback.reportBug
+                model.mailVM.isShowing.toggle()
             }
             Button("Feature Request") {
                 configureMailMessage()
-                mailVM.feedback = Feedback.featureRequest
-                mailVM.isShowing.toggle()
+                model.mailVM.feedback = Feedback.featureRequest
+                model.mailVM.isShowing.toggle()
             }
         }
         .alert(alertTitle, isPresented: $isAlertPresented) {
@@ -135,13 +188,17 @@ struct SettingsView: View {
         } message: {
             Text("Token Copied")
         }
-        .sheet(isPresented: $isShowingMailView) {
-            MailView(viewModel: mailVM)
+        .sheet(isPresented: $model.mailVM.isShowing) {
+            MailView(viewModel: model.mailVM)
         }
         .sheet(isPresented: $showingWaitingScreen) {
             WaitingCallView()
         }
-        .onAppear(perform: model.updateVersion)
+        .onAppear(perform: {
+            model.updateVersion()
+            model.updateToggles()
+            phoneServicesViewModel.setUCLoginDelegateAndStartUCServices()
+        })
         .overlay {
             if model.isLoading {
                 ActivityIndicatorView()
@@ -162,12 +219,20 @@ struct SettingsView: View {
     private func configureMailMessage() {
         MFMailComposeViewController.canSendMail() ?  sendFeedbackDialogPresented.toggle() : mailSentFailAlert.toggle()
     }
+    
+    private func callAppDelegateMethod() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            print("The AppDelegate is not accessible or of the wrong type.")
+            return
+        }
+        appDelegate.navigateToLoginViewController()
+    }
 }
 
 @available(iOS 16.0, *)
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(model: SettingsViewModel(profile: ProfileKS(imageUrl: "", name: "", status: ""), messagingVM: MessagingHomeViewModel()), mailVM: MailViewModel())
+        SettingsView(model: SettingsViewModel(profile: ProfileKS(imageUrl: "", name: "", status: ""), messagingVM: MessagingHomeViewModel(), mailVM: MailViewModel()), phoneServicesViewModel: UCLoginServicesViewModel())
             .previewDevice("iPhone 14 Pro Max")
     }
 }

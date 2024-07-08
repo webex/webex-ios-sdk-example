@@ -14,6 +14,8 @@ class LoginViewModel: ObservableObject {
     @Published var isLoggedIn: Bool = false
     @Published var showWebView: Bool = false
     @Published var showLoading: Bool = false
+    @Published var showErrorAlert: Bool = false
+    @Published var alertErrorMessage = ""
     @Published var redirectUri: String?
     @Published var code: String = ""
 
@@ -69,7 +71,13 @@ class LoginViewModel: ObservableObject {
         loadingIndicator(show: true)
         guard let redirectUri = self.getRedirectUri() else { return }
         self.webexAuthenticator.getAuthorizationUrl(authenticator: authenticator, completion: { url in
-            self.link = url!
+            guard let url = url else {
+                self.showErrorAlert = true
+                self.alertErrorMessage = "Invalid email"
+                self.loadingIndicator(show: false)
+                return
+            }
+            self.link = url
             self.redirectUri = redirectUri
             self.showWebView = true
         })
@@ -100,10 +108,14 @@ class LoginViewModel: ObservableObject {
                     self.loginType = Constants.loginTypeValue.jwt.rawValue
                     self.switchRootController()
                 } else {
+                    self.showErrorAlert = true
+                    self.alertErrorMessage = "Invalid token"
                     self.loadingIndicator(show: false)
                 }
             })
         } else {
+            self.showErrorAlert = true
+            self.alertErrorMessage = "Invalid token"
             self.loadingIndicator(show: false)
         }
     }
@@ -120,10 +132,14 @@ class LoginViewModel: ObservableObject {
                     self.loginType = Constants.loginTypeValue.token.rawValue
                     self.switchRootController()
                 } else {
+                    self.showErrorAlert = true
+                    self.alertErrorMessage = "Invalid OAuth token"
                     self.loadingIndicator(show: false)
                 }
             })
         } else {
+            self.showErrorAlert = true
+            self.alertErrorMessage = "Invalid OAuth token"
             self.loadingIndicator(show: false)
         }
     }
@@ -141,16 +157,16 @@ class LoginViewModel: ObservableObject {
         }
     }
 
-    /// Attempts to automatically login using the provided `Authenticator` object.
-    func tryAutoLogin(authenticator: Authenticator, loginType: String, email: String = "") {
+    /// Attempts to automatically login
+    func tryAutoLogin() {
         loadingIndicator(show: true)
-        self.webexAuthenticator.initializeWebex(webex: webex, completion: { res in
+        WebexManager.shared.checkAndAssignWebexInstance()
+        WebexManager.shared.initializeWebex { res in
+            print("Is Authorized: \(res)")
+            self.loadingIndicator(show: false)
             if res {
-                print("Is Authorized: \(authenticator.authorized)")
-                self.loginType = loginType
-                self.email = email
-                self.switchRootController()
+                self.isLoggedIn = true
             }
-        })
+        }
     }
 }

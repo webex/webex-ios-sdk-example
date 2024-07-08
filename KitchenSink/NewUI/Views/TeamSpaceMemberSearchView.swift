@@ -26,6 +26,7 @@ struct TeamSpaceMemberSearchView<ViewModel: SearchViewModelProtocol>: View {
                                 .font(.title3)
                                 .foregroundColor(.primary)
                             Text(data.emails?.first?.toString() ?? "")
+                                .accessibilityIdentifier("Email-\(data.emails?.first?.toString() ?? "")")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }.onTapGesture {
@@ -34,12 +35,14 @@ struct TeamSpaceMemberSearchView<ViewModel: SearchViewModelProtocol>: View {
                         }
                     }
                 }
+                .accessibilityIdentifier("teamMembershipSearchView")
                 .listStyle(.plain)
                 .onAppear {
                     searchViewModel.searchString = searchText
                 }
             }
             .searchable(text: $searchText, prompt: "Search by name or email")
+            .accessibilityIdentifier("searchTextField")
             .navigationTitle("Search Contacts")
             .navigationViewStyle(StackNavigationViewStyle())
             .onChange(of: searchText) { newValue in

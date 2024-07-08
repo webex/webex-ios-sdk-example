@@ -53,7 +53,7 @@ struct TeamSpaceMemberShipView: View {
                 } label: {
                     Image(systemName: "person.crop.circle.badge.plus")
                 }
-                
+                .accessibility(identifier: "teamMembershipButton")
             }
             List {
                 ForEach(teamMemberShipViewModel.teamMembershipResults) { membership in
@@ -62,35 +62,44 @@ struct TeamSpaceMemberShipView: View {
                             .foregroundColor(.primary)
                             .font(.subheadline)
                         Text("Email: \(membership.personEmail?.toString() ?? "--")")
+                            .accessibilityIdentifier("Email-\(membership.personEmail?.toString() ?? "")")
                             .foregroundColor(.secondary)
                             .font(.caption)
+                            .accessibilityIdentifier("Email-\(membership.personEmail?.toString() ?? "")")
                             .onTapGesture {
                                 selectedItem = membership
                                 showConfirmDialog.toggle()
                             }
+                        let _ = print("Email-\(membership.personEmail?.toString() ?? "")")
                     }
                 }
             }
+            .accessibilityIdentifier("teamDetail")
             .listStyle(.plain)
             .navigationTitle("Team Detail")
             .confirmationDialog("Membership Actions", isPresented: $showConfirmDialog, titleVisibility: .visible) {
                 Button("Fetch Membership by Id") {
                     fetchTeamMembership(byId: selectedItem?.id ?? "")
                 }
+                .accessibility(identifier: "fetchMembershipByIdButton")
                 let isModerator = selectedItem?.isModerator ?? false
                 Button(isModerator ? "Remove Moderator" : "Set Moderator") {
                     setModerator(byId: selectedItem?.id ?? "", isModerator: !isModerator)
                 }
+                .accessibility(identifier: isModerator ? "removeModeratorButton" : "setModeratorButton")
             }
             .alert(alertTitle, isPresented: $isAlertPresented) {
                 Button("Dismiss") { }
+                    .accessibility(identifier: "dismissButton")
             } message: {
                 Text(self.alertMessage)
             }
             .alert("Update Team Title", isPresented: $updateAlertPresented) {
                 TextField("", text: $teamTitle)
                 Button("Update", action: updateTeamTitle)
+                    .accessibility(identifier: "alertUpdateButton")
                 Button("Cancel", role: .cancel) { }
+                    .accessibility(identifier: "updateTeamCancelButton")
             } message: {
                 Text("Enter the new name of the Team")
             }
@@ -98,9 +107,12 @@ struct TeamSpaceMemberShipView: View {
             .alert("Add Space", isPresented: $addSpaceAlertPresented) {
                 TextField("", text: $spaceName)
                 Button("Add", action: addSpaceToTeam)
+                    .accessibility(identifier: "addSpaceButton")
                 Button("Cancel", role: .cancel) { }
+                    .accessibility(identifier: "addSpaceCancelButton")
             } message: {
                 Text("Enter the name of the new Space")
+                    .accessibilityIdentifier("emailLoginButton")
             }
             .sheet(isPresented: $isSearchViewPresented) {
                 TeamSpaceMemberSearchView<TeamSpaceMemberSearchViewModel>(searchViewModel: teamSpaceMemberSearchViewModel,  searchItemSelectAction: { (person, isSelected)  in
@@ -114,9 +126,11 @@ struct TeamSpaceMemberShipView: View {
                 Button("By Person Id") {
                     createTeamMembership(personId: selectedSearchItem.id ?? "", teamId: selectedItem?.teamId ?? "", personDisplayName: selectedSearchItem.displayName ?? "")
                 }
+                .accessibility(identifier: "createMembershipByIdButton")
                 Button("By Email Address") {
                     addTeamMembershipWithEmail()
                 }
+                .accessibility(identifier: "createMembershipByEmailButton")
             }
             .overlay {
                     if teamMemberShipViewModel.isLoading {
@@ -133,18 +147,22 @@ struct TeamSpaceMemberShipView: View {
                         }) {
                             Text("Add Space to Team")
                         }
+                        .accessibility(identifier: "addSpaceToTeamButton")
                         Button(action: {
                             fetchTeamById(teamId: team.id ?? "")
                         }) {
                             Text("Fetch Team by Id")
                         }
+                        .accessibility(identifier: "fetchTeamByIdButton")
                         Button(action: {
                             updateAlertPresented = true
                         }) {
                             Text("Update Team Name")
                         }
+                        .accessibility(identifier: "updateTeamNameButton")
                     } label: {
                         Label("Team Actions", systemImage: "ellipsis.circle")
+                            .accessibility(identifier: "teamsMenuButton")
                     }
                 }
             }

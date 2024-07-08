@@ -11,6 +11,9 @@ class SpaceMembershipListSearchViewModel: SearchViewModelProtocol {
     @Published var searchString: String = ""
         
     let webexPeople = WebexPeople()
+    var isCallIncoming: Bool = false
+    var incomingCall: Call?
+    func registerIncomingCall() {}
     
     /// Holds all subscriptions for Combine publishers to manage the memory and prevent premature deallocation.
     var subscriptions = Set<AnyCancellable>()

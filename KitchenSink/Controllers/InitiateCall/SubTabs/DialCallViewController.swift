@@ -5,6 +5,8 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
     var addedCall: Bool
     var oldCall: Call?
     var isPhoneNumber = false
+    var moveMeeting = false
+
     private var callButtonDialpadBottomConstraint: NSLayoutConstraint?
     private var callButtonTextFieldBottomConstraint: NSLayoutConstraint?
     
@@ -86,11 +88,34 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
     private lazy var dialPhoneNumberLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .preferredFont(forTextStyle: .title1)
-        label.numberOfLines = 0
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.numberOfLines = 2
         label.lineBreakMode = .byWordWrapping
-        label.text = "Dial Phone number ?"
+        label.text = "Dial Phone Number ?"
         label.accessibilityIdentifier = "dialPhoneNumberLabel"
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var moveMeetingSwitch: UISwitch = {
+        let toggle = UISwitch(frame: .zero)
+        toggle.isOn = false
+        toggle.setHeight(30)
+        toggle.onTintColor = .momentumBlue50
+        toggle.addTarget(self, action: #selector(moveMeetingValueDidChanged(_:)), for: .valueChanged)
+        toggle.translatesAutoresizingMaskIntoConstraints = false
+        return toggle
+    }()
+    
+    private lazy var moveMeetingLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .preferredFont(forTextStyle: .headline)
+        label.numberOfLines = 2
+        label.lineBreakMode = .byWordWrapping
+        label.text = "Move Meeting ?"
+        label.accessibilityIdentifier = "moveMeetingLabel"
+        label.textAlignment = .center
         return label
     }()
     
@@ -101,6 +126,10 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         button.accessibilityIdentifier = "dialButton"
         return button
     }()
+    
+    @objc func moveMeetingValueDidChanged(_ sender: UISwitch) {
+        self.moveMeeting = sender.isOn
+    }
     
     @objc func dialPhoneNumberValueDidChanged(_ sender: UISwitch) {
         self.isPhoneNumber = sender.isOn
@@ -141,15 +170,26 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
         view.addSubview(callButton)
         view.addSubview(dialPhoneNumberSwitch)
         view.addSubview(dialPhoneNumberLabel)
+        view.addSubview(moveMeetingSwitch)
+        view.addSubview(moveMeetingLabel)
     }
     
     private func setupConstraints() {
-        dialPhoneNumberLabel.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor, constant: 24).activate()
-        dialPhoneNumberLabel.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -8).activate()
-
-        dialPhoneNumberSwitch.leadingAnchor.constraint(equalTo: dialPhoneNumberLabel.trailingAnchor, constant: 16).activate()
-        dialPhoneNumberSwitch.bottomAnchor.constraint(equalTo: textField.topAnchor, constant: -8).activate()
         
+        moveMeetingLabel.trailingAnchor.constraint(equalTo: callButton.leadingAnchor, constant: -20).activate()
+        moveMeetingLabel.topAnchor.constraint(equalTo: callButton.topAnchor).activate()
+
+        moveMeetingSwitch.centerXAnchor.constraint(equalTo: moveMeetingLabel.centerXAnchor).activate()
+        moveMeetingSwitch.topAnchor.constraint(equalTo: moveMeetingLabel.bottomAnchor, constant: 15).activate()
+
+        
+        dialPhoneNumberLabel.leadingAnchor.constraint(equalTo: callButton.trailingAnchor, constant: 20).activate()
+        dialPhoneNumberLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).activate()
+        dialPhoneNumberLabel.topAnchor.constraint(equalTo: callButton.topAnchor).activate()
+
+        dialPhoneNumberSwitch.centerXAnchor.constraint(equalTo: dialPhoneNumberLabel.centerXAnchor).activate()
+        dialPhoneNumberSwitch.topAnchor.constraint(equalTo: dialPhoneNumberLabel.bottomAnchor, constant: 15).activate()
+
         textField.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor, constant: 24).activate()
         textField.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor, constant: -64).activate()
         textField.bottomAnchor.constraint(equalTo: dialPad.topAnchor, constant: -68).activate()
@@ -217,7 +257,7 @@ class DialCallViewController: UIViewController, DialPadViewDelegate, UITextField
                 }
             })
         } else {
-            present(CallViewController(space: space, addedCall: addedCall, isPhoneNumber: isPhoneNumber), animated: true)
+            present(CallViewController(space: space, addedCall: addedCall, isPhoneNumber: isPhoneNumber, moveMeeting: moveMeeting), animated: true)
         }
     }
 }

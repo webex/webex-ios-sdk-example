@@ -430,7 +430,12 @@ class SetupViewController: UIViewController, UITextFieldDelegate {
         videoStreamModeLabel.text = isComposite ? "Composite Mode" : "Auxiliary Mode"
         multiStreamApproachLabel.text = isNewMultiStreamApproach ? "New Multi stream Approach" : "Old Multi stream Approach"
     }
-    
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        webex.phone.stopPreview()
+    }
+
     func setupViews() {
         view.addSubview(videoView)
         view.addSubview(previewStackView)

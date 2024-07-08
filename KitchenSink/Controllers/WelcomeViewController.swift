@@ -3,7 +3,6 @@ import SwiftUI
 import UIKit
 
 class WelcomeViewController: UIViewController {
-
     var logoImageView: UIImageView!
     var buttonStackView: UIStackView!
 
@@ -18,6 +17,7 @@ class WelcomeViewController: UIViewController {
         view.setHeight(50)
         view.layer.cornerRadius = 25
         view.layer.masksToBounds = true
+        view.accessibilityIdentifier = "oldUIButton"
         return view
     }()
 
@@ -78,6 +78,7 @@ class WelcomeViewController: UIViewController {
             guard let window = self.keyWindow else { return }
             window.rootViewController = UINavigationController(rootViewController: LoginViewController())
             window.makeKeyAndVisible()
+            UserDefaults.standard.set(false, forKey: "isNewUI")
         }
         return
     }
@@ -85,12 +86,12 @@ class WelcomeViewController: UIViewController {
     @objc func newButtonTapped() {
         if #available(iOS 16.0, *) {
             DispatchQueue.main.async {
-                let loginView = LoginView()
-                let hostingController = UIHostingController(rootView: loginView)
+                let hostingController = UIHostingController(rootView: LoginView())
 
                 hostingController.sizingOptions = .intrinsicContentSize
                 hostingController.modalPresentationStyle = .fullScreen
                 self.present(hostingController, animated: true)
+                UserDefaults.standard.set(true, forKey: "isNewUI")
             }
         } else {
             let errorAlert = UIAlertController(title: "Error", message: "Minimum iOS 16 required", preferredStyle: .alert)

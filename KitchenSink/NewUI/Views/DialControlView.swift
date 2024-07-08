@@ -106,8 +106,10 @@ struct DialControlView: View {
                                 }
                                 .accessibilityIdentifier("call")
                                 
-                                ToggleButtonWithText(isOn: $isPhoneNumberToggleOn, text: "Dial Phone Number ?").padding()
-                                    .bold()
+                                if !showNumberPad {
+                                    ToggleButtonWithText(isOn: $isPhoneNumberToggleOn, text: "Dial Phone Number ?").padding()
+                                        .bold()
+                                }
                                 ToggleButtonWithText(isOn: $isMoveMeetingToggleOn, text: "Move Meeting ?")
                                     .bold()
                             }

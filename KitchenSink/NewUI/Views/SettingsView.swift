@@ -43,6 +43,7 @@ struct SettingsView: View {
             Text(model.profile.name ?? "")
                 .font(.title)
                 .padding(.leading, 15)
+                .accessibilityIdentifier("profileName")
             Text(model.profile.status ?? "")
                 .font(.headline)
                 .padding(.leading, 15)

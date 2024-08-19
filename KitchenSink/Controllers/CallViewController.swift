@@ -61,6 +61,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     private var shareConfig: ShareConfig? // to store share config locally and send when screen-share extension connected
     private var isPhoneNumber =  false
     private var moveMeeting =  false
+    var counter: Int = 0
     // MARK: Initializers
     init(space: Space, addedCall: Bool = false, currentCallId: String = "", oldCall: Call? = nil, incomingCall: Bool = false, call: Call? = nil, isPhoneNumber: Bool = false, moveMeeting: Bool = false) {
         self.space = space
@@ -1142,7 +1143,22 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 })
             }
         }
-        
+
+        // Audio Dump
+        guard let isRecordingAudioDump = call?.isRecordingAudioDump else {
+            print("Error: call.isRecordingAudioDump is nil")
+            return
+        }
+        let title = isRecordingAudioDump ? "Stop Recording Audio Dump" : "Start Recording Audio Dump"
+        alertController.addAction(UIAlertAction(title: title, style: .default) {  _ in
+            if isRecordingAudioDump {
+                self.stopRecordingAudioDump()
+            } else {
+                self.startRecordingAudioDump()
+            }
+        })
+
+        // Advanced Camera APIs
         alertController.addAction(UIAlertAction(title: "Video Torch Mode - \(String(describing: self.torchMode))", style: .default) {  _ in
             guard var index = torchModes.firstIndex(of: self.torchMode) else { return }
             if index == torchModes.count - 1 {
@@ -2775,5 +2791,77 @@ extension UIScrollView {
         let heightScale = bounds.height / contentSize.height
         let value = min(widthScale, heightScale)
         return value
+    }
+}
+
+// Audio Dump
+extension CallViewController {
+    func startRecordingAudioDump() {
+        guard let call = call else {
+            print("Error: call is nil")
+            return
+        }
+
+        call.canStartRecordingAudioDump(completionHandler: { err in
+            if err == nil
+            {
+                call.startRecordingAudioDump(completionHandler: { err in
+                    if err == nil {
+                        print("Started recording audio dump")
+                        self.slideInStateView(slideInMsg: "Started recording audio dump")
+                        self.durationLabel.isHidden = false
+                        self.startTimer()
+                    } else {
+                        self.slideInStateView(slideInMsg: "Start audio dump error \(err.debugDescription)")
+                    }
+                })
+            } else {
+                self.slideInStateView(slideInMsg: "Start audio dump error \(err.debugDescription)")
+            }
+        })
+    }
+
+    func stopRecordingAudioDump() {
+        guard let call = call else {
+            print("Error: call is nil")
+            return
+        }
+        if call.isRecordingAudioDump {
+            call.stopRecordingAudioDump(completionHandler: { err in
+                if err == nil {
+                    print("Stopped recording audio dump")
+                    self.slideInStateView(slideInMsg: "Stopped recording audio dump")
+                    self.durationLabel.isHidden = true
+                    self.stopTimer()
+                } else {
+                    self.slideInStateView(slideInMsg: "Stop audio dump error \(err.debugDescription)")
+                }
+            })
+        } else {
+            self.slideInStateView(slideInMsg: "Stop audio dump error: Not currently recording")
+        }
+    }
+}
+
+extension CallViewController {
+    @objc func timerFired() {
+        counter += 1
+        let hours = counter / 3600
+        let minutes = (counter % 3600) / 60
+        let seconds = counter % 60
+        durationLabel.text = "Audio dump recording: \(String(format: "%02d:%02d:%02d", hours, minutes, seconds))"
+    }
+
+    func startTimer() {
+        counter = 0
+        timer.invalidate() // Invalidate the timer if it already exists
+
+        // Start a new timer
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+    }
+
+    func stopTimer() {
+        // Stop the timer
+        timer.invalidate()
     }
 }

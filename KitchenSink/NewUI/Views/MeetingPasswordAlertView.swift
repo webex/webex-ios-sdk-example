@@ -84,6 +84,7 @@ struct MeetingPasswordAlertView: View {
                                 }
                                 .onTapGesture {
                                     if !viewModel.hostKey.isEmpty {
+                                        viewModel.meetingPinOrPassword = viewModel.hostKey
                                         viewModel.isModerator = true
                                     }
                                     viewModel.connectCall(selfVideoView: selfVideoView, remoteVideoViewRepresentable: remoteVideoView, screenShareView: screenShareView)

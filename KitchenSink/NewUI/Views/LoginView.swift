@@ -97,6 +97,7 @@ struct LoginView: View {
     /// Toggles the state of FedRAMP mode.
     func toggleFedRampMode() {
         isFedRAMPEnabled.toggle()
+        model.isFedRAMPMode = isFedRAMPEnabled
     }
 
     /// Initiates a login action with an authorization code using the model.

@@ -11,7 +11,8 @@ protocol PhoneProtocol: AnyObject
     var videoMaxRxBandwidth: UInt32 { get set }
     var videoMaxTxBandwidth: UInt32 { get set }
     var defaultFacingMode: FacingModeKS { get set }
-    
+    var isSpeechEnhancementEnabled: Bool {get}
+
     func setPushTokens(bundleId: String, deviceId: String, deviceToken: String, voipToken: String, appId: String?)
     func dial(joinAddress: String, isPhoneNumber: Bool, isMoveMeeting: Bool, isModerator: Bool, pin: String?, captchaId: String, captchaVerifyCode: String, selfVideoView: MediaRenderViewKS, remoteVideoViewRepresentable: RemoteVideoViewRepresentable, screenShareView: MediaRenderViewKS, completionHandler: @escaping (Swift.Result<CallProtocol, Error>) -> Void)
     
@@ -25,6 +26,8 @@ protocol PhoneProtocol: AnyObject
     func refreshMeetingCaptcha(completionHandler: @escaping (Result<Phone.Captcha>) -> Void)
     func updateSystemPreferredCamera(camera: Camera, completionHandler: @escaping (Result<Void>) -> Void)
     func getListOfCameras() -> [Camera]
+    func useLegacyReceiverNoiseRemoval(useLegacy: Bool)
+    func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void)
 }
 
 @available(iOS 16.0, *)
@@ -115,6 +118,10 @@ class WebexPhone: PhoneProtocol {
         set {
             webex.phone.enableBackgroundConnection =  newValue
         }
+    }
+
+    var isSpeechEnhancementEnabled: Bool {
+        return webex.phone.isReceiverSpeechEnhancementEnabled
     }
 
     // Sets the push tokens for WxC calling push notifications
@@ -215,6 +222,13 @@ class WebexPhone: PhoneProtocol {
         return webex.phone.getListOfCameras()
     }
 
+    func useLegacyReceiverNoiseRemoval(useLegacy: Bool) {
+        webex.phone.useLegacyReceiverNoiseRemoval(useLegacy: useLegacy)
+    }
+
+    func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void) {
+        webex.phone.enableReceiverSpeechEnhancement(shouldEnable: shouldEnable, completionHandler: completionHandler)
+    }
 }
 
 

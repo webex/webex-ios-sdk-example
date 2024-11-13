@@ -143,6 +143,7 @@ class CallViewModel: ObservableObject
     @Published var showDTMFControl = false
     @Published var placeholderText1 = ""
     @Published var placeholderText2 = ""
+    @Published var speechEnhancement = false
     let renderModes: [Call.VideoRenderMode] = [.fit, .cropFill, .stretchFill]
     let flashModes: [Call.FlashMode] = [.on, .off, .auto]
     let torchModes: [Call.TorchMode] = [.on, .off, .auto]
@@ -835,6 +836,7 @@ class CallViewModel: ObservableObject
             self?.canControlWXA = call.canControlWXA
             self?.isClosedCaptionAllowed = call.isClosedCaptionAllowed
             self?.isClosedCaptionEnabled = call.isClosedCaptionEnabled
+            self?.speechEnhancement = call.isSpeechEnhancementEnabled
         }
         self.updateNameLabels(connected: call.isConnected)
     }
@@ -888,7 +890,27 @@ class CallViewModel: ObservableObject
             self?.currentCall?.receivingScreenShare = isOn
         }
     }
-    
+
+    // Handles Speech Enhancement for the call.
+    func handleSpeechEnhancement(isOn: Bool) {
+        if isOn == self.speechEnhancement {
+            return
+        }
+        self.currentCall?.enableSpeechEnhancement(shouldEnable: isOn, completionHandler: { result in
+            switch result
+            {
+            case .success():
+                DispatchQueue.main.async { [weak self] in
+                    self?.speechEnhancement.toggle()
+                }
+            case .failure(let err):
+                DispatchQueue.main.async { [weak self] in
+                    self?.showError("Speech Enhancement Error ", err.localizedDescription)
+                }
+            }
+        })
+    }
+
     // Handles EndCall Action.
     func handleEndCall()
     {

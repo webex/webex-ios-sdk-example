@@ -7,6 +7,7 @@ struct MoreOptionsCallView: View {
     @State private var receivingVideo = false
     @State private var receivingAudio = false
     @State private var receivingScreenShare = false
+    @State private var speechEnhancement = false
     //@State private var isVirtualBGListPresent = false
     @State private var externalCamera = false
     var isVirtualBGListPresent: Bool {
@@ -69,6 +70,17 @@ struct MoreOptionsCallView: View {
                             }
                         }
                         .accessibilityIdentifier("receivingScreenShareToggle")
+
+                    Toggle("Speech Enhancement  ", isOn: $speechEnhancement)
+                        .onChange(of: speechEnhancement) { newValue in
+                            callingVM.handleSpeechEnhancement(isOn: newValue)
+                        }
+                        .onReceive(callingVM.$speechEnhancement) { newValue in
+                            if newValue != speechEnhancement {
+                                speechEnhancement = newValue
+                            }
+                        }
+                        .accessibilityIdentifier("speechEnhancementToggle")
                 }
                 
                 if callingVM.isCUCMOrWxcCall {

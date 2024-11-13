@@ -17,6 +17,10 @@ class SettingsViewModel: ObservableObject {
     @Published var enableBackgroundConnection = false
     @Published var isAuxiliaryMode = false
     @Published var enable1080pVideo = false
+    @Published var useLegacyNoiseRemoval = false
+    @Published var enableSpeechEnhancement = false
+    @Published var showError: Bool = false
+    @Published var error: String = ""
     @Published var videoStreamModeLabel = ""
     
     var webexAuthenticator = WebexAuthenticator()
@@ -31,6 +35,14 @@ class SettingsViewModel: ObservableObject {
         self.mailVM = mailVM
     }
 
+    /// Asynchronously displays an error message on the main queue.
+    func showError(error: Error) {
+        DispatchQueue.main.async {
+            self.showError = true
+            self.error = error.localizedDescription
+        }
+    }
+    
     /// Fetches and updates the version of the Webex SDK and the build version of the application.
     func updateVersion() {
         let bundleVersion = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
@@ -78,8 +90,9 @@ class SettingsViewModel: ObservableObject {
         isStartCallWithVideoOn = UserDefaults.standard.bool(forKey: "hasVideo")
         isAuxiliaryMode = UserDefaults.standard.bool(forKey: "compositeMode")
         enable1080pVideo = UserDefaults.standard.bool(forKey: "VideoRes1080p")
-        enable1080pVideo = UserDefaults.standard.bool(forKey: "VideoRes1080p")
         enableBackgroundConnection = UserDefaults.standard.bool(forKey: "backgroundConnection")
+        useLegacyNoiseRemoval = UserDefaults.standard.bool(forKey: "legacyNoiseRemoval")
+        enableSpeechEnhancement = webexPhone.isSpeechEnhancementEnabled
     }
     
     func updateStartCallWithVideoOn() {
@@ -115,5 +128,25 @@ class SettingsViewModel: ObservableObject {
         } else {
             webexPhone.enableBackgroundConnection = false
         }
+    }
+
+    func updateUseLegacyNoiseRemoval() {
+        useLegacyNoiseRemoval.toggle()
+        webexPhone.useLegacyReceiverNoiseRemoval(useLegacy: useLegacyNoiseRemoval)
+        UserDefaults.standard.setValue(useLegacyNoiseRemoval, forKey: "legacyNoiseRemoval")
+    }
+
+    func updateSpeechEnhancementEnabled() {
+        enableSpeechEnhancement.toggle()
+        webexPhone.enableSpeechEnhancement(shouldEnable: enableSpeechEnhancement, completionHandler: { result in
+            switch result {
+            case .success():
+                self.enableSpeechEnhancement.toggle()
+            case .failure(let err):
+                DispatchQueue.main.async {
+                    self.showError(error: err)
+                }
+            }
+        })
     }
 }

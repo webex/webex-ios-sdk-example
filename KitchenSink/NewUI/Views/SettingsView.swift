@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var alertTitle = ""
     @State private var isPhoneServicesOn = false
     @State private var showSetupView = false
+    @State private var isSpeechEnhancementEnabled: Bool = true
 
     @Environment(\.dismiss) var dismiss
 
@@ -72,7 +73,21 @@ struct SettingsView: View {
                 }.onTapGesture {
                     model.updateStartCallWithVideoOn()
                 }
-                
+
+                HStack {
+                    Toggle("Use Legacy Noise Removal", isOn: $model.useLegacyNoiseRemoval)
+                        .accessibilityIdentifier("isSpeechEnhancementEnabled")
+                }.onTapGesture {
+                    model.updateUseLegacyNoiseRemoval()
+                }
+
+                HStack {
+                    Toggle("Enable Speech Enhancement", isOn: $model.enableSpeechEnhancement)
+                        .accessibilityIdentifier("isSpeechEnhancementEnabled")
+                }.onTapGesture {
+                    model.updateSpeechEnhancementEnabled()
+                }
+
                 HStack {
                     Toggle("Auxiliary Mode", isOn: $model.isAuxiliaryMode)
                         .accessibilityIdentifier("auxiliaryMode")
@@ -156,6 +171,12 @@ struct SettingsView: View {
                 .foregroundColor(.secondary)
         }
        }// nav
+        .alert("Error", isPresented: $model.showError) {
+            Button("Ok") { }
+                .accessibilityIdentifier("errorOkButton")
+        } message: {
+            Text(model.error)
+        }
         .alert("Could Not Send Email", isPresented: $mailSentFailAlert) {
             Button("Ok") {}
         } message: {

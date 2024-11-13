@@ -3,7 +3,7 @@ import WebexSDK
 
 protocol OAuthAuthenticationProtocol: AnyObject {
     func getOAuthAuthenticator(email: String, isFedRAMP: Bool) -> OAuthAuthenticator?
-    func getAuthorizationUrl(authenticator: OAuthAuthenticator, completion: @escaping ((URL?) -> Void))
+    func getAuthorizationUrl(authenticator: OAuthAuthenticator, completion: @escaping ((OAuthResult, URL?) -> Void))
     func loginWithAuthCode(code: String, completion: @escaping (Bool) -> Void)
 }
 
@@ -65,14 +65,8 @@ extension WebexAuthenticator : OAuthAuthenticationProtocol {
     }
 
     /// Retrieves the authorization URL.
-    func getAuthorizationUrl(authenticator: OAuthAuthenticator, completion: @escaping ((URL?) -> Void)) {
-        authenticator.getAuthorizationUrl(completionHandler: { result, url in
-            if result == .success {
-                completion(url)
-            } else {
-                completion(nil)
-            }
-        })
+    func getAuthorizationUrl(authenticator: OAuthAuthenticator, completion: @escaping ((OAuthResult, URL?) -> Void)) {
+        authenticator.getAuthorizationUrl(completionHandler: completion)
     }
     
     /// Login the user using an authorization code.

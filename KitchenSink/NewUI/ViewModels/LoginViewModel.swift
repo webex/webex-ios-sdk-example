@@ -70,17 +70,21 @@ class LoginViewModel: ObservableObject {
         webex = Webex(authenticator: authenticator)
         loadingIndicator(show: true)
         guard let redirectUri = self.getRedirectUri() else { return }
-        self.webexAuthenticator.getAuthorizationUrl(authenticator: authenticator, completion: { url in
-            guard let url = url else {
+        self.webexAuthenticator.getAuthorizationUrl(authenticator: authenticator) { result, url in
+            if result == .success, let url = url {
+                self.link = url
+                self.redirectUri = redirectUri
+                self.showWebView = true
+            }
+            else {
                 self.showErrorAlert = true
-                self.alertErrorMessage = "Invalid email"
+                self.alertErrorMessage = result.rawValue
                 self.loadingIndicator(show: false)
-                return
             }
             self.link = url
             self.redirectUri = redirectUri
             self.showWebView = true
-        })
+        }
     }
 
     /// Logs in using the authentication code.

@@ -22,6 +22,7 @@ public protocol CallProtocol: AnyObject {
     var isWXAEnabled: Bool {get set}
     var isClosedCaptionEnabled: Bool {get}
     var isClosedCaptionAllowed: Bool {get}
+    var isSpeechEnhancementEnabled: Bool {get}
     var videoRenderViews: (local: MediaRenderView?, remote: MediaRenderView?) {get set}
     var screenShareView: MediaRenderView? {get set}
     var mediaStream: MediaStream? {get set}
@@ -119,6 +120,7 @@ public protocol CallProtocol: AnyObject {
     func getClosedCaptions() -> [CaptionItem]
     func enableWXA(isEnabled: Bool, callback:@escaping ((Bool)->Void)) -> Void
     func send(dtmfCode: String, completionHandler: ((Error?) -> Void)?)
+    func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void)
 }
 
 @available(iOS 16.0, *)
@@ -272,7 +274,13 @@ class CallKS: CallProtocol
     var cameraDuration: WebexSDK.Call.CameraExposureDuration? {
         return call?.exposureDuration
     }
-    
+
+    var isSpeechEnhancementEnabled: Bool {
+        get {
+            return call?.isReceiverSpeechEnhancementEnabled ?? false
+        }
+    }
+
     private var call: Call?
     
     init(call: WebexSDK.Call) {
@@ -677,6 +685,10 @@ class CallKS: CallProtocol
     
     public func send(dtmfCode: String, completionHandler: ((Error?) -> Void)?) {
         call?.send(dtmf: dtmfCode, completionHandler: completionHandler)
+    }
+
+    public func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void) {
+        call?.enableReceiverSpeechEnhancement(shouldEnable: shouldEnable, completionHandler: completionHandler)
     }
 }
 

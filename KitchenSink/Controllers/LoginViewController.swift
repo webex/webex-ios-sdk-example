@@ -281,6 +281,10 @@ class LoginViewController: UIViewController {
                             self?.loginButton.isEnabled = true
                             print("Login failed!")
                             UserDefaults.standard.removeObject(forKey: Constants.emailKey)
+                            
+                            let alert = UIAlertController(title: "Error", message: result.rawValue, preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                            self?.present(alert, animated: true, completion: nil)
                             return
                         }
                         UserDefaults.standard.setValue(Constants.loginTypeValue.email.rawValue, forKey: Constants.loginTypeKey)

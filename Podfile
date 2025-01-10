@@ -8,8 +8,8 @@ target 'KitchenSink' do
 
   # Pods for KitchenSink
 	pod 'WebexSDK','~> 3.11.5'
-  # pod 'WebexSDK/Meeting','~> 3.11.4'  # Uncomment this line and comment the above line for Meeting-only SDK
-  # pod 'WebexSDK/Wxc','~> 3.11.4'  # Uncomment this line and comment the above line for Calling-only SDK
+  # pod 'WebexSDK/Meeting','~> 3.11.5'  # Uncomment this line and comment the above line for Meeting-only SDK
+  # pod 'WebexSDK/Wxc','~> 3.11.5'  # Uncomment this line and comment the above line for Calling-only SDK
 
 
   target 'KitchenSinkUITests' do

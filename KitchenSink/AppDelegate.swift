@@ -179,10 +179,6 @@ extension AppDelegate: PKPushRegistryDelegate {
                 return
             }
             print("callerInfo: \(String(describing: callerInfo))")
-            if CallObjectStorage.shared.getAllActiveCalls().count > 0 // ignore if there is already active call, it will be handled in  webex.phone.onIncoming
-            {
-                return
-            }
             voipUUID = UUID()
             print("voipUUID: \(voipUUID)")
             print("didReceiveIncomingPushWith uuid \(String(describing: voipUUID!))")
@@ -201,15 +197,6 @@ extension AppDelegate: PKPushRegistryDelegate {
             print("processVoipPush onIncoming")
 
             if call.isWebexCallingOrWebexForBroadworks {
-                if CallObjectStorage.shared.getAllActiveCalls().count > 0
-                {
-                    voipUUID = UUID()
-                    print("voipUUID: \(voipUUID)")
-                    self?.callKitManager?.reportIncomingCallFor(uuid: voipUUID!, sender: call.title ?? "") {
-                        self?.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
-                        return
-                    }
-                }
                 print("webex.phone.onIncoming: incoming call arrived callID: \(String(describing: call.callId))")
                 self?.callKitManager?.updateCall(call: call, voipUUID: voipUUID)
             }

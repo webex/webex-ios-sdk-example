@@ -760,13 +760,12 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
     @objc private func handleEndCallAction(_ sender: UIButton) {
         guard let call = call else {
             webex.phone.cancel()
-            print("CallVC dismiss handleEndCallAction")
+            print(#file, #line, #function, "dismiss view controller.")
             self.dismiss(animated: true)
             return
         }
         endCall(call: call)
-        print("CallVC end call: voipUUID \(call.uuid)")
-        AppDelegate.shared.callKitManager?.reportEndCall(uuid: call.uuid)
+        print(#file, #line, #function, "end call: voipUUID \(call.uuid)")
     }
     
     @objc private func handleNoiseRemovalAction(_ sender: UIButton) {
@@ -824,6 +823,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             return
         }
         toggleMuteButton(call: call)
+        AppDelegate.shared.callKitManager?.muteCall(mute: call.sendingAudio, call: call)
     }
     
     @objc private func handleHoldCallAction(_ sender: UIButton) {
@@ -1626,7 +1626,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         
         call.onConnected = { [weak self] in
             guard let self = self else { return }
-            print("onConnected Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
+            print(#file, #line, #function, "onConnected Call object :  + \(call.callId ?? "")  ,  correlationId : \(call.correlationId ?? "") , externalTrackingId:  + \(call.externalTrackingId ?? "")")
             self.player.stop()
             if self.call?.onMediaChanged != nil {
                 self.badNetworkIcon.isHidden = false
@@ -1774,7 +1774,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         
         call.onFailed = { reason in
-            print("Call Failed! \(reason)")
+            print(#file, #line, #function, "Call Failed \(reason), callId: \(String(call.callId ?? "nil")) calUUlId: \(call.uuid)")
             self.player.stop()
             let otherCall = self.getOtherActiveWxcCall()
             if let otherCall = otherCall {
@@ -1798,6 +1798,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
         }
         
         call.onDisconnected = { reason in
+            print(#file, #line, #function, "Call disconnected \(reason), callId: \(String(call.callId ?? "nil")) calUUlId: \(call.uuid)")
             self.player.stop()
             // We will need to report call ended to CallKit when we are disconnected from a CallKit call
             DispatchQueue.main.async {
@@ -1820,6 +1821,7 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             if let otherCall = otherCall {
                 CallObjectStorage.self.shared.removeCallObject(callId: call.callId ?? "")
                 otherCall.holdCall(putOnHold: false)
+                AppDelegate.shared.callKitManager?.holdCall(hold: false, call: otherCall)
                 self.swapCallButton.isHidden = true
                 self.call = otherCall
                 AppDelegate.shared.callKitManager?.updateCall(call: otherCall)
@@ -1847,7 +1849,6 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 }
                 DispatchQueue.main.async { [weak self] in
                     // Need to dismiss CallVC only if no active calls are present or if the currently dismissed active call was a meeting
-                    call.isSpaceMeeting
                     if call.isScheduledMeeting || CallObjectStorage.self.shared.getAllActiveCalls().filter({ $0.callId != call.callId}).count == 0 {
                         print("CallVC dismiss onDisconnected")
                         self?.dismiss(animated: true)
@@ -2563,8 +2564,10 @@ extension CallViewController: CallKitManagerDelegate {
         endCall(call: call, endAndAccept: true)
     }
     
-    func muteButtonToggle(call: Call) {
-        toggleMuteButton(call: call)
+    func callDidMute(call: Call, isMute: Bool) {
+        if self.isLocalAudioMuted != isMute {
+            toggleMuteButton(call: call)
+        }
     }
     
     func callDidHold(call: Call, isOnHold: Bool) {

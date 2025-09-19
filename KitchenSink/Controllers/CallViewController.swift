@@ -1681,10 +1681,29 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                         call.videoRenderViews = (self.selfVideoView, self.remoteVideoView.mediaRenderView)
                     }
                     
-                /* This might be triggered when the local party muted or unmuted the audio. */
-                case .sendingAudio(let isSending):
-                    self.isLocalAudioMuted = !isSending
-                    self.updateMuteState()
+                /* This is triggered when the local party muted or unmuted the audio with operation result. */
+                case .sendingAudioWithResult(let isSending, let result):
+                    
+                    // Show alerts only for errors
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .failed:
+                            let alert = UIAlertController(title: "Audio Error", message: "Failed to change audio sending status.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "OK", style: .default))
+                            self.present(alert, animated: true)
+                        case .notAllowed:
+                            let alert = UIAlertController(title: "Audio Error", message: "Cannot change audio while call is on hold.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "OK", style: .default))
+                            self.present(alert, animated: true)
+                        case .success:
+                            // toggle audio mute state on success case
+                            self.isLocalAudioMuted = !isSending
+                            self.updateMuteState()
+                            break
+                        @unknown default:
+                            fatalError()
+                        }
+                    }
                     
                 /* This might be triggered when the local party muted or unmuted the video. */
                 case .sendingVideo(let isSending):

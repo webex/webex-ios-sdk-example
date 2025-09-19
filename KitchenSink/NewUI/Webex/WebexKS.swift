@@ -151,6 +151,8 @@ class WebexManager {
         }
         if webex != nil {
             webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
+            
+            webex.authDelegate = AppDelegate.shared
             webex.logLevel = .verbose
             DispatchQueue.main.async {
                 webex.initialize { success in

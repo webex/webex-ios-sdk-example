@@ -49,10 +49,12 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
     ]
 
     func logout() {
-        webex.authenticator?.deauthorize(completionHandler: cleanupOnLogout)
+        webex.authenticator?.deauthorize {
+            self.cleanupOnLogout()
+        }
     }
 
-    func cleanupOnLogout() {
+    func cleanupOnLogout(_ completion: (() -> Void)? = nil) {
         DispatchQueue.main.async { [weak self] in
             guard let appDelegate = (UIApplication.shared.delegate as? AppDelegate) else { fatalError() }
             self?.navigationController?.dismiss(animated: true)
@@ -60,6 +62,7 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
             UserDefaults.standard.removeObject(forKey: Constants.emailKey)
             UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
             appDelegate.navigateToLoginViewController()
+            completion?()
         }
     }
 
@@ -384,6 +387,17 @@ extension HomeViewController: WebexAuthDelegate {
     func onReLoginRequired() {
         print("onReLoginRequired called")
         cleanupOnLogout()
+    }
+    
+    func onLoginFailed() {
+        print("onLoginFailed called")
+        cleanupOnLogout {
+            if let topViewController = UIApplication.shared.topViewController() {
+                let alert = UIAlertController(title: "Error", message: "Login Failure", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                topViewController.present(alert, animated: true, completion: nil)
+            }
+        }
     }
 }
 

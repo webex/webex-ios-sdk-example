@@ -156,6 +156,7 @@ class LoginViewController: UIViewController {
         }
         webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
         webex.logLevel = .verbose
+        webex.authDelegate = AppDelegate.shared
 
         // Always call webex.initialize before invoking any other method on the webex instance
         DispatchQueue.main.async {
@@ -258,6 +259,12 @@ class LoginViewController: UIViewController {
     func initWebexUsingToken() {
         webex = Webex(authenticator: TokenAuthenticator(isFedRAMPEnvironment: self.isFedRAMPMode))
         initializeWebex()
+    }
+    
+    func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alertController, animated: true)
     }
     
     @objc private func handleLoginAction() {

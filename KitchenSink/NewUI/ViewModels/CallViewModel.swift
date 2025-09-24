@@ -423,10 +423,23 @@ class CallViewModel: ObservableObject
                         self.receivingVideo = isSending
                         self.updateMediaView()
                     }
-                    /* This might be triggered when the local party muted or unmuted the audio. */
-                case .sendingAudio(let isSending):
+                    
+                    /* This is triggered when the local party muted or unmuted the audio with operation result. */
+                case .sendingAudioWithResult(let isSending, let result):
                     DispatchQueue.main.async {
-                        self.isLocalAudioMuted = !isSending
+                        // Show alerts only for errors
+                        switch result {
+                        case .failed:
+                            self.showSlideInMessage(message: "Audio Error: Failed to change audio sending status.")
+                        case .notAllowed:
+                            self.showSlideInMessage(message: "Audio Error: Cannot change audio while call is on hold.")
+                        case .success:
+                            // toggle audio mute state on success case
+                            self.isLocalAudioMuted = !isSending
+                            break
+                        @unknown default:
+                            fatalError()
+                        }
                     }
                     
                     /* This might be triggered when the local party muted or unmuted the video. */

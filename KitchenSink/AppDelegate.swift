@@ -248,16 +248,28 @@ extension AppDelegate: WebexAuthDelegate {
         cleanupOnLogout()
     }
     
-    func cleanupOnLogout() {
-        DispatchQueue.main.async {
-            UIApplication.shared.topViewController()?.dismiss(animated: true) { [weak self] in
-                DispatchQueue.main.async {
-                    self?.navigateToLoginViewController()
-                }
+    func onLoginFailed() {
+        print("onLoginFailed called")
+        cleanupOnLogout {
+            if let topViewController = UIApplication.shared.topViewController() {
+                let alert = UIAlertController(title: "Error", message: "Login Failure", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                topViewController.present(alert, animated: true, completion: nil)
             }
+        }
+    }
+    
+    private func cleanupOnLogout(_ completion: (() -> Void)? = nil) {
+        DispatchQueue.main.async {
             UserDefaults.standard.removeObject(forKey: Constants.loginTypeKey)
             UserDefaults.standard.removeObject(forKey: Constants.emailKey)
             UserDefaults.standard.removeObject(forKey: Constants.fedRampKey)
+            UIApplication.shared.topViewController()?.dismiss(animated: true) { [weak self] in
+                DispatchQueue.main.async {
+                    self?.navigateToLoginViewController()
+                    completion?()
+                }
+            }
         }
     }
 }

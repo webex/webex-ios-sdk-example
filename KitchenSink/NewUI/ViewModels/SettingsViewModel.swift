@@ -137,12 +137,13 @@ class SettingsViewModel: ObservableObject {
     }
 
     func updateSpeechEnhancementEnabled() {
-        enableSpeechEnhancement.toggle()
+        self.enableSpeechEnhancement.toggle()
         webexPhone.enableSpeechEnhancement(shouldEnable: enableSpeechEnhancement, completionHandler: { result in
             switch result {
             case .success():
-                self.enableSpeechEnhancement.toggle()
+                break
             case .failure(let err):
+                self.enableSpeechEnhancement.toggle()
                 DispatchQueue.main.async {
                     self.showError(error: err)
                 }

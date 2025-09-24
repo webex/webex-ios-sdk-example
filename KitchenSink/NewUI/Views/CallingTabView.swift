@@ -58,7 +58,7 @@ struct SegmentView: View {
 
 @available(iOS 16.0, *)
 struct HistoryListView: View {
-    @ObservedObject private var historyListViewModel = HistoryListViewModel()
+    @StateObject private var historyListViewModel = HistoryListViewModel()
      
     var body: some View {
         List {
@@ -66,7 +66,15 @@ struct HistoryListView: View {
                 HistoryListRowView(history: result)
                     .accessibilityIdentifier("historyList")
             }
+            .onDelete(perform: deleteRows)
         }
+        .task {
+            await historyListViewModel.fetch()
+        }
+    }
+    
+    private func deleteRows(at offsets: IndexSet) {
+        historyListViewModel.delete(at: offsets)
     }
 }
 
@@ -138,9 +146,57 @@ struct HistoryListRowView: View {
 @available(iOS 16.0, *)
 class HistoryListViewModel: ObservableObject {
     
-    /// Fetches the call history from Webex phone call history.
+    @Published private(set) var callHistory: [CallHistoryRecord] = []
+    
+    init() {
+        // Assign the callback to update this instance directly
+        webex.phone.onCallHistoryEvent = { [weak self] event in
+            switch event {
+            case .syncCompleted:
+                self?.refreshCallHistory()
+            case .removed(let recordIds):
+                self?.removeRecords(with: recordIds)
+            case .removeFailed:
+                // Handle remove failed if needed
+                break
+            @unknown default:
+                fatalError()
+            }
+        }
+    }
+    
+    func fetch() async {
+        // Initial fetch
+        refreshCallHistory()
+    }
+    
+    private func refreshCallHistory() {
+        DispatchQueue.main.async {
+            self.callHistory = webex.phone.getCallHistory()
+        }
+    }
+    
+    /// Fetches the call history from the local property.
     func fetchResult() -> [CallHistoryRecord] {
-        return webex.phone.getCallHistory()
+        return callHistory
+    }
+    
+    /// Deletes call history records at the specified offsets.
+    func delete(at offsets: IndexSet) {
+        let recordsToDelete = offsets.compactMap{ callHistory[$0].recordId ?? ""}
+        webex.phone.removeCallHistoryRecords(recordIds: recordsToDelete)
+    }
+    
+    private func removeRecords(with recordIds: [String]) {
+        guard !recordIds.isEmpty else { return }
+        DispatchQueue.main.async {
+            self.callHistory.removeAll { record in
+                if let id = record.recordId {
+                    return recordIds.contains(id)
+                }
+                return false
+            }
+        }
     }
 }
 

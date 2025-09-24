@@ -36,12 +36,49 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
         }
         self.tableView.reloadData()
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .backgroundColor
         
         setupViews()
         setupConstraints()
+        
+        webex.phone.onCallHistoryEvent = { [weak self] (event) in
+            guard let self = self else { return }
+            print("Call History Event: \(event)")
+            switch event {
+            case .syncCompleted:
+                items = webex.phone.getCallHistory()
+                tableView.reloadData()
+                break
+            case .removed(let recordIds):
+                // Find indexes of items whose recordId is in recordIds
+                let indexes = items.enumerated()
+                    .compactMap { (idx: Int, item: CallHistoryRecord) -> Int? in
+                        guard let recordId = item.recordId, recordIds.contains(recordId) else { return nil }
+                        return idx
+                    }
+                guard !indexes.isEmpty else { break }
+                let indexPaths = indexes.map { IndexPath(row: $0, section: 0) }
+                // Remove items from the data source in reverse order to avoid index issues
+                for index in indexes.sorted(by: >) {
+                    items.remove(at: index)
+                }
+                tableView.beginUpdates()
+                tableView.deleteRows(at: indexPaths, with: .automatic)
+                tableView.endUpdates()
+                // Show placeholder if list is empty
+                if items.isEmpty {
+                    tableView.backgroundView = placeholderLabel
+                }
+                break
+            case .removeFailed:
+                break
+            default:
+                break
+            }
+        }
     }
     
     // MARK: TableView Datasource
@@ -57,6 +94,15 @@ class HistoryCallViewController: UIViewController, UITableViewDataSource {
         cell.setupCell(callHistoryRecord: callHistoryRecord, buttonActionHandler: { [weak self] in
             self?.redialCallHistoryRecord(callHistoryRecord) })
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            print("Deleted")
+            if let recordIdToDelete = items[indexPath.row].recordId {
+                webex.phone.removeCallHistoryRecords(recordIds: [recordIdToDelete])
+            }
+        }
     }
     
     // MARK: Methods

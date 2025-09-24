@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0425B72FB263DF46F89B22B5 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8268186707114D2DC2C2A934 /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
 		0864BA1D2582285F0029C3AF /* PushNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0864BA1C2582285F0029C3AF /* PushNotificationHandler.swift */; };
 		08CE26C22582620100F041DA /* EncryptionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CE26C12582620100F041DA /* EncryptionUtils.swift */; };
 		08CE26ED258339E200F041DA /* SwCrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08CE26EC258339E200F041DA /* SwCrypt.swift */; };
@@ -143,6 +144,7 @@
 		4FFF6F982A2E183800B55A3E /* ScreenShareConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFF6F962A2E183800B55A3E /* ScreenShareConfigView.swift */; };
 		4FFF6F992A2E183800B55A3E /* AttachmentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFF6F972A2E183800B55A3E /* AttachmentCollectionViewCell.swift */; };
 		592BABD224D3378C0071B85B /* MessagingReadStatusUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */; };
+		8FA88C4B0A8502A6B7C5B317 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFB3F4E3E47692E0ADD82865 /* Pods_KitchenSinkBroadcastExtension.framework */; };
 		90301A2A24BE594C00DDD9DB /* MessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90301A2924BE594C00DDD9DB /* MessagingTests.swift */; };
 		904F184024F71C3300FA043A /* TeamMembershipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904F183F24F71C3300FA043A /* TeamMembershipViewController.swift */; };
 		906DC95924BFB781006BE784 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 906DC95824BFB781006BE784 /* Array+Extensions.swift */; };
@@ -151,7 +153,7 @@
 		9C3E5A0424DC3FDD0030855E /* PeopleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3E5A0324DC3FDD0030855E /* PeopleViewController.swift */; };
 		9C5E417624DD914B002C95DD /* MessagingPeopleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5E417524DD914B002C95DD /* MessagingPeopleTests.swift */; };
 		9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6DE76C24F46B610055D500 /* SpaceMembershipViewController.swift */; };
-		9CB90C0824E72685009D9D75 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		9CB90C0824E72685009D9D75 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		9CB90C0924E72685009D9D75 /* FilterSpacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB90C0724E72685009D9D75 /* FilterSpacesViewController.swift */; };
 		9D1CCC272657FD3400EB302C /* CallObjectStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CCC262657FD3300EB302C /* CallObjectStorage.swift */; };
 		9D1CCC292657FD4600EB302C /* AuxCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CCC282657FD4600EB302C /* AuxCollectionViewCell.swift */; };
@@ -205,9 +207,7 @@
 		9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82CA24AA36A300F06E31 /* CallButton.swift */; };
 		BB0A70962BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */; };
 		BB0A70982BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */; };
-		D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */; };
-		D84398FF3EAE857155C4FAA8 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
-		E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */; };
+		E0A2F5E5EE318043C95E0B76 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E162D84CE902BA3C22D4D0C /* Pods_KitchenSink.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -252,10 +252,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		062D25203F0E1DCC270522C9 /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
 		0864BA1C2582285F0029C3AF /* PushNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationHandler.swift; sourceTree = "<group>"; };
 		08CE26C12582620100F041DA /* EncryptionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionUtils.swift; sourceTree = "<group>"; };
 		08CE26EC258339E200F041DA /* SwCrypt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwCrypt.swift; sourceTree = "<group>"; };
+		1B247FAD3DF21799D7A4FFD5 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; sourceTree = "<group>"; };
 		1F221977253E2B9B00384AA4 /* WebhooksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhooksViewController.swift; sourceTree = "<group>"; };
 		1FDC6E0B298157D90054EC1B /* CallHistoryRecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallHistoryRecordTableViewCell.swift; sourceTree = "<group>"; };
 		1FDC6E0D298158090054EC1B /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
@@ -264,7 +264,7 @@
 		1FDC6E2A298159B10054EC1B /* UIViewController+Extenstion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extenstion.swift"; sourceTree = "<group>"; };
 		1FEE696F253E52050070E6C9 /* WebhookTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookTableViewCell.swift; sourceTree = "<group>"; };
 		1FEE6972253E67190070E6C9 /* NewWebhookFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWebhookFormViewController.swift; sourceTree = "<group>"; };
-		28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSinkBroadcastExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2631B3B5526E07B8576C1792 /* Pods-KitchenSink.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.debug.xcconfig"; sourceTree = "<group>"; };
 		2E176D2824D9E3E7004BB3F6 /* MessageTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTableViewCell.swift; sourceTree = "<group>"; };
 		2E39A40A24BCAAA90081D077 /* UILabel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UILabel+Extensions.swift"; sourceTree = "<group>"; };
 		2E39A41024BCC8360081D077 /* MessagingSpacesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingSpacesTests.swift; sourceTree = "<group>"; };
@@ -287,6 +287,7 @@
 		2EB6BD7224B79A2900DC3B7D /* MessagingSpacesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MessagingSpacesViewController.swift; path = "../New Group/MessagingSpacesViewController.swift"; sourceTree = "<group>"; };
 		2EB6BD7524B7B66300DC3B7D /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
 		2EB6BD8324B7B86700DC3B7D /* UIAlertAction+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertAction+Extensions.swift"; sourceTree = "<group>"; };
+		3E6758CE80A567F5A61F1761 /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		4F162FE92B61760E0063DBCF /* WelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 		4F238BA127BBEB5C0035754A /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		4F2593A7284F8FC9001A777E /* MediaStreamView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaStreamView.swift; sourceTree = "<group>"; };
@@ -389,14 +390,13 @@
 		4FFF6F962A2E183800B55A3E /* ScreenShareConfigView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenShareConfigView.swift; sourceTree = "<group>"; };
 		4FFF6F972A2E183800B55A3E /* AttachmentCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttachmentCollectionViewCell.swift; sourceTree = "<group>"; };
 		592BABD124D3378C0071B85B /* MessagingReadStatusUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingReadStatusUITests.swift; sourceTree = "<group>"; };
-		7017F749060B091B19D0C73B /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
-		80459092429D450A6A12274C /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		8268186707114D2DC2C2A934 /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		90301A2924BE594C00DDD9DB /* MessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingTests.swift; sourceTree = "<group>"; };
 		904F183F24F71C3300FA043A /* TeamMembershipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMembershipViewController.swift; sourceTree = "<group>"; };
 		906DC95824BFB781006BE784 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		90F9B00A24B79FB200447A9D /* TeamsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsViewController.swift; sourceTree = "<group>"; };
 		90F9B01824B7AC7800447A9D /* NavigationItemSetupProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationItemSetupProtocol.swift; sourceTree = "<group>"; };
-		96803DB265124462205F3E6B /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		995BD8E8765D98E1B6ABC27E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		9C3E5A0324DC3FDD0030855E /* PeopleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleViewController.swift; sourceTree = "<group>"; };
 		9C5E417524DD914B002C95DD /* MessagingPeopleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagingPeopleTests.swift; sourceTree = "<group>"; };
 		9C6DE76C24F46B610055D500 /* SpaceMembershipViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpaceMembershipViewController.swift; sourceTree = "<group>"; };
@@ -460,12 +460,12 @@
 		9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactTableViewCell.swift; sourceTree = "<group>"; };
 		9DDC82C924AA36A300F06E31 /* DialPadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialPadView.swift; sourceTree = "<group>"; };
 		9DDC82CA24AA36A300F06E31 /* CallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallButton.swift; sourceTree = "<group>"; };
-		AF69537487765CF124BE512E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
-		B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E162D84CE902BA3C22D4D0C /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		BFC684BBFE9497C4EA1AEDEC /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests.release.xcconfig"; sourceTree = "<group>"; };
+		D5508C527422A671BEDC3391 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		D987F02AB6B77EBDD8DE41AE /* Pods-KitchenSink.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSink.release.xcconfig"; path = "Target Support Files/Pods-KitchenSink/Pods-KitchenSink.release.xcconfig"; sourceTree = "<group>"; };
+		DFB3F4E3E47692E0ADD82865 /* Pods_KitchenSinkBroadcastExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSinkBroadcastExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -473,7 +473,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D84398FF3EAE857155C4FAA8 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */,
+				0425B72FB263DF46F89B22B5 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,7 +482,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9DD11CCB2567CAC500B2C2CA /* ReplayKit.framework in Frameworks */,
-				E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
+				8FA88C4B0A8502A6B7C5B317 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,7 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D35B01124B491120005E83A /* Security.framework in Frameworks */,
-				D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */,
+				E0A2F5E5EE318043C95E0B76 /* Pods_KitchenSink.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,12 +518,12 @@
 		281D38F33841C059E8F40313 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				062D25203F0E1DCC270522C9 /* Pods-KitchenSink.debug.xcconfig */,
-				7017F749060B091B19D0C73B /* Pods-KitchenSink.release.xcconfig */,
-				80459092429D450A6A12274C /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */,
-				BFC684BBFE9497C4EA1AEDEC /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */,
-				96803DB265124462205F3E6B /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */,
-				AF69537487765CF124BE512E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */,
+				2631B3B5526E07B8576C1792 /* Pods-KitchenSink.debug.xcconfig */,
+				D987F02AB6B77EBDD8DE41AE /* Pods-KitchenSink.release.xcconfig */,
+				3E6758CE80A567F5A61F1761 /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */,
+				1B247FAD3DF21799D7A4FFD5 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */,
+				D5508C527422A671BEDC3391 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */,
+				995BD8E8765D98E1B6ABC27E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -820,9 +820,9 @@
 				9D35B00424B491120005E83A /* Security.framework */,
 				9D645241255AC54E0084A2C1 /* ReplayKit.framework */,
 				9D64524D255AC54F0084A2C1 /* UIKit.framework */,
-				B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */,
-				B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */,
-				28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */,
+				9E162D84CE902BA3C22D4D0C /* Pods_KitchenSink.framework */,
+				8268186707114D2DC2C2A934 /* Pods_KitchenSink_KitchenSinkUITests.framework */,
+				DFB3F4E3E47692E0ADD82865 /* Pods_KitchenSinkBroadcastExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -981,11 +981,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9D807ACF24B3A2C000D56A92 /* Build configuration list for PBXNativeTarget "KitchenSinkUITests" */;
 			buildPhases = (
-				5A1A87800F16152AD7E24E80 /* [CP] Check Pods Manifest.lock */,
+				B1989741752EDD8941991EBE /* [CP] Check Pods Manifest.lock */,
 				9D807AB624B3A2BF00D56A92 /* Sources */,
 				9D807AB724B3A2BF00D56A92 /* Frameworks */,
 				9D807AB824B3A2BF00D56A92 /* Resources */,
-				B75B941EBEA09A3DAEA88248 /* [CP] Embed Pods Frameworks */,
+				D7703E2873C98735412196FA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1001,7 +1001,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9DD11CDB2567CAC600B2C2CA /* Build configuration list for PBXNativeTarget "KitchenSinkBroadcastExtension" */;
 			buildPhases = (
-				5ECBA75266CE01D53A136B95 /* [CP] Check Pods Manifest.lock */,
+				0D6091FA7E917371996C2E86 /* [CP] Check Pods Manifest.lock */,
 				9DD11CC62567CAC500B2C2CA /* Sources */,
 				9DD11CC72567CAC500B2C2CA /* Frameworks */,
 				9DD11CC82567CAC500B2C2CA /* Resources */,
@@ -1019,13 +1019,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9DDC82AF24AA35E800F06E31 /* Build configuration list for PBXNativeTarget "KitchenSink" */;
 			buildPhases = (
-				A7645092974F9F4B7D8062FF /* [CP] Check Pods Manifest.lock */,
+				228711AD5AB1F523C1F7BEC9 /* [CP] Check Pods Manifest.lock */,
 				9DDC828C24AA35E400F06E31 /* Sources */,
 				9DDC828D24AA35E400F06E31 /* Frameworks */,
 				9DDC828E24AA35E400F06E31 /* Resources */,
 				9DD11CBE2567C75100B2C2CA /* Embed App Extensions */,
 				1F76CAA729815E6500DE5269 /* Embed Frameworks */,
-				478DD08F9E2F5A51C0B1DF13 /* [CP] Embed Pods Frameworks */,
+				B7D3F956106EAEA57A672C9A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1112,50 +1112,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		478DD08F9E2F5A51C0B1DF13 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5A1A87800F16152AD7E24E80 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-KitchenSinkUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5ECBA75266CE01D53A136B95 /* [CP] Check Pods Manifest.lock */ = {
+		0D6091FA7E917371996C2E86 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1177,7 +1134,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A7645092974F9F4B7D8062FF /* [CP] Check Pods Manifest.lock */ = {
+		228711AD5AB1F523C1F7BEC9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1199,7 +1156,46 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B75B941EBEA09A3DAEA88248 /* [CP] Embed Pods Frameworks */ = {
+		B1989741752EDD8941991EBE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KitchenSink-KitchenSinkUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B7D3F956106EAEA57A672C9A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D7703E2873C98735412196FA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1207,13 +1203,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1419,7 +1411,7 @@
 				90F9B00B24B79FB200447A9D /* TeamsViewController.swift in Sources */,
 				4FB901042C37A37200D9165E /* UCLoginFailureReasonKS.swift in Sources */,
 				4F7DE4A32B60BE4300AF9DED /* MessageListViewModel.swift in Sources */,
-				9CB90C0824E72685009D9D75 /* (null) in Sources */,
+				9CB90C0824E72685009D9D75 /* BuildFile in Sources */,
 				9C6DE77924F46B610055D500 /* SpaceMembershipViewController.swift in Sources */,
 				9D3701A924ABDD43004E480E /* ImageExtension.swift in Sources */,
 				4F326C8928EB073100EA57D9 /* PasswordCaptchaView.swift in Sources */,
@@ -1461,7 +1453,7 @@
 /* Begin XCBuildConfiguration section */
 		9D807AC124B3A2C000D56A92 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 80459092429D450A6A12274C /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */;
+			baseConfigurationReference = 3E6758CE80A567F5A61F1761 /* Pods-KitchenSink-KitchenSinkUITests.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1506,7 +1498,7 @@
 		};
 		9D807AC224B3A2C000D56A92 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BFC684BBFE9497C4EA1AEDEC /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */;
+			baseConfigurationReference = 1B247FAD3DF21799D7A4FFD5 /* Pods-KitchenSink-KitchenSinkUITests.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1716,7 +1708,7 @@
 		};
 		9DD11CDC2567CAC600B2C2CA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 96803DB265124462205F3E6B /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */;
+			baseConfigurationReference = D5508C527422A671BEDC3391 /* Pods-KitchenSinkBroadcastExtension.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1771,7 +1763,7 @@
 		};
 		9DD11CDD2567CAC600B2C2CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AF69537487765CF124BE512E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */;
+			baseConfigurationReference = 995BD8E8765D98E1B6ABC27E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1823,7 +1815,7 @@
 		};
 		9DDC82A124AA35E800F06E31 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 062D25203F0E1DCC270522C9 /* Pods-KitchenSink.debug.xcconfig */;
+			baseConfigurationReference = 2631B3B5526E07B8576C1792 /* Pods-KitchenSink.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1883,7 +1875,7 @@
 		};
 		9DDC82A224AA35E800F06E31 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7017F749060B091B19D0C73B /* Pods-KitchenSink.release.xcconfig */;
+			baseConfigurationReference = D987F02AB6B77EBDD8DE41AE /* Pods-KitchenSink.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;

@@ -85,7 +85,12 @@ extension CallViewModel
     
     // Resumes the other call and puts the current call on hold.
     func resumeCall(fromAssociatedCall: Bool = false) {
-        currentCall?.holdCall(putOnHold: true)
+        currentCall?.holdCall(putOnHold: true) { error in
+            if (error != nil)
+            {
+                print("Error resuming call: \(String(describing: error))")
+            }
+        }
         if fromAssociatedCall && currentCallAssociatedCall != nil{
             (currentCall, currentCallAssociatedCall) = (currentCallAssociatedCall, currentCall)
         } else {
@@ -95,7 +100,13 @@ extension CallViewModel
         self.updateNameLabels(connected: true)
         registerForCallStatesCallbacks(call: secondCall)
         registerForCallStatesCallbacks(call: currentCall)
-        currentCall?.holdCall(putOnHold: false)
+        currentCall?.holdCall(putOnHold: false) { error in
+            if (error != nil)
+            {
+                print("Error resuming call: \(String(describing: error))")
+            }
+        }
+        
         let addedCall = self.addedCall
         DispatchQueue.main.async { [weak self] in
             self?.addedCall = !addedCall

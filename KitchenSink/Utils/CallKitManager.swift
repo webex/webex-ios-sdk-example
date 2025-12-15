@@ -213,22 +213,23 @@ extension CallKitManager: CXProviderDelegate {
         if #available(iOS 16.0, *), isNewUI {
             // Create the ViewModel for your SwiftUI view
             // Check if the top view controller is a UIHostingController with a CallingScreenView
-            if let topController = UIApplication.shared.topViewController(),
-               let hostingController = topController as? UIHostingController<CallingScreenView> {
-                hostingController.rootView.callingVM.holdAndAcceptSecondIncomingCall(call: CallKS(call: call))
-                print(#file, #line, #function, "performing second CXAnswerCallAction callId: \(String(describing: call.callId))")
-            } else {
-                // Present the new hosting controller
-                let call = CallKS(call: call)
-                let callViewModel = CallViewModel(call: call)
-                
-                // Create your SwiftUI view with the ViewModel
-                let callingScreenView = CallingScreenView(callingVM: callViewModel)
-                
-                // Wrap your SwiftUI view in a UIHostingController
-                let hostingController = UIHostingController(rootView: callingScreenView)
-                hostingController.modalPresentationStyle = .fullScreen
-                DispatchQueue.main.async {
+            // Note: CXProvider callbacks run on a background thread, so we must dispatch UI operations to main thread
+            DispatchQueue.main.async {
+                if let topController = UIApplication.shared.topViewController(),
+                   let hostingController = topController as? UIHostingController<CallingScreenView> {
+                    hostingController.rootView.callingVM.holdAndAcceptSecondIncomingCall(call: CallKS(call: call))
+                    print(#file, #line, #function, "performing second CXAnswerCallAction callId: \(String(describing: call.callId))")
+                } else {
+                    // Present the new hosting controller
+                    let call = CallKS(call: call)
+                    let callViewModel = CallViewModel(call: call)
+                    
+                    // Create your SwiftUI view with the ViewModel
+                    let callingScreenView = CallingScreenView(callingVM: callViewModel)
+                    
+                    // Wrap your SwiftUI view in a UIHostingController
+                    let hostingController = UIHostingController(rootView: callingScreenView)
+                    hostingController.modalPresentationStyle = .fullScreen
                     UIApplication.shared.topViewController()?.present(hostingController, animated: true)
                 }
             }

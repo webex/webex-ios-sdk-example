@@ -29,7 +29,7 @@ struct MembershipReadStatusKS: Identifiable {
     
     ///constructs a `MembershipReadStatusKS` instance from a `WebexSDK.MembershipReadStatus` object.
     static func buildFrom(membership: MembershipReadStatus) -> Self {
-        return MembershipReadStatusKS(member:MembershipKS.buildFrom(membership: membership.member), lastSeenId: membership.lastSeenId, lastSeenDate: membership.lastSeenDate)
+        return MembershipReadStatusKS(id: membership.member.id, member:MembershipKS.buildFrom(membership: membership.member), lastSeenId: membership.lastSeenId, lastSeenDate: membership.lastSeenDate)
     }
 }
 

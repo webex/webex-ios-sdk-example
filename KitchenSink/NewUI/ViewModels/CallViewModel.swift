@@ -179,7 +179,9 @@ class CallViewModel: ObservableObject
         call.answer(selfVideoView: selfVideoView, remoteVideoViewRepresentable: remoteVideoViewRepresentable, screenShareView: screenShareView, isMoveMeeting: isMoveMeeting) { [weak self] error in
             if error == nil {
                 self?.updateNameLabels(connected: true)
-                self?.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
+                DispatchQueue.main.async {
+                    self?.isCUCMOrWxcCall = call.isCUCMCall || call.isWebexCallingOrWebexForBroadworks
+                }
             } else {
                 self?.showError("Error", error.debugDescription)
             }
@@ -333,7 +335,12 @@ class CallViewModel: ObservableObject
                 self.currentCall = currentCallAssociatedCall
                 self.currentCallAssociatedCall = nil
                 self.registerForCallStatesCallbacks(call: self.currentCall)
-                self.currentCall?.holdCall(putOnHold: false) // resume the remaining call
+                self.currentCall?.holdCall(putOnHold: false) { error in
+                    if (error != nil)
+                    {
+                        print("Error resuming call: \(String(describing: error))")
+                    }
+                } // resume the remaining call
                 self.updateNameLabels(connected: self.currentCall?.isConnected ?? false)
                 DispatchQueue.main.async { [weak self] in
                     self?.addedCall = false
@@ -364,7 +371,12 @@ class CallViewModel: ObservableObject
         
         if self.currentCall != nil {
             self.registerForCallStatesCallbacks(call: self.currentCall)
-            self.currentCall?.holdCall(putOnHold: false) // resume the remaining call
+            self.currentCall?.holdCall(putOnHold: false) { error in
+                if (error != nil)
+                {
+                    print("Error resuming call: \(String(describing: error))")
+                }
+            } // resume the remaining call
             self.updateNameLabels(connected: self.currentCall?.isConnected ?? false)
         } else {
             DispatchQueue.main.async { [weak self] in
@@ -381,7 +393,9 @@ class CallViewModel: ObservableObject
             self?.player.stop()
             self?.updateStates(call: call)
             if call.onMediaChanged != nil {
-                self?.showBadNetworkIcon = true
+                DispatchQueue.main.async {
+                    self?.showBadNetworkIcon = true
+                }
             }
             self?.setMediaQualityInfoChangedCallback()
             call.updateAudioSession()
@@ -879,7 +893,14 @@ class CallViewModel: ObservableObject
     
     // Handles HoldCall Action.
     func handleHoldCallAction() {
-        currentCall?.holdCall(putOnHold: !self.isOnHold)
+        self.currentCall?.holdCall(putOnHold: !self.isOnHold) { error in
+            if (error != nil)
+            {
+                print("Error holding/resuming call: \(String(describing: error))")
+            } else {
+                print("Call held/resumed successfully")
+            }
+        }
        // TODO: Handle callkit hold call
     }
     

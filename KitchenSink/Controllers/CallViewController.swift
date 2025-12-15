@@ -833,9 +833,38 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             self.present(alert, animated: true)
             return
         }
-        onHold.toggle()
-        call.holdCall(putOnHold: onHold)
-        AppDelegate.shared.callKitManager?.holdCall(hold: onHold, call: call)
+
+        // Disable button during operation
+        holdButton.isEnabled = false
+
+        let targetHoldState = !onHold
+
+        // Call the new async version with completion handler
+        call.holdCall(putOnHold: targetHoldState) { [weak self] error in
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+                // Re-enable button after completion
+                self.holdButton.isEnabled = true
+
+                if let error = error {
+                    // Operation failed - show error and restore UI state
+                    let alert = UIAlertController(title: "Hold Failed",
+                                                message: error.localizedDescription,
+                                                preferredStyle: .alert)
+                    alert.addAction(.dismissAction(withTitle: "Ok"))
+                    self.present(alert, animated: true)
+
+                    print("Hold call failed: \(error.localizedDescription)")
+                } else {
+                    // Operation succeeded - update UI
+                    self.onHold = targetHoldState
+                    AppDelegate.shared.callKitManager?.holdCall(hold: targetHoldState, call: call)
+
+                    print("Hold call succeeded: onHold = \(targetHoldState)")
+                }
+            }
+        }
     }
     
     @objc private func handletransferCallAction(_ sender: UIButton) {
@@ -1995,6 +2024,33 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
                 }
             }
         }
+
+        call.onCallHoldStateChanged = { [weak self] holdResumeInfo in
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+                // Update UI to reflect new hold state
+                self.onHold = holdResumeInfo.isOnHold
+
+                // Update hold button appearance
+                self.holdButton.isSelected = holdResumeInfo.isOnHold
+
+                // Show notification to user
+                let source = holdResumeInfo.initiatedByLocal ? "by you" : "remotely"
+                let status = holdResumeInfo.isOnHold ? "on hold" : "resumed"
+                print("Call \(status) \(source)")
+
+                // Update CallKit if needed
+                AppDelegate.shared.callKitManager?.holdCall(hold: holdResumeInfo.isOnHold, call: self.call!)
+                self.checkIsOnHold()
+
+                // Optional: Show a toast/banner notification for remote hold changes
+                if !holdResumeInfo.initiatedByLocal {
+                    let message = holdResumeInfo.isOnHold ? "Call put on hold by remote participant" : "Call resumed by remote participant"
+                    self.showToast(message: message)
+                }
+            }
+        }
         
         isMultiStreamEnabled = UserDefaults.standard.bool(forKey: "isMultiStreamEnabled")
         
@@ -2327,6 +2383,36 @@ class CallViewController: UIViewController, MultiStreamObserver, UICollectionVie
             @unknown default:
                 print("Error")
             }
+        })
+    }
+
+    private func showToast(message: String) {
+        let toastLabel = UILabel()
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        toastLabel.textColor = .white
+        toastLabel.textAlignment = .center
+        toastLabel.font = UIFont.systemFont(ofSize: 14)
+        toastLabel.text = message
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+
+        let textSize = toastLabel.intrinsicContentSize
+        toastLabel.frame = CGRect(x: (view.frame.size.width - textSize.width - 40) / 2,
+                                y: view.frame.size.height - 150,
+                                width: textSize.width + 40,
+                                height: textSize.height + 20)
+
+        view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, delay: 0.0, options: .curveEaseIn, animations: {
+            toastLabel.alpha = 1.0
+        }, completion: { _ in
+            UIView.animate(withDuration: 0.5, delay: 2.0, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }, completion: { _ in
+                toastLabel.removeFromSuperview()
+            })
         })
     }
 }

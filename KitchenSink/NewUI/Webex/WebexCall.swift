@@ -58,6 +58,7 @@ public protocol CallProtocol: AnyObject {
     var onClosedCaptionArrived: ((CaptionItem) -> Void)? {get set}
     var onClosedCaptionsInfoChanged: ((ClosedCaptionsInfo) -> Void)? {get set}
     var onTranscriptionArrived: ((Transcription) -> Void)? { get set }
+    var onCallHoldStateChanged: ((HoldResumeInfo) -> Void)? { get set }
     
     //Breakout session
     var onSessionEnabled: (() -> Void)? { get set }
@@ -79,7 +80,7 @@ public protocol CallProtocol: AnyObject {
     var onPhotoCaptured: ((_ imageData: Data?) -> Void)? { get set }
     
     //actions
-    func holdCall(putOnHold: Bool)
+    func holdCall(putOnHold: Bool, completionHandler: @escaping (Error?) -> Void)
     func hangup(completionHandler: @escaping (Error?) -> Void)
     func updateAudioSession()
     func switchToVideoCall(completionHandler: @escaping (Result<Void>) -> Void)
@@ -357,6 +358,13 @@ class CallKS: CallProtocol
         }
     }
     
+    public var onCallHoldStateChanged: ((WebexSDK.HoldResumeInfo) -> Void)? {
+        didSet {
+            call?.onCallHoldStateChanged = self.onCallHoldStateChanged
+        }
+    }
+
+    
     public var videoRenderViews: (local: MediaRenderView?, remote: MediaRenderView?) {
         didSet {
             call?.videoRenderViews = self.videoRenderViews
@@ -495,8 +503,8 @@ class CallKS: CallProtocol
         call?.joinBreakoutSession(breakoutSession: breakoutSession)
     }
     
-    public func holdCall(putOnHold: Bool) {
-        call?.holdCall(putOnHold: putOnHold)
+    public func holdCall(putOnHold: Bool, completionHandler: @escaping (Error?) -> Void) {
+        call?.holdCall(putOnHold: putOnHold, completionHandler: completionHandler)
     }
     
     public func hangup(completionHandler: @escaping (Error?) -> Void) {

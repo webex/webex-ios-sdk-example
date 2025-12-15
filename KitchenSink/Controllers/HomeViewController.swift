@@ -89,6 +89,10 @@ class HomeViewController: UIViewController, UICollectionViewDataSource, UICollec
         versionLabel.text = "v\(Webex.version) (\(bundleVersion))"
         setupViews()
         setupConstraints()
+        print("Testing Base64 encoding")
+        testBase64Decoding()
+        print("Testing Base64 decoding")
+        testBase64Encoding()
         DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
             self.deviceRegistration()
         })
@@ -455,6 +459,69 @@ extension HomeViewController: WebexUCLoginDelegate {
                 print("Error disconnecting \(result.error.debugDescription)")
             }
         })
+    }
+
+    func testBase64Encoding() {
+        // Replace your personId with personUUIDString and comparison base64 string
+        let personUUIDString: String = "ed5dbc29-174e-4979-a226-697481b6f7e0"
+        webex.base64Encode(resourceType: .People, resource: personUUIDString, completionHandler: { result in
+            switch result{
+            case .success(let encodedString):
+                print("Base64 People encoded string: \(encodedString)")
+                if encodedString == "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9lZDVkYmMyOS0xNzRlLTQ5NzktYTIyNi02OTc0ODFiNmY3ZTA=" {
+                    print("Base64 Encoding People ✅")
+                } else {
+                    print("Base64 Encoding People ❌")
+                }
+            case .failure(let error):
+                print("Base64 Encoding People ❌", error)
+            @unknown default: break
+            }
+        })
+
+        // Replace with any roomId in your account with personUUIDString and comparison base64 string
+        let roomUUIDString: String = "1ec40d30-935a-11f0-b52c-293fb47ea7be"
+        webex.base64Encode(resourceType: .Rooms, resource: roomUUIDString, completionHandler: { result in
+            switch result{
+            case .success(let encodedString):
+                print("Base64 Rooms encoded string: \(encodedString)")
+                if encodedString == "Y2lzY29zcGFyazovL3VzL1JPT00vMWVjNDBkMzAtOTM1YS0xMWYwLWI1MmMtMjkzZmI0N2VhN2Jl" {
+                    print("Base64 Encoding Rooms ✅")
+                } else {
+                    print("Base64 Encoding Rooms ❌")
+                }
+            case .failure(let error):
+                print("Base64 Encoding Rooms ❌", error)
+            @unknown default: break
+            }
+        })
+
+        // Replace with any teamId in your account with teamUUIDString and comparison base64 string
+        let teamUUIDString: String = "85a91460-b6c0-11ed-b302-ebe3762df884"
+        webex.base64Encode(resourceType: .Teams, resource: teamUUIDString, completionHandler: { result in
+            switch result{
+            case .success(let encodedString):
+                print("Base64 Teams encoded string: \(encodedString)")
+                if encodedString == "Y2lzY29zcGFyazovL3VzL1RFQU0vODVhOTE0NjAtYjZjMC0xMWVkLWIzMDItZWJlMzc2MmRmODg0" {
+                    print("Base64 Encoding Teams ✅")
+                } else {
+                    print("Base64 Encoding Teams ❌")
+                }
+            case .failure(let error):
+                print("Base64 Encoding Teams ❌", error)
+            @unknown default: break
+            }
+        })
+    }
+
+    func testBase64Decoding() {
+        let encodedString: String = "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9lZDVkYmMyOS0xNzRlLTQ5NzktYTIyNi02OTc0ODFiNmY3ZTA"
+        let decodedString = webex.base64Decode(encodedResource: encodedString)
+        if decodedString.resource == "ed5dbc29-174e-4979-a226-697481b6f7e0" {
+            print("Base64 Decoding ✅")
+        } else {
+            print("Base64 Decoding ❌")
+        }
     }
 }
 

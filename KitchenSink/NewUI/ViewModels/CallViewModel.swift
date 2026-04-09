@@ -144,6 +144,7 @@ class CallViewModel: ObservableObject
     @Published var placeholderText1 = ""
     @Published var placeholderText2 = ""
     @Published var speechEnhancement = false
+    @Published var isRecordingAudioDump = false
     let renderModes: [Call.VideoRenderMode] = [.fit, .cropFill, .stretchFill]
     let flashModes: [Call.FlashMode] = [.on, .off, .auto]
     let torchModes: [Call.TorchMode] = [.on, .off, .auto]
@@ -864,6 +865,7 @@ class CallViewModel: ObservableObject
             self?.isClosedCaptionAllowed = call.isClosedCaptionAllowed
             self?.isClosedCaptionEnabled = call.isClosedCaptionEnabled
             self?.speechEnhancement = call.isSpeechEnhancementEnabled
+            self?.isRecordingAudioDump = call.isRecordingAudioDump
         }
         self.updateNameLabels(connected: call.isConnected)
     }
@@ -886,8 +888,64 @@ class CallViewModel: ObservableObject
     
     // Handles more Options.
     func handleMoreClickAction() {
+        refreshAudioDumpRecordingState()
         DispatchQueue.main.async { [weak self] in
             self?.showMoreOptions = true
+        }
+    }
+
+    func refreshAudioDumpRecordingState() {
+        DispatchQueue.main.async { [weak self] in
+            self?.isRecordingAudioDump = self?.currentCall?.isRecordingAudioDump ?? false
+        }
+    }
+
+    func handleAudioDumpAction() {
+        guard let call = currentCall else {
+            showError("Audio Dump Error", "Call not found")
+            return
+        }
+
+        if call.isRecordingAudioDump {
+            stopRecordingAudioDump(call: call)
+        } else {
+            startRecordingAudioDump(call: call)
+        }
+    }
+
+    private func startRecordingAudioDump(call: CallProtocol) {
+        call.canStartRecordingAudioDump { [weak self] error in
+            if let error = error {
+                self?.showSlideInMessage(message: "Start audio dump error \(String(describing: error))")
+                self?.refreshAudioDumpRecordingState()
+                return
+            }
+
+            call.startRecordingAudioDump { [weak self] error in
+                if let error = error {
+                    self?.showSlideInMessage(message: "Start audio dump error \(String(describing: error))")
+                } else {
+                    self?.showSlideInMessage(message: "Started recording audio dump")
+                }
+                self?.refreshAudioDumpRecordingState()
+            }
+        }
+    }
+
+    private func stopRecordingAudioDump(call: CallProtocol) {
+        guard call.isRecordingAudioDump else {
+            showSlideInMessage(message: "Stop audio dump error: Not currently recording")
+            refreshAudioDumpRecordingState()
+            return
+        }
+
+        call.stopRecordingAudioDump { [weak self] error in
+            if let error = error {
+                self?.showSlideInMessage(message: "Stop audio dump error \(String(describing: error))")
+            } else {
+                self?.showSlideInMessage(message: "Stopped recording audio dump")
+            }
+            self?.refreshAudioDumpRecordingState()
         }
     }
     

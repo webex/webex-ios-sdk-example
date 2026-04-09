@@ -19,6 +19,7 @@ class SettingsViewModel: ObservableObject {
     @Published var enable1080pVideo = false
     @Published var useLegacyNoiseRemoval = false
     @Published var enableSpeechEnhancement = false
+    @Published var isCrashAutoUploadEnabled: Bool
     @Published var showError: Bool = false
     @Published var error: String = ""
     @Published var videoStreamModeLabel = ""
@@ -33,6 +34,7 @@ class SettingsViewModel: ObservableObject {
         self.profile = profile
         self.messagingViewModel = messagingVM
         self.mailVM = mailVM
+        self.isCrashAutoUploadEnabled = UserDefaults.standard.bool(forKey: Constants.crashAutoUploadEnabledKey)
     }
 
     /// Asynchronously displays an error message on the main queue.
@@ -84,6 +86,31 @@ class SettingsViewModel: ObservableObject {
             }
         }
     }
+
+    func uploadDiagnosticLogs(completion: @escaping (String, String) -> Void) {
+        guard let webex = webex else {
+            completion("Upload Diagnostic Logs Failure", "Webex instance is not available.")
+            return
+        }
+
+        isLoading = true
+        webex.uploadDiagnosticLogs { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success(let response):
+                    switch response.result {
+                    case .noError:
+                        completion("Upload Diagnostic Logs Success", response.feedbackId ?? "")
+                    default:
+                        completion("Upload Diagnostic Logs Failure", response.result.rawValue)
+                    }
+                case .failure(let error):
+                    completion("Upload Diagnostic Logs Failure", error.localizedDescription)
+                }
+            }
+        }
+    }
     
     func updateToggles()
     {
@@ -92,6 +119,7 @@ class SettingsViewModel: ObservableObject {
         enable1080pVideo = UserDefaults.standard.bool(forKey: "VideoRes1080p")
         enableBackgroundConnection = UserDefaults.standard.bool(forKey: "backgroundConnection")
         useLegacyNoiseRemoval = UserDefaults.standard.bool(forKey: "legacyNoiseRemoval")
+        isCrashAutoUploadEnabled = UserDefaults.standard.bool(forKey: Constants.crashAutoUploadEnabledKey)
         enableSpeechEnhancement = webexPhone.isSpeechEnhancementEnabled
     }
     
@@ -149,5 +177,40 @@ class SettingsViewModel: ObservableObject {
                 }
             }
         })
+    }
+
+    func setCrashAutoUploadEnabled(_ isEnabled: Bool) {
+        isCrashAutoUploadEnabled = isEnabled
+        UserDefaults.standard.set(isEnabled, forKey: Constants.crashAutoUploadEnabledKey)
+        UserDefaults.standard.synchronize()
+        webex?.isCrashReportingEnabled = isEnabled
+    }
+
+    func triggerSDKCrashForTesting() {
+        webex?.triggerSDKCrashForTesting()
+    }
+
+    func triggerNullDereferenceCrashForTesting() {
+        webex?.triggerNullDereferenceCrashForTesting()
+    }
+
+    func triggerIllegalInstructionCrashForTesting() {
+        webex?.triggerIllegalInstructionCrashForTesting()
+    }
+
+    func triggerStackOverflowCrashForTesting() {
+        webex?.triggerStackOverflowCrashForTesting()
+    }
+
+    func triggerUncaughtExceptionForTesting() {
+        webex?.triggerUncaughtExceptionForTesting()
+    }
+
+    func triggerSIGFPECrashForTesting() {
+        webex?.triggerSIGFPECrashForTesting()
+    }
+
+    func triggerSIGBUSCrashForTesting() {
+        webex?.triggerSIGBUSCrashForTesting()
     }
 }

@@ -23,6 +23,7 @@ public protocol CallProtocol: AnyObject {
     var isClosedCaptionEnabled: Bool {get}
     var isClosedCaptionAllowed: Bool {get}
     var isSpeechEnhancementEnabled: Bool {get}
+    var isRecordingAudioDump: Bool {get}
     var videoRenderViews: (local: MediaRenderView?, remote: MediaRenderView?) {get set}
     var screenShareView: MediaRenderView? {get set}
     var mediaStream: MediaStream? {get set}
@@ -122,6 +123,9 @@ public protocol CallProtocol: AnyObject {
     func enableWXA(isEnabled: Bool, callback:@escaping ((Bool)->Void)) -> Void
     func send(dtmfCode: String, completionHandler: ((Error?) -> Void)?)
     func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void)
+    func canStartRecordingAudioDump(completionHandler: @escaping (Error?) -> Void)
+    func startRecordingAudioDump(completionHandler: @escaping (Error?) -> Void)
+    func stopRecordingAudioDump(completionHandler: @escaping (Error?) -> Void)
 }
 
 @available(iOS 16.0, *)
@@ -280,6 +284,10 @@ class CallKS: CallProtocol
         get {
             return call?.isReceiverSpeechEnhancementEnabled ?? false
         }
+    }
+
+    var isRecordingAudioDump: Bool {
+        return call?.isRecordingAudioDump ?? false
     }
 
     private var call: Call?
@@ -697,6 +705,18 @@ class CallKS: CallProtocol
 
     public func enableSpeechEnhancement(shouldEnable: Bool, completionHandler: @escaping (Result<Void>) -> Void) {
         call?.enableReceiverSpeechEnhancement(shouldEnable: shouldEnable, completionHandler: completionHandler)
+    }
+
+    public func canStartRecordingAudioDump(completionHandler: @escaping (Error?) -> Void) {
+        call?.canStartRecordingAudioDump(completionHandler: completionHandler)
+    }
+
+    public func startRecordingAudioDump(completionHandler: @escaping (Error?) -> Void) {
+        call?.startRecordingAudioDump(completionHandler: completionHandler)
+    }
+
+    public func stopRecordingAudioDump(completionHandler: @escaping (Error?) -> Void) {
+        call?.stopRecordingAudioDump(completionHandler: completionHandler)
     }
 }
 

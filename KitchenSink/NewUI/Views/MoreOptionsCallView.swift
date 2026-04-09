@@ -82,6 +82,16 @@ struct MoreOptionsCallView: View {
                         }
                         .accessibilityIdentifier("speechEnhancementToggle")
                 }
+
+                Section(header: Text("Troubleshooting")) {
+                    Button(action: {
+                        callingVM.handleAudioDumpAction()
+                    }) {
+                        Text(callingVM.isRecordingAudioDump ? "Stop Audio Dump" : "Start Audio Dump")
+                            .foregroundStyle(Color.primary)
+                    }
+                    .accessibilityIdentifier("audioDumpToggle")
+                }
                 
                 if callingVM.isCUCMOrWxcCall {
                     Section(header: Text("WxC/CUCUM Calling")) {
@@ -347,6 +357,9 @@ struct MoreOptionsCallView: View {
                         .accessibilityIdentifier("takePhoto")
                 }
             }
+        }
+        .onAppear {
+            callingVM.refreshAudioDumpRecordingState()
         }
     }
     

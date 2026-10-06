@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var isPhoneServicesOn = false
     @State private var showSetupView = false
     @State private var isSpeechEnhancementEnabled: Bool = true
+    @State private var showSimulateCrashAlert = false
 
     @Environment(\.dismiss) var dismiss
 
@@ -108,6 +109,15 @@ struct SettingsView: View {
                 }.onTapGesture {
                     model.updateBackgroundConnection()
                 }
+
+                Toggle(
+                    "Crash Auto Upload",
+                    isOn: Binding(
+                        get: { model.isCrashAutoUploadEnabled },
+                        set: { model.setCrashAutoUploadEnabled($0) }
+                    )
+                )
+                    .accessibilityIdentifier("crashAutoUpload")
                 
                 Text("Incoming Call")
                     .onTapGesture {
@@ -117,6 +127,16 @@ struct SettingsView: View {
                     .onTapGesture {
                         getAccessToken()
                     }
+                Text("Upload Diagnostic Logs")
+                    .onTapGesture {
+                        uploadDiagnosticLogs()
+                    }
+                Text("Simulate Crash")
+                    .foregroundColor(.red)
+                    .onTapGesture {
+                        showSimulateCrashAlert = true
+                    }
+                    .accessibilityIdentifier("simulateCrash")
                 NavigationLink(destination: CameraSettingView(cameraSettingVM: CameraSettingViewModel())) {
                     Text("Camera Settings")
                         .accessibilityIdentifier("cameraSettings")
@@ -210,6 +230,32 @@ struct SettingsView: View {
         } message: {
             Text("Token Copied")
         }
+        .confirmationDialog("Simulate Crash", isPresented: $showSimulateCrashAlert, titleVisibility: .visible) {
+            Button("SDK Exception", role: .destructive) {
+                model.triggerUncaughtExceptionForTesting()
+            }
+            Button("Crash SDK", role: .destructive) {
+                model.triggerSDKCrashForTesting()
+            }
+            Button("Null Deref (SIGSEGV)", role: .destructive) {
+                model.triggerNullDereferenceCrashForTesting()
+            }
+            Button("Illegal Instruction (SIGILL)", role: .destructive) {
+                model.triggerIllegalInstructionCrashForTesting()
+            }
+            Button("Stack Overflow", role: .destructive) {
+                model.triggerStackOverflowCrashForTesting()
+            }
+            Button("Div-by-Zero (SIGFPE)", role: .destructive) {
+                model.triggerSIGFPECrashForTesting()
+            }
+            Button("Bus Error (SIGBUS)", role: .destructive) {
+                model.triggerSIGBUSCrashForTesting()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Use these KitchenSink actions to verify crash detection and deferred log upload on next launch.")
+        }
         .sheet(isPresented: $model.mailVM.isShowing) {
             MailView(viewModel: model.mailVM)
         }
@@ -231,6 +277,14 @@ struct SettingsView: View {
     /// Retrieves the access token from the model
     private func getAccessToken() {
         model.getAccessToken { (title, message) in
+            alertTitle = title
+            alertMessage = message
+            isAlertPresented = true
+        }
+    }
+
+    private func uploadDiagnosticLogs() {
+        model.uploadDiagnosticLogs { (title, message) in
             alertTitle = title
             alertMessage = message
             isAlertPresented = true

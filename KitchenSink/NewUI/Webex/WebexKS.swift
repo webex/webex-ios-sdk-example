@@ -145,15 +145,12 @@ class WebexManager {
     }
     
     func initializeWebex(completionHandler: @escaping (Bool) -> Void) {
-        if let webex = webex, webex.authenticator?.authorized == true {
-            completionHandler(true)
-            return
-        }
         if webex != nil {
             webex.enableConsoleLogger = true // Do not set this to true in production unless you want to print logs in prod
             
             webex.authDelegate = AppDelegate.shared
             webex.logLevel = .verbose
+            configureCrashReporting(for: webex)
             DispatchQueue.main.async {
                 webex.initialize { success in
                     print("webex.initialize: " + "\(success)")
@@ -166,6 +163,11 @@ class WebexManager {
             completionHandler(false)
             return
         }
+    }
+
+    private func configureCrashReporting(for webex: Webex) {
+        let persistedValue = UserDefaults.standard.bool(forKey: Constants.crashAutoUploadEnabledKey)
+        webex.isCrashReportingEnabled = persistedValue
     }
 
     func initWebexUsingOauth() {

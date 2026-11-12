@@ -208,6 +208,8 @@
 		D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */; };
 		D84398FF3EAE857155C4FAA8 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
 		E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */; };
+		F68DE99630A5955000F7A9A0 /* WebexBroadcastExtensionKit in Frameworks */ = {isa = PBXBuildFile; productRef = F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */; };
+		F68DE99830A5955000F7A9A0 /* WebexSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F68DE99730A5955000F7A9A0 /* WebexSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -481,6 +483,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F68DE99630A5955000F7A9A0 /* WebexBroadcastExtensionKit in Frameworks */,
 				9DD11CCB2567CAC500B2C2CA /* ReplayKit.framework in Frameworks */,
 				E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
 			);
@@ -492,6 +495,7 @@
 			files = (
 				9D35B01124B491120005E83A /* Security.framework in Frameworks */,
 				D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */,
+				F68DE99830A5955000F7A9A0 /* WebexSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -985,7 +989,6 @@
 				9D807AB624B3A2BF00D56A92 /* Sources */,
 				9D807AB724B3A2BF00D56A92 /* Frameworks */,
 				9D807AB824B3A2BF00D56A92 /* Resources */,
-				A39263055A3A228D3A1D22A9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1011,6 +1014,9 @@
 			dependencies = (
 			);
 			name = KitchenSinkBroadcastExtension;
+			packageProductDependencies = (
+				F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */,
+			);
 			productName = KitchenSinkBroadcastExtension;
 			productReference = 9DD11CCA2567CAC500B2C2CA /* KitchenSinkBroadcastExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1025,7 +1031,6 @@
 				9DDC828E24AA35E400F06E31 /* Resources */,
 				9DD11CBE2567C75100B2C2CA /* Embed App Extensions */,
 				1F76CAA729815E6500DE5269 /* Embed Frameworks */,
-				0A369AD97C547D13503BBB9D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1033,6 +1038,9 @@
 				9DD11D2B2567D40900B2C2CA /* PBXTargetDependency */,
 			);
 			name = KitchenSink;
+			packageProductDependencies = (
+				F68DE99730A5955000F7A9A0 /* WebexSDK */,
+			);
 			productName = KitchenSink;
 			productReference = 9DDC829024AA35E400F06E31 /* KitchenSink.app */;
 			productType = "com.apple.product-type.application";
@@ -1069,6 +1077,9 @@
 				Base,
 			);
 			mainGroup = 9DAA01C92450BBB1009C85F8;
+			packageReferences = (
+				F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */,
+			);
 			productRefGroup = 9DAA01D42450BBB1009C85F8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1112,27 +1123,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0A369AD97C547D13503BBB9D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink/Pods-KitchenSink-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		5A1A87800F16152AD7E24E80 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1175,27 +1165,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A39263055A3A228D3A1D22A9 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KitchenSink-KitchenSinkUITests/Pods-KitchenSink-KitchenSinkUITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A7645092974F9F4B7D8062FF /* [CP] Check Pods Manifest.lock */ = {
@@ -1977,6 +1946,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/webex/webex-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.17.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
+			productName = WebexBroadcastExtensionKit;
+		};
+		F68DE99730A5955000F7A9A0 /* WebexSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
+			productName = WebexSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9DAA01CA2450BBB1009C85F8 /* Project object */;
 }

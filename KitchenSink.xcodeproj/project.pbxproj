@@ -203,13 +203,14 @@
 		9DDC82DC24AA36A300F06E31 /* ContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */; };
 		9DDC82DD24AA36A300F06E31 /* DialPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82C924AA36A300F06E31 /* DialPadView.swift */; };
 		9DDC82DE24AA36A300F06E31 /* CallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DDC82CA24AA36A300F06E31 /* CallButton.swift */; };
+		A1B2C3D42EC4A00100000001 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42EC4A00100000002 /* SceneDelegate.swift */; };
 		BB0A70962BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70952BC3CB1300DB47B6 /* PrivacyInfo.xcprivacy */; };
 		BB0A70982BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BB0A70972BC3CB2600DB47B6 /* PrivacyInfo.xcprivacy */; };
 		D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */; };
 		D84398FF3EAE857155C4FAA8 /* Pods_KitchenSink_KitchenSinkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */; };
 		E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28D52947D06EA0ABE9B28785 /* Pods_KitchenSinkBroadcastExtension.framework */; };
-		F68DE99630A5955000F7A9A0 /* WebexBroadcastExtensionKit in Frameworks */ = {isa = PBXBuildFile; productRef = F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */; };
-		F68DE99830A5955000F7A9A0 /* WebexSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F68DE99730A5955000F7A9A0 /* WebexSDK */; };
+		F6A1E2BF30B579DD00B6023E /* WebexBroadcastExtensionKit in Frameworks */ = {isa = PBXBuildFile; productRef = F6A1E2BE30B579DD00B6023E /* WebexBroadcastExtensionKit */; };
+		F6A1E2C130B579DD00B6023E /* WebexSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F6A1E2C030B579DD00B6023E /* WebexSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -462,6 +463,7 @@
 		9DDC82C824AA36A300F06E31 /* ContactTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactTableViewCell.swift; sourceTree = "<group>"; };
 		9DDC82C924AA36A300F06E31 /* DialPadView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DialPadView.swift; sourceTree = "<group>"; };
 		9DDC82CA24AA36A300F06E31 /* CallButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallButton.swift; sourceTree = "<group>"; };
+		A1B2C3D42EC4A00100000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		AF69537487765CF124BE512E /* Pods-KitchenSinkBroadcastExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KitchenSinkBroadcastExtension.release.xcconfig"; path = "Target Support Files/Pods-KitchenSinkBroadcastExtension/Pods-KitchenSinkBroadcastExtension.release.xcconfig"; sourceTree = "<group>"; };
 		B1666ED492C3716A67B34D6D /* Pods_KitchenSink.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1F021183495B82143F3AF9E /* Pods_KitchenSink_KitchenSinkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KitchenSink_KitchenSinkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -483,7 +485,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F68DE99630A5955000F7A9A0 /* WebexBroadcastExtensionKit in Frameworks */,
+				F6A1E2BF30B579DD00B6023E /* WebexBroadcastExtensionKit in Frameworks */,
 				9DD11CCB2567CAC500B2C2CA /* ReplayKit.framework in Frameworks */,
 				E4B9F3E926515BAC8C4D7508 /* Pods_KitchenSinkBroadcastExtension.framework in Frameworks */,
 			);
@@ -495,7 +497,7 @@
 			files = (
 				9D35B01124B491120005E83A /* Security.framework in Frameworks */,
 				D81126F00C64C4B130FDBBF5 /* Pods_KitchenSink.framework in Frameworks */,
-				F68DE99830A5955000F7A9A0 /* WebexSDK in Frameworks */,
+				F6A1E2C130B579DD00B6023E /* WebexSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -877,6 +879,7 @@
 				9DDC82B024AA36A200F06E31 /* Models */,
 				9DDC82C524AA36A300F06E31 /* Views */,
 				9DDC829224AA35E400F06E31 /* AppDelegate.swift */,
+				A1B2C3D42EC4A00100000002 /* SceneDelegate.swift */,
 				9DDC829B24AA35E800F06E31 /* Assets.xcassets */,
 				9DDC829D24AA35E800F06E31 /* LaunchScreen.storyboard */,
 				9DDC82A024AA35E800F06E31 /* Info.plist */,
@@ -1015,7 +1018,7 @@
 			);
 			name = KitchenSinkBroadcastExtension;
 			packageProductDependencies = (
-				F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */,
+				F6A1E2BE30B579DD00B6023E /* WebexBroadcastExtensionKit */,
 			);
 			productName = KitchenSinkBroadcastExtension;
 			productReference = 9DD11CCA2567CAC500B2C2CA /* KitchenSinkBroadcastExtension.appex */;
@@ -1039,7 +1042,7 @@
 			);
 			name = KitchenSink;
 			packageProductDependencies = (
-				F68DE99730A5955000F7A9A0 /* WebexSDK */,
+				F6A1E2C030B579DD00B6023E /* WebexSDK */,
 			);
 			productName = KitchenSink;
 			productReference = 9DDC829024AA35E400F06E31 /* KitchenSink.app */;
@@ -1078,7 +1081,7 @@
 			);
 			mainGroup = 9DAA01C92450BBB1009C85F8;
 			packageReferences = (
-				F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */,
+				F6A1E2BD30B579DD00B6023E /* XCRemoteSwiftPackageReference "webex-ios-sdk" */,
 			);
 			productRefGroup = 9DAA01D42450BBB1009C85F8 /* Products */;
 			projectDirPath = "";
@@ -1271,6 +1274,7 @@
 				4F7DE4912B60BE3900AF9DED /* MessageComposerUtil.swift in Sources */,
 				9D39519A256BD4CD00B4718D /* GetMeViewController.swift in Sources */,
 				9DDC829324AA35E400F06E31 /* AppDelegate.swift in Sources */,
+				A1B2C3D42EC4A00100000001 /* SceneDelegate.swift in Sources */,
 				2EB6BD7024B7996800DC3B7D /* MessagingViewController.swift in Sources */,
 				4F7DE4A72B60BE4300AF9DED /* MessageComposerViewModel.swift in Sources */,
 				9D1CCC272657FD3400EB302C /* CallObjectStorage.swift in Sources */,
@@ -1702,7 +1706,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31700;
+				CURRENT_PROJECT_VERSION = 31702;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1723,7 +1727,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.17.0;
+				MARKETING_VERSION = 3.17.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
@@ -1757,7 +1761,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSinkBroadcastExtension/KitchenSinkBroadcastExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31700;
+				CURRENT_PROJECT_VERSION = 31702;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1775,7 +1779,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.17.0;
+				MARKETING_VERSION = 3.17.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0.KitchenSinkBroadcastExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1811,7 +1815,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31700;
+				CURRENT_PROJECT_VERSION = 31701;
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1834,7 +1838,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.17.0;
+				MARKETING_VERSION = 3.17.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
@@ -1871,7 +1875,7 @@
 				CODE_SIGN_ENTITLEMENTS = KitchenSink/KitchenSink.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31700;
+				CURRENT_PROJECT_VERSION = 31701;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9X38D433RE;
 				ENABLE_BITCODE = NO;
@@ -1890,7 +1894,7 @@
 					"@executable_path/Frameworks",
 					executable_path/Frameworks,
 				);
-				MARKETING_VERSION = 3.17.0;
+				MARKETING_VERSION = 3.17.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.webex.sdk.KitchenSinkv3.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1948,25 +1952,25 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */ = {
+		F6A1E2BD30B579DD00B6023E /* XCRemoteSwiftPackageReference "webex-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/webex/webex-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.17.0;
+				minimumVersion = 3.17.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F68DE99530A5955000F7A9A0 /* WebexBroadcastExtensionKit */ = {
+		F6A1E2BE30B579DD00B6023E /* WebexBroadcastExtensionKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
+			package = F6A1E2BD30B579DD00B6023E /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
 			productName = WebexBroadcastExtensionKit;
 		};
-		F68DE99730A5955000F7A9A0 /* WebexSDK */ = {
+		F6A1E2C030B579DD00B6023E /* WebexSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F68DE99430A5955000F7A9A0 /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
+			package = F6A1E2BD30B579DD00B6023E /* XCRemoteSwiftPackageReference "webex-ios-sdk" */;
 			productName = WebexSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
